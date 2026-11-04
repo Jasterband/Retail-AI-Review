@@ -1,0 +1,126 @@
+{
+  "sections": [
+    {
+      "id": "A",
+      "title": "A · 先拍板（阻塞后续）",
+      "items": [
+        {
+          "id": "a-eposter",
+          "label": "大讲堂电子日程：第 7 页必填 vs 第 12 页不审",
+          "status": "done",
+          "note": "拍板：E_POSTER 必审；缺类型 ASSET_MISSING FAIL"
+        },
+        {
+          "id": "a-panorama-model",
+          "label": "全景人数模型：定用通用多模态（如 qwen3.5-flash），不用纯 OCR",
+          "status": "done",
+          "note": "VISION_COUNT_MODEL；prompt 已加强数人头"
+        },
+        {
+          "id": "a-vision-split",
+          "label": "Vision 分工：OCR / 数人 / 是否双模型",
+          "status": "done",
+          "note": "双模型：VISION_OCR_MODEL + VISION_COUNT_MODEL"
+        },
+        {
+          "id": "a-pe-align",
+          "label": "与 PE 对齐：回调、Token、测试 URL、何时推送 AI",
+          "status": "todo",
+          "note": "先不联调；后续再对接"
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "title": "B · 样例与数据",
+      "items": [
+        {
+          "id": "b-naming-5",
+          "label": "修大讲堂 5 场命名/缺材（169 / 183 / 185 / 218 / 225）",
+          "status": "done",
+          "note": "169/=、183台卡-、218序号、225陈玲1；185缺全景+台卡误传已记入 _issues"
+        },
+        {
+          "id": "b-naming-small",
+          "label": "修命名小瑕疵（208 连字符、231 签到前缀）",
+          "status": "done",
+          "note": "208 彭艳梅加连字符；231 签到 9→10"
+        },
+        {
+          "id": "b-golden-forms",
+          "label": "合格场补齐 form JSON（至少 3～5 场黄金场）",
+          "status": "done",
+          "note": "大讲堂 143/204/208/209/224；微型 000606/000670/000921/000938"
+        },
+        {
+          "id": "b-negatives",
+          "label": "不合格样例整理成夹具 + 期望 FAIL 点",
+          "status": "done",
+          "note": "微型 5 场 fail 夹具 + 大讲堂 185 缺材 + 负样本图包；见 docs/fixtures/expects.json"
+        },
+        {
+          "id": "b-micro-extra",
+          "label": "（可选）微型再抽双讲/不合格对照夹具",
+          "status": "done",
+          "note": "双讲对照 000938；单讲对照 000670；不合格 5 场齐全"
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "title": "C · 核心能力打磨",
+      "items": [
+        { "id": "c-panorama", "label": "全景人数：换模型 + 加强 prompt + 标点图回归", "status": "done", "note": "prompt 加强；阈值进配置；标点图回归仍建议抽测" },
+        { "id": "c-asset-type", "label": "ASSET_TYPE_CHECK 真实图抽测", "status": "done", "note": "规则已接线；抽测用黄金集批量跑" },
+        { "id": "c-key-fields", "label": "关键字段比对（海报/展架/电子日程 vs form）", "status": "done", "note": "场级 KEY_FIELD_MATCH + 资产 checks 回填 date/time/location/speakers_matches_form" },
+        { "id": "c-logo", "label": "拜耳 Logo", "status": "done", "note": "应检材料均需检出；模版对照+vision" },
+        { "id": "c-duration", "label": "签到时长阈值", "status": "done", "note": "阈值进 options/thresholds" },
+        { "id": "c-watermark", "label": "水印一致性", "status": "done", "note": "WATERMARK_CONSISTENCY 已接线" },
+        { "id": "c-dup", "label": "IMAGE_DUP 跨会盗用", "status": "done", "note": "pHash 跨会库；embedding 预留" },
+        { "id": "c-topic", "label": "TOPIC_REUSE 主题查重", "status": "done", "note": "主题+讲者名联合比对历史库" }
+      ]
+    },
+    {
+      "id": "D",
+      "title": "D · 大讲堂专属",
+      "items": [
+        { "id": "d-namecard", "label": "台卡四人姓名 vs form.speakers", "status": "done", "note": "" },
+        { "id": "d-template", "label": "台卡模版（crop 进 pack）", "status": "done", "note": "name_card_one + border crop" },
+        { "id": "d-handbook", "label": "手册封面 + 非旧版", "status": "done", "note": "无负样本：封面年份须=HANDBOOK_CURRENT_YEAR(2026)" },
+        { "id": "d-pair", "label": "讲者成对 TITLE_GROUP + LECTURING", "status": "done", "note": "" },
+        { "id": "d-topic", "label": "讲者主题 OCR vs form.topic", "status": "done", "note": "" }
+      ]
+    },
+    {
+      "id": "E",
+      "title": "E · 微型专属",
+      "items": [
+        { "id": "e-ribbon", "label": "权益一模版（彩色丝带）", "status": "done", "note": "" },
+        { "id": "e-agenda", "label": "权益二模版 + 页类不重复", "status": "done", "note": "页类优先 pack 特征，不再仅凭声明 PASS" },
+        { "id": "e-ratio", "label": "签到听众比例与门店种类", "status": "done", "note": "阈值可配置" }
+      ]
+    },
+    {
+      "id": "F",
+      "title": "F · 模版与工程化",
+      "items": [
+        { "id": "f-crops", "label": "补齐 docs/templates/2026Q2 crop", "status": "done", "note": "缺旧版手册负样本可选" },
+        { "id": "f-golden-batch", "label": "黄金集回归（Demo 批量跑）", "status": "done", "note": "本验收台「批量跑可审场次」" },
+        { "id": "f-thresholds", "label": "阈值表固化进配置并记文档", "status": "done", "note": "app/services/thresholds.py + docs/thresholds.md" },
+        { "id": "f-multi-session", "label": "Demo 可切换多场次", "status": "done", "note": "本验收台场次下拉" }
+      ]
+    },
+    {
+      "id": "G",
+      "title": "G · 对接与上线",
+      "items": [
+        { "id": "g-pe-simple", "label": "PE simple 联调：提交→轮询→状态映射（NEED_HUMAN ≠ FAIL）", "status": "todo", "note": "先不联调" },
+        { "id": "g-s3", "label": "真 S3 只读（去掉本地 map）", "status": "done", "note": "USE_REAL_S3=true 时 map 未命中走 boto3" },
+        { "id": "g-hmac", "label": "回调 HMAC（若 PE 要）", "status": "done", "note": "CALLBACK_HMAC_SECRET 已支持签名" },
+        { "id": "g-rds", "label": "库迁 RDS PostgreSQL（若上云）", "status": "todo", "note": "先不做" },
+        { "id": "g-ops", "label": "鉴权 Token、限流、超时、重试", "status": "done", "note": "Token + RATE_LIMIT_PER_MINUTE + vision 重试" },
+        { "id": "g-report", "label": "验收报告：黄金集准确率 + 已知坏例清单", "status": "todo", "note": "黄金集用户自行跑" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "request_id": "req-micro-000938-001",
+  "meeting_id": 1938,
+  "session_no": "000938",
+  "project_type": "MICRO",
+  "meeting_subtype": "DUAL",
+  "period_id": 2,
+  "form": {
+    "meeting_name": "双讲师",
+    "meeting_date": "2026-09-03",
+    "start_time": "14:00",
+    "end_time": "15:10",
+    "chain_or_store_name": "洛阳德心堂药业有限公司",
+    "location": "洛阳市洛阳德心堂药业有限公司红山二店",
+    "total_attendees": 14,
+    "speakers": [
+      {
+        "speaker_id": 1,
+        "speaker_name": "李吉鹏",
+        "topic": "微型药店健康服务赋能",
+        "store_name": "红山二店",
+        "service_minutes": 30
+      },
+      {
+        "speaker_id": 2,
+        "speaker_name": "董灵娟",
+        "topic": "门店药学服务实践",
+        "store_name": "红山二店",
+        "service_minutes": 30
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": 93801,
+      "asset_type": "E_POSTER",
+      "s3_uri": "s3://pe-meetings/micro/000938/agenda.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 93802,
+      "asset_type": "PROJECT_INTRO_DISPLAY",
+      "s3_uri": "s3://pe-meetings/micro/000938/intro.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 93803,
+      "asset_type": "E_POSTER_DISPLAY",
+      "s3_uri": "s3://pe-meetings/micro/000938/display.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 93804,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/micro/000938/speaker1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 1,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 93805,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/micro/000938/speaker2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 2,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 93806,
+      "asset_type": "PANORAMA",
+      "s3_uri": "s3://pe-meetings/micro/000938/panorama1.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 93807,
+      "asset_type": "PANORAMA",
+      "s3_uri": "s3://pe-meetings/micro/000938/panorama2.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 93808,
+      "asset_type": "SIGNIN",
+      "s3_uri": "s3://pe-meetings/micro/000938/signin.pdf",
+      "content_type": "application/pdf"
+    }
+  ],
+  "refs": {
+    "template_pack_version": "2026Q2"
+  },
+  "options": {
+    "response_mode": "simple"
+  }
+}

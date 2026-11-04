@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>药师会材料审核 · 验收工作台</title>
+  <style>
+    :root {
+      --bg: #f4f6f4;
+      --surface: #ffffff;
+      --ink: #1a2420;
+      --muted: #5c6b64;
+      --line: #d5ddd8;
+      --accent: #0d6b4c;
+      --accent-soft: #e6f3ed;
+      --pass: #0d6b4c;
+      --pass-bg: #e6f3ed;
+      --fail: #a12b2b;
+      --fail-bg: #f8e8e8;
+      --null: #6b7280;
+      --null-bg: #eef0ef;
+      --uncertain: #9a6b00;
+      --uncertain-bg: #f7f0dc;
+      --skip: #5c6b64;
+      --skip-bg: #eef0ef;
+      --blocked: #6b3a7a;
+      --blocked-bg: #f3eaf6;
+      --todo: #4a5d72;
+      --todo-bg: #e8eef4;
+      --wip: #9a6b00;
+      --wip-bg: #f7f0dc;
+      --done: #0d6b4c;
+      --done-bg: #e6f3ed;
+      --font: "IBM Plex Sans", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", sans-serif;
+      --mono: "IBM Plex Mono", "SF Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 50% at 0% 0%, #dceae3 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, #e8ebe4 0%, transparent 50%),
+        var(--bg);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1320px; margin: 0 auto; padding: 28px 20px 64px; }
+    header.top { display: grid; gap: 16px; margin-bottom: 16px; }
+    .brand { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+    h1 { margin: 4px 0 0; font-size: 28px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.2; }
+    .lead { margin: 0; color: var(--muted); max-width: 56rem; line-height: 1.55; font-size: 15px; }
+    .toolbar { display: flex; flex-direction: column; gap: 12px; }
+    .toolbar-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .seg { display: inline-flex; border: 1px solid var(--line); background: var(--surface); overflow: hidden; }
+    .seg.primary button { padding: 12px 22px; font-size: 15px; }
+    .seg button {
+      appearance: none; border: 0; background: transparent; padding: 10px 16px;
+      font: inherit; font-size: 14px; color: var(--muted); cursor: pointer;
+      border-right: 1px solid var(--line);
+    }
+    .seg button:last-child { border-right: 0; }
+    .seg button.active { background: var(--accent); color: #fff; font-weight: 600; }
+    .seg button:hover:not(.active):not(:disabled) { background: var(--accent-soft); color: var(--accent); }
+    .session-wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1; min-width: 240px; }
+    .session-wrap label { font-size: 12px; color: var(--muted); }
+    .session-wrap select {
+      font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--surface);
+      padding: 10px 12px; min-width: min(100%, 420px); max-width: 100%; color: var(--ink);
+    }
+    .session-note { font-size: 12px; color: var(--uncertain); max-width: 36rem; }
+    .tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
+    .tabs button {
+      appearance: none; border: 1px solid transparent; background: transparent;
+      padding: 8px 12px; font: inherit; font-size: 13px; color: var(--muted); cursor: pointer;
+    }
+    .tabs button.active {
+      border-color: var(--line); background: var(--surface); color: var(--ink); font-weight: 600;
+    }
+    .live-bar {
+      display: none; flex-wrap: wrap; gap: 10px; align-items: center;
+      background: var(--surface); border: 1px solid var(--line); padding: 12px 14px; margin-bottom: 14px;
+    }
+    .live-bar label { font-size: 12px; color: var(--muted); }
+    .live-bar input[type="text"] {
+      font: inherit; font-family: var(--mono); font-size: 13px;
+      border: 1px solid var(--line); padding: 8px 10px; min-width: 200px; background: #fff;
+    }
+    .btn-run {
+      appearance: none; border: 0; background: var(--accent); color: #fff;
+      font: inherit; font-weight: 650; font-size: 14px; padding: 10px 18px; cursor: pointer;
+    }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-run.secondary { background: #3d5248; }
+    .hint { font-size: 12px; color: var(--muted); }
+    .hint.warn { color: #9a6b00; }
+    .hint.ok { color: var(--pass); }
+    .progress { display: none; margin-bottom: 12px; background: var(--surface); border: 1px solid var(--line); padding: 12px 14px; }
+    .progress.show { display: block; }
+    .progress .bar { height: 4px; background: var(--line); margin-top: 8px; overflow: hidden; }
+    .progress .bar i {
+      display: block; height: 100%; width: 40%; background: var(--accent);
+      animation: slide 1.2s ease-in-out infinite;
+    }
+    @keyframes slide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+    .banner {
+      background: var(--surface); border: 1px solid var(--line); padding: 12px 14px;
+      margin-bottom: 14px; font-size: 14px; line-height: 1.5; color: var(--muted);
+    }
+    .banner.live { border-color: #b7d4c6; background: #f3faf6; color: var(--ink); }
+    .banner.warn { border-color: #e2d4a8; background: var(--uncertain-bg); color: #5c4a10; }
+    .banner.err { border-color: #e2b8b8; background: var(--fail-bg); color: var(--fail); }
+    .banner code { font-family: var(--mono); font-size: 12px; }
+    .status-bar {
+      display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: stretch;
+      background: var(--surface); border: 1px solid var(--line); padding: 18px 20px; margin-bottom: 20px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; justify-content: center; min-width: 96px;
+      padding: 12px 18px; font-weight: 700; font-size: 18px; letter-spacing: 0.04em;
+    }
+    .badge.PASS { background: var(--pass-bg); color: var(--pass); }
+    .badge.FAIL { background: var(--fail-bg); color: var(--fail); }
+    .badge.NEED_HUMAN { background: var(--uncertain-bg); color: var(--uncertain); }
+    .badge.ERROR { background: #eee; color: #444; }
+    .badge.RUNNING, .badge.IDLE { background: #e8eef8; color: #2a4a7a; }
+    .meta-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px 16px; margin-bottom: 12px;
+    }
+    .meta-grid dt { font-size: 11px; color: var(--muted); margin: 0; }
+    .meta-grid dd { margin: 2px 0 0; font-size: 13px; }
+    .summaries { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .sum-box { background: var(--null-bg); padding: 10px 12px; font-size: 13px; }
+    .sum-box h3 { margin: 0 0 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+    .sum-box ul { margin: 0; padding-left: 18px; }
+    .sum-box.fail-box { background: var(--fail-bg); }
+    .sum-box.ok-box { background: var(--pass-bg); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; gap: 14px; min-height: 420px; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+    .asset-list {
+      background: var(--surface); border: 1px solid var(--line); overflow: auto; max-height: 70vh;
+    }
+    .asset-item {
+      width: 100%; display: grid; grid-template-columns: 56px 1fr auto; gap: 10px; align-items: center;
+      appearance: none; border: 0; border-bottom: 1px solid var(--line); background: transparent;
+      padding: 10px; text-align: left; cursor: pointer; font: inherit;
+    }
+    .asset-item:hover { background: var(--accent-soft); }
+    .asset-item.active { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+    .asset-item img { width: 56px; height: 42px; object-fit: cover; background: #ddd; }
+    .asset-item .t { font-size: 13px; font-weight: 600; }
+    .asset-item .s { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .pill { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 6px; font-weight: 700; }
+    .pill.ok { background: var(--pass-bg); color: var(--pass); }
+    .pill.bad { background: var(--fail-bg); color: var(--fail); }
+    .pill.mix { background: var(--uncertain-bg); color: var(--uncertain); }
+    .detail { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    @media (max-width: 1100px) { .detail { grid-template-columns: 1fr; } }
+    .preview {
+      background: #1a2420; border: 1px solid var(--line); min-height: 280px;
+      display: flex; flex-direction: column; align-items: stretch; justify-content: center;
+    }
+    .preview img { max-width: 100%; max-height: 420px; object-fit: contain; margin: 0 auto; display: block; }
+    .preview .cap { color: #9fb5a8; font-size: 12px; padding: 8px 10px; font-family: var(--mono); }
+    .checks-pane { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; }
+    .checks-pane h2 { margin: 0 0 4px; font-size: 16px; }
+    .checks-pane .sub { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+    .check-legend { display: flex; gap: 12px; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .dot { display: inline-block; width: 8px; height: 8px; margin-right: 4px; vertical-align: middle; }
+    .dot.t { background: var(--pass); }
+    .dot.f { background: var(--fail); }
+    .dot.n { background: var(--null); }
+    .check-row {
+      display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px;
+    }
+    .check-row .key { font-family: var(--mono); font-size: 12px; }
+    .check-row .desc { font-size: 11px; color: var(--muted); }
+    .val { font-family: var(--mono); font-size: 12px; font-weight: 650; padding: 2px 6px; }
+    .val.true { background: var(--pass-bg); color: var(--pass); }
+    .val.false { background: var(--fail-bg); color: var(--fail); }
+    .val.null { background: var(--null-bg); color: var(--null); }
+    .ocr-block { margin-top: 14px; }
+    .ocr-block h3 { margin: 0 0 6px; font-size: 12px; color: var(--muted); }
+    .ocr-block pre {
+      margin: 0; background: #f0f3f1; padding: 10px; overflow: auto; font-size: 12px;
+      font-family: var(--mono); max-height: 220px;
+    }
+    .note { margin-top: 12px; color: var(--muted); font-size: 13px; }
+    .section-title { margin: 0 0 12px; font-size: 16px; }
+    .scroll-x { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); }
+    table.matrix { border-collapse: collapse; font-size: 12px; min-width: 100%; }
+    table.matrix th, table.matrix td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; white-space: nowrap; }
+    table.matrix th { background: #f0f3f1; font-weight: 600; position: sticky; top: 0; }
+    .rule-grid { display: grid; gap: 8px; }
+    .rule {
+      display: grid; grid-template-columns: 200px 100px 1fr; gap: 12px; align-items: start;
+      background: var(--surface); border: 1px solid var(--line); padding: 12px 14px; font-size: 13px;
+    }
+    @media (max-width: 800px) { .rule { grid-template-columns: 1fr; } }
+    .rule .code { font-family: var(--mono); font-weight: 650; font-size: 13px; }
+    .rule .st { font-weight: 700; text-align: center; padding: 6px 8px; }
+    .st.PASS { background: var(--pass-bg); color: var(--pass); }
+    .st.FAIL { background: var(--fail-bg); color: var(--fail); }
+    .st.NEED_HUMAN, .st.UNCERTAIN { background: var(--uncertain-bg); color: var(--uncertain); }
+    .st.SKIP { background: var(--skip-bg); color: var(--skip); }
+    .st.ERROR { background: #eee; color: #444; }
+    .rule .reason { color: var(--ink); line-height: 1.45; }
+    .rule .ids { margin-top: 6px; font-size: 11px; color: var(--muted); font-family: var(--mono); }
+    #json-view {
+      background: #1a2420; color: #cfe0d6; padding: 16px; overflow: auto; font-family: var(--mono);
+      font-size: 12px; line-height: 1.45; min-height: 320px; border: 1px solid var(--line); margin: 0;
+    }
+
+    /* Capability matrix */
+    .cap-group { margin-bottom: 22px; }
+    .cap-group h2 { margin: 0 0 10px; font-size: 15px; }
+    table.cap {
+      width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); font-size: 13px;
+    }
+    table.cap th, table.cap td { border-bottom: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+    table.cap th { background: #f0f3f1; font-size: 12px; color: var(--muted); font-weight: 600; }
+    table.cap .rule-mono { font-family: var(--mono); font-size: 12px; }
+    table.cap .detail { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; grid-template-columns: none; }
+    .match-yes { color: var(--pass); font-weight: 650; }
+    .match-no { color: var(--fail); font-weight: 650; }
+    .match-na { color: var(--muted); }
+    .batch-box {
+      background: var(--surface); border: 1px solid var(--line); padding: 14px; margin-bottom: 16px;
+    }
+    .batch-box h2 { margin: 0 0 10px; font-size: 15px; }
+    table.batch { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.batch th, table.batch td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+    table.batch th { background: #f0f3f1; font-size: 12px; color: var(--muted); }
+
+    /* Roadmap */
+    .roadmap { display: grid; gap: 16px; }
+    .rm-section { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; }
+    .rm-section h2 { margin: 0 0 12px; font-size: 15px; }
+    .rm-item {
+      display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: start;
+      padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px;
+    }
+    .rm-item:first-of-type { border-top: 0; }
+    .rm-status {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 4px 8px; min-width: 72px;
+    }
+    .rm-status.blocked { background: var(--blocked-bg); color: var(--blocked); }
+    .rm-status.todo { background: var(--todo-bg); color: var(--todo); }
+    .rm-status.wip { background: var(--wip-bg); color: var(--wip); }
+    .rm-status.done { background: var(--done-bg); color: var(--done); }
+    .rm-label { font-weight: 600; }
+    .rm-note { margin-top: 4px; color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <div class="brand">Retail Meeting AI · Acceptance</div>
+        <h1>药师会材料审核 · 验收工作台</h1>
+        <p class="lead">
+          选项目与场次，跑真实审核；用能力矩阵对照期望与实跑；路线图跟踪 A–G 进度。NEED_HUMAN 单独标色，不当作 FAIL。
+        </p>
+      </div>
+      <div class="toolbar">
+        <div class="toolbar-row">
+          <div class="seg primary" role="group" aria-label="项目类型">
+            <button type="button" data-project="LECTURE_HALL">药师大讲堂</button>
+            <button type="button" data-project="MICRO">微型药师</button>
+          </div>
+          <div class="session-wrap" id="session-wrap" hidden>
+            <label for="session-select">场次</label>
+            <select id="session-select" aria-label="场次"></select>
+            <span class="session-note" id="session-note"></span>
+          </div>
+          <div class="tabs" role="tablist">
+            <button type="button" class="active" data-view="assets">按材料</button>
+            <button type="button" data-view="caps">能力矩阵</button>
+            <button type="button" data-view="rules">场级规则</button>
+            <button type="button" data-view="roadmap">路线图 A–G</button>
+            <button type="button" data-view="json">JSON</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="live-bar" id="live-bar">
+      <div>
+        <label for="token">Bearer Token</label><br />
+        <input id="token" type="text" autocomplete="off" spellcheck="false" />
+      </div>
+      <button type="button" class="btn-run" id="btn-run">开始真实审核</button>
+      <button type="button" class="btn-run secondary" id="btn-batch">批量跑可审场次</button>
+      <span class="hint" id="cfg-hint">加载配置中…</span>
+    </div>
+
+    <div class="progress" id="progress">
+      <div id="progress-text">审核进行中…</div>
+      <div class="bar"><i></i></div>
+    </div>
+
+    <div class="banner" id="banner"></div>
+    <section class="status-bar" id="status-bar"></section>
+
+    <section id="view-assets" class="panel active">
+      <div class="layout">
+        <div class="asset-list" id="asset-list"></div>
+        <div class="detail" id="asset-detail"></div>
+      </div>
+      <p class="note">
+        Live 返回 <code>mode=full</code>。<strong>true</strong>=合格；<strong>false</strong>=不合格；
+        <strong>null</strong>=不适用。场级结论见「场级规则」；期望对照见「能力矩阵」。
+      </p>
+    </section>
+
+    <section id="view-caps" class="panel">
+      <div class="batch-box" id="batch-box" hidden>
+        <h2>黄金集批量跑结果</h2>
+        <div class="scroll-x"><table class="batch" id="batch-table"></table></div>
+      </div>
+      <div id="cap-root"></div>
+    </section>
+
+    <section id="view-rules" class="panel">
+      <h2 class="section-title">场级 rule_results</h2>
+      <div class="rule-grid" id="rule-grid"></div>
+    </section>
+
+    <section id="view-roadmap" class="panel">
+      <div class="roadmap" id="roadmap-root"></div>
+    </section>
+
+    <section id="view-json" class="panel">
+      <pre id="json-view">// 选材料后显示 asset_result</pre>
+    </section>
+  </div>
+
+  <script>
+    const CHECK_LABELS = {
+      type_match: "类别与声明一致",
+      is_clear: "清晰度达标",
+      image_not_duplicated: "未盗用他场照片",
+      has_bayer_logo: "含拜耳 Logo",
+      date_matches_form: "日期与表单一致",
+      time_matches_form: "时间与表单一致",
+      location_matches_form: "地点与表单一致",
+      speakers_match_form: "讲者名与表单一致",
+      name_card_count_ok: "台卡人数与讲者人数一致",
+      name_set_matches_speakers: "台卡姓名集合 = 讲者集合",
+      name_card_template_ok: "台卡版式与模版一致",
+      speaker_shot_kind_ok: "合影/讲课类型与声明一致",
+      topic_matches_form: "课件标题与表单 topic 一致",
+      topic_not_reused_in_period: "主题未在同期重复",
+      people_count_recorded: "成功得到本张人数",
+      duration_readable: "起止时间可读",
+      duration_meets_threshold: "时长达标",
+      ppt_template_match: "现场 PPT 与规定模版一致",
+      ppt_page_kind_ok: "页类正确（介绍/日程）",
+      watermark_time_ok: "水印时间合理",
+      watermark_location_ok: "水印地点与表单一致",
+    };
+    const TYPE_LABEL = {
+      POSTER: "日程海报", STAND: "日程展架", NAME_CARD: "台卡", HANDBOOK: "手册",
+      E_POSTER: "电子日程海报", E_POSTER_DISPLAY: "电子海报展示",
+      PROJECT_INTRO_DISPLAY: "项目介绍展示", SPEAKER_PHOTO: "讲者照",
+      PANORAMA: "全景", SIGNIN: "签到表",
+    };
+    const STATUS_LABEL = { blocked: "阻塞", todo: "待做", wip: "进行中", done: "完成" };
+
+    let scenarios = {};
+    let capabilities = { groups: [] };
+    let roadmap = { sections: [] };
+    let demoConfig = { default_token: "dev-token-change-me", vision_configured: false };
+    let currentProject = null;
+    let currentSessionId = null;
+    let currentAssetId = null;
+    let currentView = "assets";
+    let livePack = null;
+    let liveBySession = {};
+    let batchRows = [];
+    let running = false;
+
+    function sessionsForProject(project) {
+      return Object.values(scenarios).filter((s) => s.project_type === project);
+    }
+
+    function scenarioMeta() {
+      if (!currentSessionId || !scenarios[currentSessionId]) {
+        return { id: null, label: "请先选择场次", photo_base: "", assets_meta: [], fixture: null, auditable: false, expect: null };
+      }
+      return scenarios[currentSessionId];
+    }
+
+    function currentPack() {
+      if (!currentSessionId) return null;
+      return livePack || liveBySession[currentSessionId] || null;
+    }
+
+    function photoUrl(pack, file) {
+      const base = pack.photo_base || "";
+      return base + String(file).split("/").map(encodeURIComponent).join("/");
+    }
+
+    function isPdf(meta) {
+      return meta.is_pdf || /\.pdf$/i.test(meta.file || "");
+    }
+
+    function assetScore(ar) {
+      if (!ar) return "mix";
+      if (ar.asset_status === "FAIL" || ar.asset_status === "ERROR") return "bad";
+      if (ar.asset_status === "UNCERTAIN") return "mix";
+      const vals = Object.values(ar.checks || {});
+      if (vals.some((v) => v === false)) return "bad";
+      if (ar.fail_reasons && ar.fail_reasons.length) return "bad";
+      if (vals.length && vals.every((v) => v === true || v === null)) return "ok";
+      if (ar.asset_status === "PASS") return "ok";
+      return "mix";
+    }
+
+    function valClass(v) {
+      if (v === true) return "true";
+      if (v === false) return "false";
+      return "null";
+    }
+    function valText(v) {
+      if (v === true) return "true";
+      if (v === false) return "false";
+      return "null";
+    }
+    function metaOf(pack, assetId) {
+      return (pack.assets_meta || []).find((a) => a.asset_id === assetId);
+    }
+    function resultOf(pack, assetId) {
+      return ((pack.response && pack.response.asset_results) || []).find((a) => a.asset_id === assetId);
+    }
+    function ruleStatus(pack, ruleCode) {
+      if (!pack || !pack.response) return null;
+      const rr = (pack.response.rule_results || []).find((r) => r.rule_code === ruleCode);
+      return rr ? rr.status : null;
+    }
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function authHeaders() {
+      const token = document.getElementById("token").value.trim() || demoConfig.default_token;
+      return {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      };
+    }
+
+    function setProgress(show, text) {
+      const el = document.getElementById("progress");
+      el.classList.toggle("show", !!show);
+      if (text) document.getElementById("progress-text").textContent = text;
+    }
+
+    function fillSessionSelect() {
+      const wrap = document.getElementById("session-wrap");
+      const sel = document.getElementById("session-select");
+      const note = document.getElementById("session-note");
+      if (!currentProject) {
+        wrap.hidden = true;
+        return;
+      }
+      wrap.hidden = false;
+      const list = sessionsForProject(currentProject);
+      sel.innerHTML = list.map((s) => {
+        const tag = s.auditable ? "可审" : "浏览";
+        return `<option value="${escapeHtml(s.id)}">${escapeHtml("[" + tag + "] " + s.label)}</option>`;
+      }).join("");
+      if (!list.length) {
+        currentSessionId = null;
+        note.textContent = "暂无场次";
+        return;
+      }
+      if (!list.some((s) => s.id === currentSessionId)) {
+        const preferred = list.find((s) => s.auditable) || list[0];
+        currentSessionId = preferred.id;
+      }
+      sel.value = currentSessionId;
+      const meta = scenarioMeta();
+      note.textContent = meta.auditable ? "" : (meta.note || "待补 form 夹具，仅可浏览材料");
+    }
+
+    function emptyLiveShell() {
+      const meta = scenarioMeta();
+      return {
+        source: "live",
+        label: meta.label || meta.id,
+        photo_base: meta.photo_base || "",
+        assets_meta: meta.assets_meta || [],
+        expect: meta.expect || null,
+        request: {
+          project_type: currentProject,
+          meeting_subtype: meta.meeting_subtype || null,
+          form: {},
+          session_no: meta.session_no || "—",
+        },
+        response: {
+          overall_status: null,
+          processing_status: "IDLE",
+          asset_results: [],
+          rule_results: [],
+          summary_matched: [],
+          summary_failed: [],
+        },
+      };
+    }
+
+    function renderBanner(pack) {
+      const el = document.getElementById("banner");
+      const meta = scenarioMeta();
+      if (!currentProject) {
+        el.className = "banner";
+        el.textContent = "请先选择项目：药师大讲堂 或 微型药师。";
+        return;
+      }
+      if (!meta.auditable) {
+        el.className = "banner warn";
+        el.innerHTML = "<strong>浏览场次：</strong>" + escapeHtml(meta.note || "无 Live 夹具，可查看材料命名与缺材。补 form 后改为可审。");
+        return;
+      }
+      if (!pack || !pack.response || !pack.response.request_id) {
+        el.className = "banner warn";
+        el.innerHTML = "<strong>真实审核：</strong>选好场次后点「开始真实审核」。需配置 <code>OPENAI_API_KEY</code>。期望 overall=<code>" +
+          escapeHtml((meta.expect && meta.expect.overall_status) || "—") + "</code>";
+        return;
+      }
+      el.className = "banner live";
+      el.innerHTML = `<strong>Live 结果：</strong>${escapeHtml(pack.label)} ·
+        request_id=<code>${escapeHtml(pack.response.request_id || "")}</code> ·
+        model=<code>${escapeHtml(pack.response.model_version || "—")}</code> ·
+        response_mode=<code>${escapeHtml(pack.response.response_mode || "full")}</code>`;
+    }
+
+    function renderStatus(pack) {
+      const bar = document.getElementById("status-bar");
+      if (!currentProject) {
+        bar.innerHTML = "";
+        return;
+      }
+      if (!pack || !pack.response) {
+        bar.innerHTML = `<div class="badge IDLE">IDLE</div><div style="color:var(--muted);font-size:14px">尚未有结果</div>`;
+        return;
+      }
+      const r = pack.response;
+      const f = (pack.request && pack.request.form) || {};
+      const req = pack.request || {};
+      const status = r.overall_status || r.processing_status || "—";
+      const expectOverall = (pack.expect && pack.expect.overall_status) || (scenarioMeta().expect && scenarioMeta().expect.overall_status);
+      const expectLine = expectOverall
+        ? `<div><dt>期望 overall</dt><dd style="font-family:var(--mono)">${escapeHtml(expectOverall)}${
+            r.overall_status
+              ? (r.overall_status === expectOverall
+                ? ' <span class="match-yes">一致</span>'
+                : ' <span class="match-no">不一致</span>')
+              : ""
+          }</dd></div>`
+        : "";
+      const failed = (r.summary_failed || []).length
+        ? `<div class="sum-box fail-box"><h3>summary_failed</h3><ul>${r.summary_failed.map((x) => `<li>${escapeHtml(x)}</li>`).join("")}</ul></div>`
+        : `<div class="sum-box"><h3>summary_failed</h3><ul><li style="color:var(--muted)">（无）</li></ul></div>`;
+      const matched = (r.summary_matched || []).length
+        ? `<div class="sum-box ok-box"><h3>summary_matched</h3><ul>${r.summary_matched.slice(0, 6).map((x) => `<li>${escapeHtml(x)}</li>`).join("")}${(r.summary_matched.length > 6) ? `<li>…共 ${r.summary_matched.length} 条</li>` : ""}</ul></div>`
+        : "";
+      const needHuman = (r.need_human_reasons || []).length
+        ? `<div class="sum-box" style="background:var(--uncertain-bg)"><h3>need_human（≠ FAIL）</h3><ul>${r.need_human_reasons.map((x) => `<li>${escapeHtml(x)}</li>`).join("")}</ul></div>`
+        : "";
+      const err = r.error
+        ? `<div class="sum-box fail-box"><h3>error</h3><ul><li><code>${escapeHtml(r.error.code)}</code> ${escapeHtml(r.error.message || "")}</li></ul></div>`
+        : "";
+      const skipCount = (r.rule_results || []).filter((x) => x.status === "SKIP").length;
+
+      bar.innerHTML = `
+        <div class="badge ${status}">${escapeHtml(status)}</div>
+        <div>
+          <dl class="meta-grid">
+            <div><dt>project_type</dt><dd style="font-family:var(--mono)">${escapeHtml(req.project_type || currentProject || "—")}${req.meeting_subtype ? ` / ${escapeHtml(req.meeting_subtype)}` : ""}</dd></div>
+            <div><dt>场景</dt><dd>${escapeHtml(pack.label || "")}</dd></div>
+            <div><dt>session_no</dt><dd>${escapeHtml(req.session_no || scenarioMeta().session_no || "—")}</dd></div>
+            ${expectLine}
+            <div><dt>会议日期</dt><dd>${escapeHtml(f.meeting_date || "—")} ${escapeHtml(f.start_time || "")}–${escapeHtml(f.end_time || "")}</dd></div>
+            <div><dt>连锁/药店</dt><dd>${escapeHtml(f.chain_or_store_name || "—")}</dd></div>
+            <div><dt>地点</dt><dd>${escapeHtml(f.location || "—")}</dd></div>
+            <div><dt>讲者</dt><dd>${(f.speakers || []).map((s) => s.speaker_name).join("、") || "—"}</dd></div>
+            <div><dt>规则 SKIP</dt><dd>${skipCount} 条</dd></div>
+          </dl>
+          <div class="summaries">${matched}${failed}${needHuman}${err}</div>
+        </div>`;
+    }
+
+    function thumbHtml(pack, m) {
+      if (isPdf(m)) {
+        return `<div style="width:56px;height:42px;background:#243028;color:#9fb5a8;display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono)">PDF</div>`;
+      }
+      return `<img src="${photoUrl(pack, m.file)}" alt="" loading="lazy" />`;
+    }
+
+    function previewHtml(pack, m) {
+      const url = photoUrl(pack, m.file);
+      if (isPdf(m)) {
+        return `<div style="color:#cfe0d6;text-align:center;padding:24px;line-height:1.6">
+          <div style="font-family:var(--mono);font-size:13px;margin-bottom:8px">SIGNIN · PDF</div>
+          <a href="${url}" target="_blank" rel="noopener" style="color:#7dcea0;font-size:13px">打开 PDF</a>
+        </div>`;
+      }
+      return `<img src="${url}" alt="${escapeHtml(m.file)}" />`;
+    }
+
+    function renderAssetList(pack) {
+      const list = document.getElementById("asset-list");
+      if (!pack || !(pack.assets_meta || []).length) {
+        list.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px">无材料</div>`;
+        return;
+      }
+      list.innerHTML = pack.assets_meta.map((m) => {
+        const ar = resultOf(pack, m.asset_id) || { checks: {} };
+        const score = assetScore(ar);
+        const shot = m.speaker_shot_kind ? ` · ${m.speaker_shot_kind}` : "";
+        const who = m.speaker_name ? ` · ${m.speaker_name}` : "";
+        const active = m.asset_id === currentAssetId ? " active" : "";
+        return `
+          <button type="button" class="asset-item${active}" data-id="${m.asset_id}">
+            ${thumbHtml(pack, m)}
+            <div>
+              <div class="t">${TYPE_LABEL[m.declared_type] || m.declared_type}${who}</div>
+              <div class="s">#${m.asset_id}${shot} · ${escapeHtml(ar.asset_status || "—")}</div>
+            </div>
+            <span class="pill ${score}">${score === "bad" ? "fail" : score === "ok" ? "ok" : "mix"}</span>
+          </button>`;
+      }).join("");
+      list.querySelectorAll(".asset-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          currentAssetId = Number(el.dataset.id);
+          renderAssetList(pack);
+          renderAssetDetail(pack);
+          renderJson(pack);
+        });
+      });
+    }
+
+    function renderAssetDetail(pack) {
+      const box = document.getElementById("asset-detail");
+      if (!pack || currentAssetId == null) {
+        box.innerHTML = "";
+        return;
+      }
+      const m = metaOf(pack, currentAssetId);
+      if (!m) {
+        box.innerHTML = "";
+        return;
+      }
+      const ar = resultOf(pack, currentAssetId);
+      const preview = `
+        <div class="preview">
+          ${previewHtml(pack, m)}
+          <div class="cap">${escapeHtml(m.file)} · ${escapeHtml(m.declared_type)}${ar ? ` → ${escapeHtml(ar.detected_type || "—")} · clarity ${ar.clarity_score ?? "—"}` : ""}</div>
+        </div>`;
+      if (!ar) {
+        box.innerHTML = preview + `<div class="checks-pane"><p class="sub">尚无该材料审核结果（浏览场次或未跑审核）</p></div>`;
+        return;
+      }
+      const checks = ar.checks || {};
+      const rows = Object.keys(checks).length
+        ? Object.entries(checks).map(([k, v]) => `
+          <div class="check-row">
+            <div><div class="key">${escapeHtml(k)}</div><div class="desc">${escapeHtml(CHECK_LABELS[k] || "")}</div></div>
+            <div class="val ${valClass(v)}">${valText(v)}</div>
+          </div>`).join("")
+        : `<div style="color:var(--muted);font-size:13px">无 checks</div>`;
+      const fails = (ar.fail_reasons || []).length
+        ? `<div class="ocr-block"><h3>fail_reasons</h3><pre>${escapeHtml(JSON.stringify(ar.fail_reasons, null, 2))}</pre></div>`
+        : "";
+      box.innerHTML = `
+        ${preview}
+        <div class="checks-pane">
+          <h2>checks · 本张检测点</h2>
+          <p class="sub">asset_id=${ar.asset_id} · status=${escapeHtml(ar.asset_status || "—")} · type_match=${ar.type_match} · is_clear=${ar.is_clear}</p>
+          <div class="check-legend">
+            <span><i class="dot t"></i> true</span>
+            <span><i class="dot f"></i> false</span>
+            <span><i class="dot n"></i> null</span>
+          </div>
+          <div class="check-rows">${rows}</div>
+          ${fails}
+          ${ar.ocr_fields ? `<div class="ocr-block"><h3>ocr_fields</h3><pre>${escapeHtml(JSON.stringify(ar.ocr_fields, null, 2))}</pre></div>` : ""}
+        </div>`;
+    }
+
+    function renderRules(pack) {
+      const grid = document.getElementById("rule-grid");
+      if (!pack || !pack.response) {
+        grid.innerHTML = `<div style="color:var(--muted)">暂无 rule_results</div>`;
+        return;
+      }
+      const rules = pack.response.rule_results || [];
+      if (!rules.length) {
+        grid.innerHTML = `<div style="color:var(--muted)">暂无 rule_results（先跑真实审核）</div>`;
+        return;
+      }
+      grid.innerHTML = rules.map((rr) => {
+        const passed = rr.passed === true ? "true" : rr.passed === false ? "false" : "null";
+        const ids = (rr.related_asset_ids || []).join(", ") || "—";
+        return `<div class="rule">
+          <div class="code">${escapeHtml(rr.rule_code)}<div style="margin-top:6px;font-size:11px;color:var(--muted);font-weight:400">passed=${passed}</div></div>
+          <div class="st ${rr.status}">${escapeHtml(rr.status)}</div>
+          <div class="reason">${escapeHtml(rr.reason_text || "")}
+            <div class="ids">related_asset_ids: [${ids}]</div>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    function renderCaps(pack) {
+      const root = document.getElementById("cap-root");
+      const meta = scenarioMeta();
+      const expectRules = (meta.expect && meta.expect.rules) || (pack && pack.expect && pack.expect.rules) || {};
+      const project = currentProject;
+      if (!project) {
+        root.innerHTML = `<p style="color:var(--muted)">请先选择项目</p>`;
+        return;
+      }
+      root.innerHTML = (capabilities.groups || []).map((g) => {
+        const items = (g.items || []).filter((it) => (it.projects || []).includes(project));
+        if (!items.length) return "";
+        const rows = items.map((it) => {
+          const expected = expectRules[it.rule_code] || "—";
+          const actual = ruleStatus(pack, it.rule_code) || "—";
+          let matchHtml = `<span class="match-na">—</span>`;
+          if (expected !== "—" && actual !== "—") {
+            matchHtml = expected === actual
+              ? `<span class="match-yes">一致</span>`
+              : `<span class="match-no">不一致</span>`;
+          } else if (expected !== "—" && actual === "—") {
+            matchHtml = `<span class="match-na">未跑</span>`;
+          }
+          return `<tr>
+            <td>${escapeHtml(it.label)}<span class="detail">${escapeHtml(it.detail || "")}</span></td>
+            <td class="rule-mono">${escapeHtml(it.rule_code)}</td>
+            <td class="rule-mono">${escapeHtml(expected)}</td>
+            <td class="rule-mono">${escapeHtml(actual)}</td>
+            <td>${matchHtml}</td>
+          </tr>`;
+        }).join("");
+        return `<div class="cap-group">
+          <h2>${escapeHtml(g.title)}</h2>
+          <div class="scroll-x"><table class="cap">
+            <thead><tr><th>能力</th><th>rule_code</th><th>期望</th><th>实跑</th><th>对照</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>
+        </div>`;
+      }).join("") || `<p style="color:var(--muted)">无适用能力项</p>`;
+
+      const batchBox = document.getElementById("batch-box");
+      const batchTable = document.getElementById("batch-table");
+      if (batchRows.length) {
+        batchBox.hidden = false;
+        batchTable.innerHTML = `<thead><tr>
+          <th>场次</th><th>overall</th><th>期望</th><th>对照</th><th>耗时</th><th>备注</th>
+        </tr></thead><tbody>${batchRows.map((row) => {
+          let match = "—";
+          if (row.error) match = `<span class="match-no">ERROR</span>`;
+          else if (row.overall === "NEED_HUMAN") match = `<span class="match-na">NEED_HUMAN</span>`;
+          else if (row.expect && row.overall) {
+            match = row.overall === row.expect
+              ? `<span class="match-yes">一致</span>`
+              : `<span class="match-no">不一致</span>`;
+          }
+          return `<tr>
+            <td>${escapeHtml(row.label)}</td>
+            <td class="rule-mono">${escapeHtml(row.overall || "—")}</td>
+            <td class="rule-mono">${escapeHtml(row.expect || "—")}</td>
+            <td>${match}</td>
+            <td>${row.ms != null ? Math.round(row.ms / 1000) + "s" : "—"}</td>
+            <td style="color:var(--muted);font-size:12px">${escapeHtml(row.note || "")}</td>
+          </tr>`;
+        }).join("")}</tbody>`;
+      } else {
+        batchBox.hidden = true;
+      }
+    }
+
+    function renderRoadmap() {
+      const root = document.getElementById("roadmap-root");
+      root.innerHTML = (roadmap.sections || []).map((sec) => {
+        const items = (sec.items || []).map((it) => `
+          <div class="rm-item">
+            <div><span class="rm-status ${escapeHtml(it.status)}">${escapeHtml(STATUS_LABEL[it.status] || it.status)}</span></div>
+            <div>
+              <div class="rm-label">${escapeHtml(it.label)}</div>
+              ${it.note ? `<div class="rm-note">${escapeHtml(it.note)}</div>` : ""}
+            </div>
+          </div>`).join("");
+        return `<section class="rm-section"><h2>${escapeHtml(sec.title)}</h2>${items}</section>`;
+      }).join("");
+    }
+
+    function renderJson(pack) {
+      const ar = pack && currentAssetId != null ? resultOf(pack, currentAssetId) : null;
+      document.getElementById("json-view").textContent = ar
+        ? JSON.stringify(ar, null, 2)
+        : (pack && pack.response && pack.response.request_id
+          ? JSON.stringify({
+              overall_status: pack.response.overall_status,
+              rule_results: pack.response.rule_results,
+              summary_failed: pack.response.summary_failed,
+              need_human_reasons: pack.response.need_human_reasons,
+            }, null, 2)
+          : "// 选材料或先跑审核");
+    }
+
+    function setView(view) {
+      currentView = view;
+      document.querySelectorAll(".tabs button").forEach((b) => {
+        b.classList.toggle("active", b.dataset.view === view);
+      });
+      document.querySelectorAll(".panel").forEach((p) => {
+        p.classList.toggle("active", p.id === `view-${view}`);
+      });
+    }
+
+    function syncToolbar() {
+      const hasProject = !!currentProject;
+      const meta = scenarioMeta();
+      document.getElementById("live-bar").style.display = hasProject ? "flex" : "none";
+      document.querySelectorAll("[data-project]").forEach((b) => {
+        b.classList.toggle("active", b.dataset.project === currentProject);
+      });
+      document.getElementById("btn-run").disabled = running || !hasProject || !meta.auditable;
+      document.getElementById("btn-batch").disabled = running || !hasProject ||
+        !sessionsForProject(currentProject).some((s) => s.auditable);
+    }
+
+    function renderAll() {
+      fillSessionSelect();
+      syncToolbar();
+      if (!currentProject) {
+        livePack = null;
+        document.getElementById("banner").className = "banner";
+        document.getElementById("banner").textContent = "请先选择项目：药师大讲堂 或 微型药师。";
+        document.getElementById("status-bar").innerHTML = "";
+        document.getElementById("asset-list").innerHTML = "";
+        document.getElementById("asset-detail").innerHTML = "";
+        document.getElementById("rule-grid").innerHTML = "";
+        document.getElementById("cap-root").innerHTML = "";
+        document.getElementById("json-view").textContent = "// 请先选择项目类型";
+        setView(currentView);
+        return;
+      }
+      const pack = currentPack() || emptyLiveShell();
+      if (!currentAssetId || !(pack.assets_meta || []).some((a) => a.asset_id === currentAssetId)) {
+        currentAssetId = (pack.assets_meta && pack.assets_meta[0] && pack.assets_meta[0].asset_id) || null;
+      }
+      renderBanner(pack);
+      renderStatus(pack);
+      renderAssetList(pack);
+      renderAssetDetail(pack);
+      renderRules(pack);
+      renderCaps(pack);
+      renderRoadmap();
+      renderJson(pack);
+      setView(currentView);
+    }
+
+    async function pollResult(requestId) {
+      const started = Date.now();
+      while (Date.now() - started < 10 * 60 * 1000) {
+        await new Promise((r) => setTimeout(r, 2500));
+        const get = await fetch(
+          "/v1/retail_meeting_checks/" + encodeURIComponent(requestId) + "?mode=full",
+          { headers: authHeaders() }
+        );
+        const data = await get.json();
+        if (!get.ok) {
+          throw new Error((data.error && data.error.message) || ("查询失败 HTTP " + get.status));
+        }
+        if (data.processing_status === "RUNNING" || data.overall_status == null) {
+          setProgress(true, "审核进行中… " + Math.round((Date.now() - started) / 1000) + "s · " + requestId);
+          continue;
+        }
+        return data;
+      }
+      throw new Error("轮询超时（>10 分钟）");
+    }
+
+    async function submitAndPoll(meta) {
+      const fixture = await fetch(meta.fixture).then((r) => {
+        if (!r.ok) throw new Error("加载夹具失败 " + r.status);
+        return r.json();
+      });
+      const body = JSON.parse(JSON.stringify(fixture));
+      body.request_id = "req-demo-" + Date.now() + "-" + (meta.session_no || meta.id);
+      body.options = Object.assign({}, body.options || {}, { response_mode: "full" });
+      const post = await fetch("/v1/retail_meeting_checks", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(body),
+      });
+      const accepted = await post.json().catch(() => ({}));
+      if (!post.ok) {
+        throw new Error((accepted.error && accepted.error.message) || ("提交失败 HTTP " + post.status));
+      }
+      const requestId = accepted.request_id || body.request_id;
+      const result = await pollResult(requestId);
+      return { body, result };
+    }
+
+    async function runLiveAudit() {
+      if (running) return;
+      const meta = scenarioMeta();
+      if (!meta.auditable || !meta.fixture) {
+        alert("当前场次没有 Live 夹具（浏览场次仅可看材料）");
+        return;
+      }
+      running = true;
+      syncToolbar();
+      setProgress(true, "提交审核任务… " + meta.label);
+
+      try {
+        const { body, result } = await submitAndPoll(meta);
+        livePack = {
+          source: "live",
+          label: meta.label,
+          photo_base: meta.photo_base,
+          assets_meta: meta.assets_meta,
+          expect: meta.expect || null,
+          request: body,
+          response: result,
+        };
+        liveBySession[meta.id] = livePack;
+        currentAssetId = null;
+        setProgress(false);
+        renderAll();
+      } catch (err) {
+        setProgress(false);
+        const el = document.getElementById("banner");
+        el.className = "banner err";
+        el.innerHTML = "<strong>审核失败：</strong>" + escapeHtml(err.message || String(err));
+        if (/OPENAI_API_KEY|MODEL_UNAVAILABLE/i.test(err.message || "")) {
+          el.innerHTML += " — 请在项目 <code>.env</code> 配置 <code>OPENAI_API_KEY</code> 后重启服务。";
+        }
+      } finally {
+        running = false;
+        syncToolbar();
+      }
+    }
+
+    async function runBatch() {
+      if (running || !currentProject) return;
+      const list = sessionsForProject(currentProject).filter((s) => s.auditable && s.fixture);
+      if (!list.length) {
+        alert("当前项目没有可审场次");
+        return;
+      }
+      running = true;
+      syncToolbar();
+      batchRows = [];
+      setView("caps");
+
+      try {
+        for (let i = 0; i < list.length; i++) {
+          const meta = list[i];
+          setProgress(true, `批量 ${i + 1}/${list.length} · ${meta.label}`);
+          const t0 = Date.now();
+          try {
+            const { body, result } = await submitAndPoll(meta);
+            const pack = {
+              source: "live",
+              label: meta.label,
+              photo_base: meta.photo_base,
+              assets_meta: meta.assets_meta,
+              expect: meta.expect || null,
+              request: body,
+              response: result,
+            };
+            liveBySession[meta.id] = pack;
+            if (meta.id === currentSessionId) livePack = pack;
+            const overall = result.overall_status;
+            let note = "";
+            if (overall === "NEED_HUMAN") note = "需人工，不当 FAIL";
+            batchRows.push({
+              label: meta.label,
+              overall,
+              expect: (meta.expect && meta.expect.overall_status) || null,
+              ms: Date.now() - t0,
+              note,
+            });
+          } catch (err) {
+            batchRows.push({
+              label: meta.label,
+              overall: null,
+              expect: (meta.expect && meta.expect.overall_status) || null,
+              ms: Date.now() - t0,
+              error: true,
+              note: err.message || String(err),
+            });
+          }
+          renderCaps(currentPack() || emptyLiveShell());
+        }
+        setProgress(false);
+        renderAll();
+      } finally {
+        running = false;
+        syncToolbar();
+      }
+    }
+
+    async function boot() {
+      const [cfg, scen, caps, road] = await Promise.all([
+        fetch("/v1/demo_config").then((r) => r.json()).catch(() => demoConfig),
+        fetch("./scenarios.json").then((r) => r.json()),
+        fetch("./capabilities.json").then((r) => r.json()),
+        fetch("./roadmap.json").then((r) => r.json()),
+      ]);
+      demoConfig = cfg;
+      scenarios = scen;
+      capabilities = caps;
+      roadmap = road;
+
+      const tokenInput = document.getElementById("token");
+      tokenInput.value = localStorage.getItem("pe_demo_token") || demoConfig.default_token || "dev-token-change-me";
+      tokenInput.addEventListener("change", () => {
+        localStorage.setItem("pe_demo_token", tokenInput.value.trim());
+      });
+
+      const hint = document.getElementById("cfg-hint");
+      if (demoConfig.vision_configured) {
+        hint.className = "hint ok";
+        hint.textContent = "已配置 Vision · " + (demoConfig.vision_model || "");
+      } else {
+        hint.className = "hint warn";
+        hint.textContent = "未配置 OPENAI_API_KEY：提交会返回 ERROR";
+      }
+
+      document.querySelectorAll("[data-project]").forEach((b) => {
+        b.addEventListener("click", () => {
+          currentProject = b.dataset.project;
+          currentSessionId = null;
+          currentAssetId = null;
+          livePack = null;
+          batchRows = [];
+          renderAll();
+        });
+      });
+      document.getElementById("session-select").addEventListener("change", (e) => {
+        currentSessionId = e.target.value;
+        currentAssetId = null;
+        livePack = liveBySession[currentSessionId] || null;
+        renderAll();
+      });
+      document.querySelectorAll(".tabs button").forEach((b) => {
+        b.addEventListener("click", () => {
+          setView(b.dataset.view);
+          if (b.dataset.view === "caps") renderCaps(currentPack() || emptyLiveShell());
+          if (b.dataset.view === "roadmap") renderRoadmap();
+        });
+      });
+      document.getElementById("btn-run").addEventListener("click", runLiveAudit);
+      document.getElementById("btn-batch").addEventListener("click", runBatch);
+
+      renderAll();
+    }
+
+    boot().catch((err) => {
+      document.body.innerHTML = `<div class="wrap"><h1>验收工作台加载失败</h1>
+        <p>请用 <code>uvicorn app.main:app --reload --port 8000</code> 启动后打开
+        <a href="/demo/">http://127.0.0.1:8000/demo/</a></p>
+        <pre>${escapeHtml(err && err.message ? err.message : String(err))}</pre></div>`;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+{
+  "scenario": "fail",
+  "project_type": "LECTURE_HALL",
+  "meeting_subtype": null,
+  "label": "不合格对比 · 大讲堂 · 主题与演示历史库重复（台卡仍按四人）",
+  "photo_base": "../药师大讲堂/2-2026-4-17-河南美锐大药房连锁有限公司/",
+  "request": {
+    "request_id": "req-hall-2-fail-demo",
+    "meeting_id": 1009,
+    "session_no": "2-FAIL",
+    "project_type": "LECTURE_HALL",
+    "period_id": "2026-Q2",
+    "form": {
+      "meeting_name": "菁英药师大讲堂",
+      "meeting_date": "2026-04-17",
+      "start_time": "14:00",
+      "end_time": "16:10",
+      "chain_or_store_name": "河南美锐大药房连锁有限公司",
+      "location": "信阳市六合春宴酒店（信阳师范大学店）",
+      "total_attendees": 35,
+      "speakers": [
+        { "speaker_id": 1, "speaker_name": "高芳", "topic": "自我药疗与合理用药指导" },
+        { "speaker_id": 2, "speaker_name": "袁芳", "topic": "慢病患者用药依从性管理" },
+        { "speaker_id": 3, "speaker_name": "刘亭", "topic": "抗菌药物合理使用要点" },
+        { "speaker_id": 4, "speaker_name": "余艳红", "topic": "药店常见用药咨询场景" }
+      ]
+    }
+  },
+  "assets_meta": [
+    { "asset_id": 201, "file": "1权益-海报.jpg", "declared_type": "POSTER" },
+    { "asset_id": 202, "file": "2权益-展架.jpg", "declared_type": "STAND" },
+    { "asset_id": 203, "file": "3台卡.jpg", "declared_type": "NAME_CARD" },
+    { "asset_id": 204, "file": "4讲者-高芳1.jpg", "declared_type": "SPEAKER_PHOTO", "speaker_name": "高芳", "speaker_shot_kind": "TITLE_GROUP" },
+    { "asset_id": 205, "file": "4讲者-高芳2.jpg", "declared_type": "SPEAKER_PHOTO", "speaker_name": "高芳", "speaker_shot_kind": "LECTURING" },
+    { "asset_id": 206, "file": "5讲者-袁芳1.jpg", "declared_type": "SPEAKER_PHOTO", "speaker_name": "袁芳", "speaker_shot_kind": "TITLE_GROUP" },
+    { "asset_id": 207, "file": "5讲者-袁芳2.jpg", "declared_type": "SPEAKER_PHOTO", "speaker_name": "袁芳", "speaker_shot_kind": "LECTURING" },
+    { "asset_id": 208, "file": "6讲者-刘亭1.jpg", "declared_type": "SPEAKER_PHOTO", "speaker_name": "刘亭", "speaker_shot_kind": "TITLE_GROUP" },
+    { "asset_id": 209, "file": "6讲者-刘亭2.jpg", "declared_type": "SPEAKER_PHOTO", "speaker_name": "刘亭", "speaker_shot_kind": "LECTURING" },
+    { "asset_id": 210, "file": "7讲者4-徐艳红1.jpg", "declared_type": "SPEAKER_PHOTO", "speaker_name": "余艳红", "speaker_shot_kind": "TITLE_GROUP" },
+    { "asset_id": 211, "file": "7讲者4-徐艳红2.jpg", "declared_type": "SPEAKER_PHOTO", "speaker_name": "余艳红", "speaker_shot_kind": "LECTURING" },
+    { "asset_id": 212, "file": "8全景照片-35.jpg", "declared_type": "PANORAMA" },
+    { "asset_id": 213, "file": "9签到表-35（1）.jpg", "declared_type": "SIGNIN" },
+    { "asset_id": 214, "file": "9签到表-35（2）.jpg", "declared_type": "SIGNIN" }
+  ],
+  "response": {
+    "request_id": "req-hall-2-fail-demo",
+    "meeting_id": 1009,
+    "job_id": 9002,
+    "attempt_no": 1,
+    "overall_status": "FAIL",
+    "overall_confidence": 0.88,
+    "model_version": "demo-mock-1.0",
+    "template_pack_version": "2026Q2-v1",
+    "summary_matched": [
+      "台卡四名与讲者名单一致（高芳、袁芳、刘亭、余艳红）",
+      "海报/展架检出拜耳 Logo",
+      "全景合计 35 人，满足 ≥35",
+      "清晰度达标"
+    ],
+    "summary_failed": [
+      "讲者高芳课件标题「自我药疗与合理用药指导」与演示历史库记录重复：session_no=DEMO-HIST-01（虚构场次，非本地场次1国瑞堂）"
+    ],
+    "need_human_reasons": [],
+    "error": null,
+    "asset_results": [
+      {
+        "asset_id": 201,
+        "declared_type": "POSTER",
+        "detected_type": "POSTER",
+        "type_match": true,
+        "clarity_score": 0.91,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "has_bayer_logo": true,
+          "date_matches_form": true,
+          "time_matches_form": true,
+          "location_matches_form": true,
+          "speakers_match_form": true
+        },
+        "uncertain_checks": [],
+        "ocr_fields": {
+          "meeting_date": "2026-04-17",
+          "meeting_time": "14:00",
+          "location": "信阳市六合春宴酒店（信阳师范大学店）",
+          "speaker_names": ["高芳", "袁芳", "刘亭", "余艳红"]
+        }
+      },
+      {
+        "asset_id": 202,
+        "declared_type": "STAND",
+        "detected_type": "STAND",
+        "type_match": true,
+        "clarity_score": 0.88,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "has_bayer_logo": true,
+          "date_matches_form": true,
+          "time_matches_form": true,
+          "location_matches_form": true,
+          "speakers_match_form": true
+        },
+        "uncertain_checks": []
+      },
+      {
+        "asset_id": 203,
+        "declared_type": "NAME_CARD",
+        "detected_type": "NAME_CARD",
+        "type_match": true,
+        "clarity_score": 0.9,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "name_card_count_ok": true,
+          "name_set_matches_speakers": true,
+          "name_card_template_ok": true
+        },
+        "uncertain_checks": [],
+        "ocr_fields": {
+          "speaker_names": ["余艳红", "刘亭", "袁芳", "高芳"]
+        }
+      },
+      {
+        "asset_id": 204,
+        "declared_type": "SPEAKER_PHOTO",
+        "detected_type": "SPEAKER_PHOTO",
+        "type_match": true,
+        "clarity_score": 0.86,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "speaker_shot_kind_ok": true,
+          "topic_matches_form": true,
+          "topic_not_reused_in_period": false,
+          "speaker_name_visible_ok": true
+        },
+        "uncertain_checks": [],
+        "topic_reuse_hit": true,
+        "topic_reuse_ref_session_no": "DEMO-HIST-01",
+        "topic_text_ocr": "自我药疗与合理用药指导",
+        "ocr_fields": {
+          "speaker_name": "高芳",
+          "topic": "自我药疗与合理用药指导",
+          "topic_reuse_ref": {
+            "session_no": "DEMO-HIST-01",
+            "meeting_name": "演示用历史场次（虚构）",
+            "meeting_date": "2026-04-10",
+            "chain_or_store_name": "某某连锁（Demo）",
+            "speaker_name": "高芳",
+            "topic": "自我药疗与合理用药指导",
+            "note": "非本地结算表场次1；本地场次1=江苏国瑞堂，讲者孙春香等，且表内无讲题字段"
+          }
+        }
+      },
+      {
+        "asset_id": 205,
+        "declared_type": "SPEAKER_PHOTO",
+        "detected_type": "SPEAKER_PHOTO",
+        "type_match": true,
+        "clarity_score": 0.84,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "speaker_shot_kind_ok": true,
+          "topic_matches_form": null,
+          "topic_not_reused_in_period": null,
+          "speaker_name_visible_ok": true
+        },
+        "uncertain_checks": []
+      },
+      {
+        "asset_id": 206,
+        "declared_type": "SPEAKER_PHOTO",
+        "detected_type": "SPEAKER_PHOTO",
+        "type_match": true,
+        "clarity_score": 0.89,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "speaker_shot_kind_ok": true,
+          "topic_matches_form": true,
+          "topic_not_reused_in_period": true,
+          "speaker_name_visible_ok": true
+        },
+        "uncertain_checks": [],
+        "topic_reuse_hit": false,
+        "topic_text_ocr": "慢病患者用药依从性管理"
+      },
+      {
+        "asset_id": 207,
+        "declared_type": "SPEAKER_PHOTO",
+        "detected_type": "SPEAKER_PHOTO",
+        "type_match": true,
+        "clarity_score": 0.87,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "speaker_shot_kind_ok": true,
+          "topic_matches_form": null,
+          "topic_not_reused_in_period": null,
+          "speaker_name_visible_ok": true
+        },
+        "uncertain_checks": []
+      },
+      {
+        "asset_id": 208,
+        "declared_type": "SPEAKER_PHOTO",
+        "detected_type": "SPEAKER_PHOTO",
+        "type_match": true,
+        "clarity_score": 0.85,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "speaker_shot_kind_ok": true,
+          "topic_matches_form": true,
+          "topic_not_reused_in_period": true,
+          "speaker_name_visible_ok": true
+        },
+        "uncertain_checks": [],
+        "topic_reuse_hit": false,
+        "topic_text_ocr": "抗菌药物合理使用要点"
+      },
+      {
+        "asset_id": 209,
+        "declared_type": "SPEAKER_PHOTO",
+        "detected_type": "SPEAKER_PHOTO",
+        "type_match": true,
+        "clarity_score": 0.86,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "speaker_shot_kind_ok": true,
+          "topic_matches_form": null,
+          "topic_not_reused_in_period": null,
+          "speaker_name_visible_ok": true
+        },
+        "uncertain_checks": []
+      },
+      {
+        "asset_id": 210,
+        "declared_type": "SPEAKER_PHOTO",
+        "detected_type": "SPEAKER_PHOTO",
+        "type_match": true,
+        "clarity_score": 0.88,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "speaker_shot_kind_ok": true,
+          "topic_matches_form": true,
+          "topic_not_reused_in_period": true,
+          "speaker_name_visible_ok": true
+        },
+        "uncertain_checks": [],
+        "topic_reuse_hit": false,
+        "topic_text_ocr": "药店常见用药咨询场景"
+      },
+      {
+        "asset_id": 211,
+        "declared_type": "SPEAKER_PHOTO",
+        "detected_type": "SPEAKER_PHOTO",
+        "type_match": true,
+        "clarity_score": 0.87,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "speaker_shot_kind_ok": true,
+          "topic_matches_form": null,
+          "topic_not_reused_in_period": null,
+          "speaker_name_visible_ok": true
+        },
+        "uncertain_checks": []
+      },
+      {
+        "asset_id": 212,
+        "declared_type": "PANORAMA",
+        "detected_type": "PANORAMA",
+        "type_match": true,
+        "clarity_score": 0.82,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "people_count_recorded": true
+        },
+        "uncertain_checks": [],
+        "detections": { "people_count": 35, "people_count_confidence": 0.9 }
+      },
+      {
+        "asset_id": 213,
+        "declared_type": "SIGNIN",
+        "detected_type": "SIGNIN",
+        "type_match": true,
+        "clarity_score": 0.79,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "signin_template_ok": true,
+          "duration_readable": true,
+          "duration_meets_threshold": true
+        },
+        "uncertain_checks": [],
+        "ocr_fields": { "start_time": "14:00", "end_time": "16:10", "duration_minutes": 130 }
+      },
+      {
+        "asset_id": 214,
+        "declared_type": "SIGNIN",
+        "detected_type": "SIGNIN",
+        "type_match": true,
+        "clarity_score": 0.78,
+        "is_clear": true,
+        "checks": {
+          "type_match": true,
+          "is_clear": true,
+          "signin_template_ok": true,
+          "duration_readable": null,
+          "duration_meets_threshold": null
+        },
+        "uncertain_checks": []
+      }
+    ],
+    "rule_results": [
+      { "rule_code": "ASSET_TYPE_CHECK", "passed": true, "status": "PASS", "confidence": 0.95, "trigger_human": false, "reason_text": "声明类型与识别类型一致", "related_asset_ids": [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214] },
+      { "rule_code": "CLARITY", "passed": true, "status": "PASS", "confidence": 0.9, "trigger_human": false, "reason_text": "全部材料清晰度达标", "related_asset_ids": [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214] },
+      { "rule_code": "KEY_FIELD_MATCH", "passed": true, "status": "PASS", "confidence": 0.93, "trigger_human": false, "reason_text": "海报/展架关键字段与表单一致", "related_asset_ids": [201, 202] },
+      { "rule_code": "BAYER_LOGO", "passed": true, "status": "PASS", "confidence": 0.94, "trigger_human": false, "reason_text": "海报与展架均检出拜耳 Logo", "related_asset_ids": [201, 202] },
+      { "rule_code": "NAME_CARD_SPEAKER_MATCH", "passed": true, "status": "PASS", "confidence": 0.93, "trigger_human": false, "reason_text": "台卡姓名与系统讲者一致：高芳、袁芳、刘亭、余艳红（画面四人）", "related_asset_ids": [203] },
+      { "rule_code": "PANORAMA_COUNT", "passed": true, "status": "PASS", "confidence": 0.9, "trigger_human": false, "reason_text": "全景合计 35 人，满足 ≥35", "evidence": { "count": 35, "threshold": 35 }, "related_asset_ids": [212] },
+      { "rule_code": "SIGNIN_DURATION", "passed": true, "status": "PASS", "confidence": 0.86, "trigger_human": false, "reason_text": "签到时长 130 分钟，满足 >120", "related_asset_ids": [213, 214] },
+      { "rule_code": "SPEAKER_SHOT_PAIR", "passed": true, "status": "PASS", "confidence": 0.97, "trigger_human": false, "reason_text": "四位讲者均具备 TITLE_GROUP + LECTURING", "related_asset_ids": [204, 205, 206, 207, 208, 209, 210, 211] },
+      { "rule_code": "SPEAKER_TOPIC_OCR", "passed": true, "status": "PASS", "confidence": 0.91, "trigger_human": false, "reason_text": "标题合影课件标题与表单 topic 一致", "related_asset_ids": [204, 206, 208, 210] },
+      {
+        "rule_code": "TOPIC_REUSE",
+        "passed": false,
+        "status": "FAIL",
+        "confidence": 0.96,
+        "trigger_human": false,
+        "reason_code": "TOPIC_REUSED",
+        "reason_text": "讲者高芳标题「自我药疗与合理用药指导」与演示历史库 DEMO-HIST-01 同讲者同主题重复（主题查重=比标题文字）",
+        "evidence": {
+          "speaker": "高芳",
+          "topic": "自我药疗与合理用药指导",
+          "ref_session_no": "DEMO-HIST-01",
+          "ref_meeting_date": "2026-04-10",
+          "ref_chain": "某某连锁（Demo）",
+          "demo_note": "虚构撞题记录，用于演示 FAIL；不是与本地场次1（江苏国瑞堂）比对"
+        },
+        "related_asset_ids": [204]
+      }
+    ],
+    "finished_at": "2026-04-18T11:00:00+08:00"
+  }
+}

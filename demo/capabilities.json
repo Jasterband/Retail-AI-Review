@@ -1,0 +1,148 @@
+{
+  "groups": [
+    {
+      "id": "C",
+      "title": "C · 核心能力（共用）",
+      "items": [
+        {
+          "id": "panorama_count",
+          "label": "全景人数",
+          "rule_code": "PANORAMA_COUNT",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "大讲堂 ≥35；微型单 ≥6 / 双 ≥12。应用通用多模态（非纯 OCR）。"
+        },
+        {
+          "id": "asset_type",
+          "label": "材料类型识别",
+          "rule_code": "ASSET_TYPE_CHECK",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "真实图抽测；禁止误检成 PASTOR 等错误类型。"
+        },
+        {
+          "id": "key_fields",
+          "label": "关键字段比对",
+          "rule_code": "KEY_FIELD_MATCH",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "海报/展架/电子日程 vs form（日期地点讲者）。"
+        },
+        {
+          "id": "bayer_logo",
+          "label": "拜耳 Logo",
+          "rule_code": "BAYER_LOGO",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "大讲堂：海报+展架；微型：电子日程+项目介绍。"
+        },
+        {
+          "id": "signin_duration",
+          "label": "签到时长",
+          "rule_code": "SIGNIN_DURATION",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "大讲堂 >120；微型单 >30 / 双 >60。"
+        },
+        {
+          "id": "watermark",
+          "label": "水印一致性",
+          "rule_code": "WATERMARK_CONSISTENCY",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "有水印的图：时间/地点与表单一致。"
+        },
+        {
+          "id": "image_dup",
+          "label": "跨会照片盗用",
+          "rule_code": "IMAGE_DUP",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "两场同海报应命中 IMAGE_DUP。"
+        },
+        {
+          "id": "topic_reuse",
+          "label": "主题查重",
+          "rule_code": "TOPIC_REUSE",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "讲者标题合影 OCR vs 历史主题库。"
+        },
+        {
+          "id": "clarity",
+          "label": "清晰度",
+          "rule_code": "CLARITY",
+          "projects": ["LECTURE_HALL", "MICRO"],
+          "detail": "材料清晰度阈值（写入配置）。"
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "title": "D · 大讲堂专属",
+      "items": [
+        {
+          "id": "name_card_speakers",
+          "label": "台卡四人姓名 vs form.speakers",
+          "rule_code": "NAME_CARD_SPEAKER_MATCH",
+          "projects": ["LECTURE_HALL"],
+          "detail": "台卡姓名集合与讲者集合一致。"
+        },
+        {
+          "id": "name_card_template",
+          "label": "台卡模版",
+          "rule_code": "NAME_CARD_TEMPLATE",
+          "projects": ["LECTURE_HALL"],
+          "detail": "需 crop 进 template pack。"
+        },
+        {
+          "id": "handbook_detect",
+          "label": "手册封面识别",
+          "rule_code": "HANDBOOK_DETECT",
+          "projects": ["LECTURE_HALL"],
+          "detail": "识别为菁英药师大讲堂手册封面。"
+        },
+        {
+          "id": "handbook_stale",
+          "label": "手册非旧版",
+          "rule_code": "HANDBOOK_NOT_STALE",
+          "projects": ["LECTURE_HALL"],
+          "detail": "与当期模版一致、非旧版。"
+        },
+        {
+          "id": "speaker_pair",
+          "label": "讲者成对 TITLE_GROUP + LECTURING",
+          "rule_code": "SPEAKER_SHOT_PAIR",
+          "projects": ["LECTURE_HALL"],
+          "detail": "每位讲者各一张合影 + 一张讲课照。"
+        },
+        {
+          "id": "speaker_topic",
+          "label": "讲者主题 OCR vs form.topic",
+          "rule_code": "SPEAKER_TOPIC_OCR",
+          "projects": ["LECTURE_HALL"],
+          "detail": "标题合影主题与表单一致。"
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "title": "E · 微型专属",
+      "items": [
+        {
+          "id": "ppt_template",
+          "label": "权益一模版（彩色丝带）+ 权益二模版",
+          "rule_code": "PPT_TEMPLATE_MATCH",
+          "projects": ["MICRO"],
+          "detail": "项目介绍 / 电子日程展示与规定模版一致。"
+        },
+        {
+          "id": "ppt_page_kind",
+          "label": "页类不重复",
+          "rule_code": "PPT_PAGE_KIND",
+          "projects": ["MICRO"],
+          "detail": "介绍页与日程页各一，不可两张同为介绍。"
+        },
+        {
+          "id": "signin_ratio",
+          "label": "签到听众比例与门店种类",
+          "rule_code": "SIGNIN_RATIO_AND_STORES",
+          "projects": ["MICRO"],
+          "detail": "听众 ≥ 讲者×6；门店种类 ≥ 2。"
+        }
+      ]
+    }
+  ]
+}

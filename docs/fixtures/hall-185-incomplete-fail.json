@@ -1,0 +1,155 @@
+{
+  "request_id": "req-hall-185-incomplete-001",
+  "meeting_id": 1185,
+  "session_no": "185",
+  "project_type": "LECTURE_HALL",
+  "meeting_subtype": null,
+  "period_id": 1,
+  "form": {
+    "meeting_name": "菁英药师大讲堂项目",
+    "meeting_date": "2026-07-06",
+    "start_time": "14:00",
+    "end_time": "16:10",
+    "chain_or_store_name": "江苏嘉伦光彩大药房有限公司",
+    "location": "江苏嘉伦光彩大药房有限公司",
+    "total_attendees": 35,
+    "speakers": [
+      {
+        "speaker_id": 1,
+        "speaker_name": "李玉侠",
+        "topic": "合理用药",
+        "store_name": "嘉伦光彩",
+        "service_minutes": 30
+      },
+      {
+        "speaker_id": 2,
+        "speaker_name": "高秀林",
+        "topic": "慢病管理",
+        "store_name": "嘉伦光彩",
+        "service_minutes": 30
+      },
+      {
+        "speaker_id": 3,
+        "speaker_name": "翁蓉蔚",
+        "topic": "药学服务",
+        "store_name": "嘉伦光彩",
+        "service_minutes": 30
+      },
+      {
+        "speaker_id": 4,
+        "speaker_name": "徐云云",
+        "topic": "门店赋能",
+        "store_name": "嘉伦光彩",
+        "service_minutes": 40
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": 18500,
+      "asset_type": "E_POSTER",
+      "s3_uri": "s3://pe-meetings/hall/185/eposter.png",
+      "content_type": "image/png"
+    },
+    {
+      "asset_id": 18501,
+      "asset_type": "HANDBOOK",
+      "s3_uri": "s3://pe-meetings/hall/185/handbook.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 18502,
+      "asset_type": "POSTER",
+      "s3_uri": "s3://pe-meetings/hall/185/poster.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 18503,
+      "asset_type": "STAND",
+      "s3_uri": "s3://pe-meetings/hall/185/stand.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 18523,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/185/speaker1_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 1,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 18524,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/185/speaker1_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 1,
+      "speaker_shot_kind": "LECTURING"
+    },
+    {
+      "asset_id": 18525,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/185/speaker2_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 2,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 18526,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/185/speaker2_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 2,
+      "speaker_shot_kind": "LECTURING"
+    },
+    {
+      "asset_id": 18527,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/185/speaker3_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 3,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 18528,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/185/speaker3_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 3,
+      "speaker_shot_kind": "LECTURING"
+    },
+    {
+      "asset_id": 18529,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/185/speaker4_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 4,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 18530,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/185/speaker4_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 4,
+      "speaker_shot_kind": "LECTURING"
+    },
+    {
+      "asset_id": 18591,
+      "asset_type": "SIGNIN",
+      "s3_uri": "s3://pe-meetings/hall/185/signin_1.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 18592,
+      "asset_type": "SIGNIN",
+      "s3_uri": "s3://pe-meetings/hall/185/signin_2.jpg",
+      "content_type": "image/jpeg"
+    }
+  ],
+  "refs": {
+    "template_pack_version": "2026Q2"
+  },
+  "options": {
+    "response_mode": "simple"
+  }
+}

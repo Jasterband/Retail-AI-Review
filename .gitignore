@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.env
+*.db
+.DS_Store
+.ruff_cache/
+
+# Large local datasets / runtime outputs (not for GitHub)
+零售照片ai审核/
+runs/

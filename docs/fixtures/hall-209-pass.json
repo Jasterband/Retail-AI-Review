@@ -1,0 +1,161 @@
+{
+  "request_id": "req-hall-209-golden-001",
+  "meeting_id": 1209,
+  "session_no": "209",
+  "project_type": "LECTURE_HALL",
+  "meeting_subtype": null,
+  "period_id": 1,
+  "form": {
+    "meeting_name": "菁英药师大讲堂项目",
+    "meeting_date": "2026-07-15",
+    "start_time": "14:00",
+    "end_time": "16:10",
+    "chain_or_store_name": "厦门九鼎药房有限公司",
+    "location": "厦门九鼎药房有限公司",
+    "total_attendees": 41,
+    "speakers": [
+      {
+        "speaker_id": 1,
+        "speaker_name": "党雪玲",
+        "topic": "合理用药与患者教育",
+        "store_name": "厦门九鼎药房有限",
+        "service_minutes": 30
+      },
+      {
+        "speaker_id": 2,
+        "speaker_name": "张小娴",
+        "topic": "慢病管理实践分享",
+        "store_name": "厦门九鼎药房有限",
+        "service_minutes": 30
+      },
+      {
+        "speaker_id": 3,
+        "speaker_name": "吴晶晶",
+        "topic": "药学服务要点",
+        "store_name": "厦门九鼎药房有限",
+        "service_minutes": 30
+      },
+      {
+        "speaker_id": 4,
+        "speaker_name": "陈雪霞",
+        "topic": "门店健康服务赋能",
+        "store_name": "厦门九鼎药房有限",
+        "service_minutes": 40
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": 20901,
+      "asset_type": "E_POSTER",
+      "s3_uri": "s3://pe-meetings/hall/209/eposter.png",
+      "content_type": "image/png"
+    },
+    {
+      "asset_id": 20911,
+      "asset_type": "HANDBOOK",
+      "s3_uri": "s3://pe-meetings/hall/209/handbook.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 20912,
+      "asset_type": "POSTER",
+      "s3_uri": "s3://pe-meetings/hall/209/poster.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 20913,
+      "asset_type": "STAND",
+      "s3_uri": "s3://pe-meetings/hall/209/stand.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 20914,
+      "asset_type": "NAME_CARD",
+      "s3_uri": "s3://pe-meetings/hall/209/name_card.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 20953,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/209/speaker1_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 1,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 20954,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/209/speaker1_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 1,
+      "speaker_shot_kind": "LECTURING"
+    },
+    {
+      "asset_id": 20955,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/209/speaker2_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 2,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 20956,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/209/speaker2_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 2,
+      "speaker_shot_kind": "LECTURING"
+    },
+    {
+      "asset_id": 20957,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/209/speaker3_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 3,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 20958,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/209/speaker3_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 3,
+      "speaker_shot_kind": "LECTURING"
+    },
+    {
+      "asset_id": 20959,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/209/speaker4_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 4,
+      "speaker_shot_kind": "TITLE_GROUP"
+    },
+    {
+      "asset_id": 20960,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/209/speaker4_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 4,
+      "speaker_shot_kind": "LECTURING"
+    },
+    {
+      "asset_id": 20980,
+      "asset_type": "PANORAMA",
+      "s3_uri": "s3://pe-meetings/hall/209/panorama.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 20991,
+      "asset_type": "SIGNIN",
+      "s3_uri": "s3://pe-meetings/hall/209/signin_1.pdf",
+      "content_type": "application/pdf"
+    }
+  ],
+  "refs": {
+    "template_pack_version": "2026Q2"
+  },
+  "options": {
+    "response_mode": "simple"
+  }
+}

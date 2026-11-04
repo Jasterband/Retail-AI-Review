@@ -1,0 +1,189 @@
+# 黄金集与负样本清单
+
+现有本地样例均为**合格**参考。黄金集用于回归：给定构造的 `RetailMeetingCheckRequest`（表单与路径对齐），期望 `overall_status=PASS` 且关键规则 `PASS`。
+
+路径均相对仓库根：`/Users/ruining.yu/project/零售/`。
+
+**B 项进展（2026-11-02）：** 命名修复、5 场大讲堂黄金夹具、微型 5 场不合格夹具、双讲对照等已落地。机器可读期望见 [`docs/fixtures/expects.json`](fixtures/expects.json)；整理说明见 [`docs/fixtures/README-B样例整理.md`](fixtures/README-B样例整理.md)。
+
+### 当前可跑黄金 / 负样本夹具
+
+| 场次 | 夹具 | overall 期望 |
+|------|------|--------------|
+| 大讲堂 143 / 204 / 208 / 209 / 224 | `hall-*-pass.json` / `hall-meirui-pass.json` | PASS |
+| 大讲堂 185（缺材） | `hall-185-incomplete-fail.json` | FAIL |
+| 大讲堂负样本图包 | `hall-negative-samples-fail.json` | FAIL |
+| 微型 000606 / 000670 | `micro-000090-pass.json` / `micro-000670-pass.json` | PASS |
+| 微型双讲 000921 / 000938 | `micro-000125-pass.json` / `micro-000938-dual-pass.json` | PASS |
+| 微型不合格 000620 / 000823 / 001421 / 001499 / 001541 | `micro-*-fail.json` | FAIL |
+
+---
+
+## A. 药师大讲堂黄金场次
+
+### A1. session_no=`2` — 河南美锐大药房
+
+**目录：** `零售照片ai审核/药师大讲堂/大讲堂已上传过的50场会议核销资料/143~2026-6-23~广州东兴堂大药房连锁有限公司核销资料/`（夹具文件名仍为 `hall-meirui-pass.json`）
+
+**表单期望（与结算表/海报一致）：**
+
+| 字段 | 值 |
+|------|-----|
+| project_type | LECTURE_HALL |
+| meeting_date | 2026-04-17 |
+| start_time / end_time | 14:00 / 16:10 |
+| chain_or_store_name | 河南美锐大药房连锁有限公司 |
+| location | 信阳市六合春宴酒店（信阳师范大学店）（以海报为准） |
+| total_attendees | 35 |
+| speakers | 高芳、袁芳、刘亭、余艳红（注意：文件夹有「徐艳红」笔误，黄金集姓名以台卡/结算「余艳红」为准） |
+
+**资产映射：**
+
+| asset_type | 文件 | speaker / shot |
+|------------|------|----------------|
+| POSTER | `1权益-海报.jpg` | |
+| STAND | `2权益-展架.jpg` | |
+| NAME_CARD | `3台卡.jpg` | |
+| HANDBOOK | **缺失** — 见缺口 | |
+| SPEAKER_PHOTO | `4讲者-高芳1.jpg` | 高芳 / TITLE_GROUP |
+| SPEAKER_PHOTO | `4讲者-高芳2.jpg` | 高芳 / LECTURING |
+| SPEAKER_PHOTO | `5讲者-袁芳1.jpg` | 袁芳 / TITLE_GROUP |
+| SPEAKER_PHOTO | `5讲者-袁芳2.jpg` | 袁芳 / LECTURING |
+| SPEAKER_PHOTO | `6讲者-刘亭1.jpg` | 刘亭 / TITLE_GROUP |
+| SPEAKER_PHOTO | `6讲者-刘亭2.jpg` | 刘亭 / LECTURING |
+| SPEAKER_PHOTO | `7讲者4-徐艳红1.jpg` | 余艳红 / TITLE_GROUP |
+| SPEAKER_PHOTO | `7讲者4-徐艳红2.jpg` | 余艳红 / LECTURING |
+| PANORAMA | `8全景照片-35.jpg` | |
+| SIGNIN | `9签到表-35（1）.jpg`, `9签到表-35（2）.jpg` | |
+| E_POSTER | 本包未单独提供 | 若产品必传需补图或用海报电子版 |
+
+**期望 overall：** `PASS`（拍板：大讲堂 `E_POSTER` / `HANDBOOK` 等为**必审**；请求缺类型 → `ASSET_MISSING` FAIL。夹具见 `docs/fixtures/hall-meirui-pass.json`）
+
+**期望规则：**
+
+| rule_code | 期望 status | 备注 |
+|-----------|-------------|------|
+| ASSET_TYPE_CHECK | PASS | |
+| CLARITY | PASS | 样例清晰 |
+| KEY_FIELD_MATCH | PASS | 海报日期地点讲者与表单一致 |
+| BAYER_LOGO | PASS | 海报/展架 |
+| NAME_CARD_SPEAKER_MATCH | PASS | 余艳红/刘亭/袁芳/高芳 |
+| NAME_CARD_TEMPLATE | PASS | 有模版后 |
+| PANORAMA_COUNT | PASS | ≥35 |
+| SIGNIN_DURATION | PASS | >120（结算 130 分钟） |
+| SPEAKER_SHOT_PAIR | PASS | 4 人各 2 张 |
+| SPEAKER_TOPIC_OCR | PASS | 标题页主题与表单一致（需正确填 topic） |
+| TOPIC_REUSE | PASS | 主题库无同讲者同标题 |
+| HANDBOOK_DETECT | PASS 或 SKIP | **无独立手册图时 SKIP/缺口** |
+| HANDBOOK_NOT_STALE | PASS 或 SKIP | 同上 |
+
+**summary_matched 应包含：** 日期地点一致、台卡四名匹配、Logo、全景人数、签到时长等。
+
+---
+
+## B. 微型药师黄金场次
+
+### B1. session_no=`000090` — 老百姓（安徽）单讲者
+
+**目录：** `微型药师/000090-2026-05-27-合肥市-老百姓大药房连锁（安徽）有限公司/`
+
+| 字段 | 值 |
+|------|-----|
+| project_type | MICRO |
+| meeting_subtype | SINGLE |
+| meeting_date | 2026-05-27 |
+| chain_or_store_name | 老百姓大药房连锁（安徽）有限公司 |
+| location | 水印/门店：淠河路店（表单应对齐） |
+
+| asset_type | 文件 |
+|------------|------|
+| E_POSTER | `会议日程.png` |
+| E_POSTER_DISPLAY / PROJECT_INTRO_DISPLAY | `权益照片1.jpg`, `权益照片2.jpg`（按页类标注） |
+| SPEAKER_PHOTO | `讲者标题页.jpg` |
+| PANORAMA | `参会人员.jpg` |
+| SIGNIN | `会议签到表.pdf` |
+
+**期望规则：** `PPT_TEMPLATE_MATCH` PASS、`PPT_PAGE_KIND` PASS、`BAYER_LOGO` PASS、`PANORAMA_COUNT` PASS（≥6）、`WATERMARK_CONSISTENCY` PASS（权益照含水印）、`SIGNIN_DURATION` PASS（>30）、`SIGNIN_RATIO_AND_STORES` PASS、`TOPIC_REUSE` PASS（若有标题合影）。
+
+### B2. session_no=`000089` — 淮安广济 单讲者
+
+**目录：** `微型药师/000089-2026-05-29-淮安广济医药连锁有限公司/`
+
+执行报告：汪淳琼，2026-05-29，总参会 7。资产命名同 B1 结构（`会议日程.png`、`权益照片-*`、`讲者照片标题页.jpg`、`参会人员.jpg`、`会议签到表.pdf`）。
+
+**期望：** `overall_status=PASS`（表单人数/讲者与报告对齐后）。
+
+### B3. session_no=`000125` — 山西国大万民 双讲者
+
+**目录：** `微型药师/000125-2026-06-10-山西国大万民药房连锁有限公司/`
+
+| 字段 | 值 |
+|------|-----|
+| meeting_subtype | DUAL |
+| meeting_date | 2026-06-10 |
+| speakers | 张辉、张彦文 |
+| total_attendees | 14 |
+
+| asset_type | 文件 |
+|------------|------|
+| E_POSTER | `会议日程.jpg` |
+| 展示类 | `权益照片-1.jpg`, `权益照片-2.jpg` |
+| SPEAKER_PHOTO | `讲者标题页-1.jpg`, `讲者标题页-2.jpg` |
+| PANORAMA | `参会人员-1.jpg`, `参会人员-2.jpg`（人数合计 ≥12） |
+| SIGNIN | `会议签到表.pdf` |
+
+**期望：** `PANORAMA_COUNT` PASS（双讲者 ≥12）、`SIGNIN_DURATION` PASS（>60）、其余微型规则 PASS。
+
+---
+
+## C. 样例缺口（影响黄金集满分）
+
+| 缺口 | 影响规则 | 处理 |
+|------|----------|------|
+| 大讲堂无独立「手册」照片 | HANDBOOK_* | **已实现：无 HANDBOOK 资产 → SKIP**；补封面后可跑真规则 |
+| 大讲堂无独立「电子日程海报」 | E_POSTER | 补图或产品确认是否可用日程海报电子档 |
+| 仅合格样本 | 阈值/召回 | 必须补负样本（见下） |
+| 姓名文件名「徐艳红」vs 台卡「余艳红」 | 姓名匹配评测 | 黄金集以 OCR/台卡为准；表单勿用错字 |
+
+---
+
+## D. 需补充的负样本清单
+
+上线前至少各准备若干张（建议每类 ≥3），并标注期望 `FAIL` 或 `NEED_HUMAN`：
+
+| ID | 类型 | 构造方式 | 期望 overall | 期望触发 rule |
+|----|------|----------|--------------|---------------|
+| N01 | 模糊图 | 高斯模糊合格海报 | NEED_HUMAN | CLARITY + KEY_FIELD_MATCH UNCERTAIN |
+| N02 | 错模版 | 非拜耳波浪/旧 VI 海报 | FAIL | PPT_TEMPLATE_MATCH / POSTER 模版 |
+| N03 | 无 Logo | 遮挡或裁掉 Logo | FAIL | BAYER_LOGO |
+| N04 | 旧手册封面 | 往期手册标题/版式 | FAIL | HANDBOOK_NOT_STALE |
+| N05 | 非手册 | 普通笔记本特写当 HANDBOOK | FAIL | HANDBOOK_DETECT |
+| N06 | 台卡缺人 | 仅 3 个台卡入镜 | FAIL | NAME_CARD_SPEAKER_MATCH |
+| N07 | 台卡错名 | 姓名与表单不符 | FAIL | NAME_CARD_SPEAKER_MATCH |
+| N08 | 人数不足 | 全景明显 <35 / 微型 <6 | FAIL | PANORAMA_COUNT |
+| N09 | 主题重复 | 另一场同讲者使用相同课件标题（讲者照） | FAIL | TOPIC_REUSE |
+| N09b | 跨会议图片完全重复 | 本场上传与**另一会议**完全相同的文件 | FAIL | IMAGE_DUP |
+| N09c | 跨会议图片近似重复 | 本场上传与**另一会议**近似相似的图（压缩/裁剪） | FAIL | IMAGE_DUP |
+| N10 | 投影严重倾斜 | 微型权益照极端角度 | NEED_HUMAN 或 FAIL | PPT_TEMPLATE_MATCH |
+| N11 | 签到时长不足 | 伪造短时长表头 | FAIL | SIGNIN_DURATION |
+| N12 | 签到门店单一 | 微型听众均同一门店 | FAIL | SIGNIN_RATIO_AND_STORES |
+| N13 | 水印日期错误 | 水印改到其他日 | FAIL | WATERMARK_CONSISTENCY |
+| N14 | 类别错挂 | 全景图声明为 POSTER | FAIL | ASSET_TYPE_CHECK |
+| N15 | S3 404 | 错误 uri | ERROR | S3_NOT_FOUND |
+| N16 | 讲者缺过程照 | 大讲堂仅 TITLE_GROUP | FAIL | SPEAKER_SHOT_PAIR |
+| N17 | 主题不一致 | 标题合影课件≠表单 topic | FAIL | SPEAKER_TOPIC_OCR |
+| N18 | 两张同为项目介绍 | 微型缺日程页 | FAIL | PPT_PAGE_KIND |
+
+---
+
+## E. 回归执行建议
+
+1. 将本地文件上传到测试桶，生成真实 `s3_uri` 的 Request JSON（可放 `docs/fixtures/` 后续补充）
+2. 跑 AI 流水线，断言：
+   - `overall_status`
+   - 关键 `rule_code` 的 `status`
+   - `summary_matched` / `summary_failed` 非空策略
+3. 负样本集与黄金集分开报告：**黄金集 False FAIL 率**、**负样本漏检率**
+4. 阈值变更必须重跑本清单并更新本文档日期
+
+**文档维护：** 新增期数模版或规则时，同步更新本黄金集期望表与 [03-rule-matrix.md](03-rule-matrix.md)。

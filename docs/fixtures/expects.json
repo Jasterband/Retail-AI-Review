@@ -1,0 +1,116 @@
+{
+  "hall-143": {
+    "fixture": "hall-meirui-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden"
+  },
+  "hall-204": {
+    "fixture": "hall-204-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden"
+  },
+  "hall-209": {
+    "fixture": "hall-209-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden"
+  },
+  "hall-224": {
+    "fixture": "hall-224-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden"
+  },
+  "hall-208": {
+    "fixture": "hall-208-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden"
+  },
+  "hall-185-incomplete": {
+    "fixture": "hall-185-incomplete-fail.json",
+    "overall_status": "FAIL",
+    "kind": "negative",
+    "fail_notes": [
+      "缺全景",
+      "缺真实台卡"
+    ],
+    "rules": {
+      "PANORAMA_COUNT": "SKIP",
+      "NAME_CARD_SPEAKER_MATCH": "SKIP"
+    }
+  },
+  "hall-negative-samples": {
+    "fixture": "hall-negative-samples-fail.json",
+    "overall_status": "FAIL",
+    "kind": "negative",
+    "fail_notes": [
+      "模糊/信息不全/人数不够/手册重叠/特写"
+    ],
+    "rules": {
+      "CLARITY": "FAIL",
+      "PANORAMA_COUNT": "FAIL",
+      "KEY_FIELD_MATCH": "FAIL"
+    }
+  },
+  "micro-000606": {
+    "fixture": "micro-000090-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden"
+  },
+  "micro-000670": {
+    "fixture": "micro-000670-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden"
+  },
+  "micro-000921": {
+    "fixture": "micro-000125-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden-dual"
+  },
+  "micro-000938": {
+    "fixture": "micro-000938-dual-pass.json",
+    "overall_status": "PASS",
+    "kind": "golden-dual"
+  },
+  "micro-000620": {
+    "fixture": "micro-000620-fail.json",
+    "overall_status": "FAIL",
+    "kind": "negative",
+    "rules": {
+      "PPT_PAGE_KIND": "FAIL"
+    },
+    "fail_notes": [
+      "页类问题"
+    ]
+  },
+  "micro-000823": {
+    "fixture": "micro-000823-fail.json",
+    "overall_status": "FAIL",
+    "kind": "negative",
+    "fail_notes": [
+      "业务不合格场，实跑确认"
+    ]
+  },
+  "micro-001421": {
+    "fixture": "micro-001421-fail.json",
+    "overall_status": "FAIL",
+    "kind": "negative",
+    "fail_notes": [
+      "缺标题合影"
+    ]
+  },
+  "micro-001499": {
+    "fixture": "micro-001499-fail.json",
+    "overall_status": "FAIL",
+    "kind": "negative",
+    "fail_notes": [
+      "缺电子日程海报"
+    ]
+  },
+  "micro-001541": {
+    "fixture": "micro-001541-fail.json",
+    "overall_status": "FAIL",
+    "kind": "negative",
+    "fail_notes": [
+      "缺电子日程海报展示"
+    ]
+  }
+}

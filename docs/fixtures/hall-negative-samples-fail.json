@@ -1,0 +1,66 @@
+{
+  "request_id": "req-hall-negatives-001",
+  "meeting_id": 999001,
+  "session_no": "NEG-HALL",
+  "project_type": "LECTURE_HALL",
+  "meeting_subtype": null,
+  "period_id": 1,
+  "form": {
+    "meeting_name": "菁英药师大讲堂项目",
+    "meeting_date": "2026-06-01",
+    "start_time": "14:00",
+    "end_time": "16:10",
+    "chain_or_store_name": "负样本合成连锁",
+    "location": "负样本合成地点",
+    "total_attendees": 35,
+    "speakers": [
+      {
+        "speaker_id": 1,
+        "speaker_name": "测试讲者",
+        "topic": "测试主题",
+        "store_name": "测试店",
+        "service_minutes": 130
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": 9000,
+      "asset_type": "STAND",
+      "s3_uri": "s3://pe-meetings/hall/fail/stand_blur.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 9001,
+      "asset_type": "STAND",
+      "s3_uri": "s3://pe-meetings/hall/fail/stand_incomplete.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 9002,
+      "asset_type": "PANORAMA",
+      "s3_uri": "s3://pe-meetings/hall/fail/panorama_few.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 9003,
+      "asset_type": "HANDBOOK",
+      "s3_uri": "s3://pe-meetings/hall/fail/handbook_overlap.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "asset_id": 9004,
+      "asset_type": "SPEAKER_PHOTO",
+      "s3_uri": "s3://pe-meetings/hall/fail/speaker_closeup.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": 1,
+      "speaker_shot_kind": "LECTURING"
+    }
+  ],
+  "refs": {
+    "template_pack_version": "2026Q2"
+  },
+  "options": {
+    "response_mode": "simple"
+  }
+}

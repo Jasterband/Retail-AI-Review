@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>黄金集人工标注 · hall-183 / micro-000606</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #10151c;
+      --panel: #18212b;
+      --panel-2: #222d3a;
+      --line: #314152;
+      --text: #e9eef4;
+      --muted: #8fa0b3;
+      --accent: #3d9cf0;
+      --ok: #3d9a7a;
+      --warn: #e8a54b;
+      --danger: #d96b6b;
+      --box: #5ec4ff;
+      --point: #ff6b8a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 0% 0%, #1a3048 0%, transparent 55%),
+        radial-gradient(700px 400px at 100% 0%, #243028 0%, transparent 50%),
+        var(--bg);
+    }
+    header {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: .85rem 1.25rem; border-bottom: 1px solid var(--line);
+      background: rgba(16,21,28,.85); backdrop-filter: blur(10px);
+      position: sticky; top: 0; z-index: 20;
+    }
+    header h1 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+    header p { margin: .15rem 0 0; color: var(--muted); font-size: .8rem; }
+    .hdr-actions { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr 300px;
+      min-height: calc(100vh - 64px);
+    }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    aside, .side {
+      background: var(--panel); padding: .9rem 1rem; overflow: auto;
+    }
+    aside { border-right: 1px solid var(--line); }
+    .side { border-left: 1px solid var(--line); }
+    .stage-wrap {
+      display: flex; flex-direction: column; min-height: 0;
+      background: #0c1015;
+    }
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: .45rem; align-items: center;
+      padding: .55rem .8rem; border-bottom: 1px solid var(--line);
+      background: var(--panel-2);
+    }
+    .canvas-host {
+      flex: 1; position: relative; overflow: auto;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 1rem; min-height: 60vh;
+    }
+    #stage {
+      position: relative; display: inline-block; max-width: 100%;
+      box-shadow: 0 12px 40px rgba(0,0,0,.45);
+      cursor: crosshair; user-select: none;
+    }
+    #stage img { display: block; max-width: min(1100px, 100%); height: auto; }
+    #overlay {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+    }
+    label.field {
+      display: block; font-size: .68rem; letter-spacing: .05em;
+      text-transform: uppercase; color: var(--muted); margin: .55rem 0 .25rem;
+    }
+    select, input[type=text], textarea, button {
+      font: inherit; color: var(--text);
+    }
+    select, input[type=text], textarea {
+      width: 100%; background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 8px; padding: .45rem .55rem;
+    }
+    textarea { min-height: 64px; resize: vertical; }
+    button {
+      background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 8px; padding: .4rem .7rem; cursor: pointer;
+    }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #1e4f7a; border-color: #2f6ea3; }
+    button.ok { background: #1d4f42; border-color: #2f7a66; }
+    button.danger { background: #5a2a2a; border-color: #8a4040; }
+    button.active { outline: 2px solid var(--accent); }
+    .asset-list { list-style: none; margin: 0; padding: 0; }
+    .asset-list li {
+      padding: .45rem .5rem; border-radius: 8px; cursor: pointer;
+      border: 1px solid transparent; margin-bottom: .25rem;
+      font-size: .82rem; line-height: 1.25;
+    }
+    .asset-list li:hover { background: var(--panel-2); }
+    .asset-list li.sel { border-color: var(--accent); background: #1a2c40; }
+    .asset-list li.done::after {
+      content: " ✓"; color: var(--ok); font-weight: 700;
+    }
+    .type-tag {
+      display: inline-block; font-size: .65rem; color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+    }
+    .hint { color: var(--muted); font-size: .78rem; line-height: 1.4; }
+    .stat {
+      font-family: "JetBrains Mono", monospace; font-size: .78rem; color: var(--warn);
+    }
+    .box-list { max-height: 180px; overflow: auto; font-size: .78rem; }
+    .box-list div {
+      display: flex; justify-content: space-between; gap: .4rem;
+      padding: .3rem 0; border-bottom: 1px solid var(--line);
+    }
+    .chip {
+      display: inline-flex; gap: .35rem; flex-wrap: wrap; margin-top: .35rem;
+    }
+    .chip button { font-size: .75rem; padding: .28rem .5rem; }
+    .chip button.on { background: #1e4f7a; border-color: var(--accent); }
+    .status-pill {
+      font-size: .75rem; padding: .2rem .5rem; border-radius: 999px;
+      background: var(--panel-2); border: 1px solid var(--line);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>黄金集人工标注</h1>
+      <p>框选 ROI / 点人头 · 结果写入 <code>docs/golden_annotations/</code></p>
+    </div>
+    <div class="hdr-actions">
+      <span id="saveStatus" class="status-pill">未保存</span>
+      <button class="primary" id="btnSave">保存当前场次</button>
+      <button id="btnExport">下载 JSON</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <label class="field">场次</label>
+      <select id="sessionSel"></select>
+      <p class="hint" id="sessionHint" style="margin-top:.5rem"></p>
+      <label class="field">材料列表</label>
+      <ul class="asset-list" id="assetList"></ul>
+    </aside>
+
+    <div class="stage-wrap">
+      <div class="toolbar">
+        <strong id="assetTitle" style="margin-right:.5rem">选择材料</strong>
+        <button data-tool="box" class="active" id="toolBox">四点框</button>
+        <button data-tool="point" id="toolPoint">点人头</button>
+        <button data-tool="pan" id="toolPan">拖动画布</button>
+        <span style="width:8px"></span>
+        <button id="btnUndo">撤销</button>
+        <button id="btnCancelQuad">取消当前四点</button>
+        <button id="btnClearBox" class="danger">清空框</button>
+        <button id="btnClearPts" class="danger">清空点</button>
+        <span style="flex:1"></span>
+        <span class="stat" id="countStat"></span>
+      </div>
+      <div class="canvas-host" id="host">
+        <div id="stage">
+          <img id="img" alt="asset" />
+          <canvas id="overlay"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <label class="field">当前标签（四点框）</label>
+      <div class="chip" id="labelChips"></div>
+      <select id="labelSel" style="margin-top:.4rem"></select>
+      <p class="hint" id="labelHint"></p>
+      <p class="hint" id="quadHint" style="color:var(--warn)">四点顺序：左上 → 右上 → 右下 → 左下。点完 4 个顶点成框；可拖顶点微调。</p>
+
+      <label class="field">选中框的文字（OCR 真值）</label>
+      <input type="text" id="boxText" placeholder="如：2026 / 陈丽娟 / 14:00" />
+
+      <label class="field">本张字段真值</label>
+      <input type="text" id="fYear" placeholder="handbook_year / 年份" />
+      <input type="text" id="fPeople" placeholder="people_count（全景可自动=点数）" style="margin-top:.35rem" />
+      <input type="text" id="fTopic" placeholder="topic_title 讲题" style="margin-top:.35rem" />
+      <input type="text" id="fNames" placeholder="speaker_names，逗号分隔" style="margin-top:.35rem" />
+      <input type="text" id="fDate" placeholder="meeting_date" style="margin-top:.35rem" />
+      <input type="text" id="fTime" placeholder="start~end 时间" style="margin-top:.35rem" />
+      <input type="text" id="fLoc" placeholder="location" style="margin-top:.35rem" />
+      <input type="text" id="fStores" placeholder="store_names，逗号分隔（微型签到）" style="margin-top:.35rem" />
+      <input type="text" id="fAudience" placeholder="audience_count（微型签到）" style="margin-top:.35rem" />
+
+      <label class="field">本张备注</label>
+      <textarea id="assetNotes"></textarea>
+
+      <label class="field" style="margin-top:.7rem">已画框</label>
+      <div class="box-list" id="boxList"></div>
+
+      <div style="display:flex; gap:.4rem; margin-top:.8rem; flex-wrap:wrap">
+        <button class="ok" id="btnDone">标记本张完成</button>
+        <button id="btnUndone">取消完成</button>
+      </div>
+      <p class="hint" style="margin-top:.8rem">
+        操作：四点框依次点 4 顶点；点人头单击；拖顶点调整；Delete 删选中框；S 保存。<br/>
+        坐标均为相对图宽高 0~1；框存为 <code>quad[4]</code>。
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      sessions: [],
+      sessionId: null,
+      meta: null,
+      ann: null,
+      file: null,
+      asset: null,
+      tool: "box",
+      label: null,
+      labels: [],
+      selectedBox: -1,
+      quadDraft: [],       // 正在点的 4 顶点（相对坐标）
+      dragCorner: null,    // { boxIndex, cornerIndex }
+      dirty: false,
+      imgNatural: { w: 0, h: 0 },
+    };
+
+    const CORNER_LABELS = ["TL", "TR", "BR", "BL"];
+
+    function aabbFromQuad(quad) {
+      const xs = quad.map((p) => p.x);
+      const ys = quad.map((p) => p.y);
+      const x = Math.min(...xs);
+      const y = Math.min(...ys);
+      return {
+        x: +x.toFixed(5),
+        y: +y.toFixed(5),
+        w: +(Math.max(...xs) - x).toFixed(5),
+        h: +(Math.max(...ys) - y).toFixed(5),
+      };
+    }
+
+    /** 兼容旧矩形数据 → 四点 */
+    function ensureQuad(b) {
+      if (b.quad && b.quad.length === 4) return b.quad;
+      if (b.x != null && b.w != null) {
+        return [
+          { x: b.x, y: b.y },
+          { x: b.x + b.w, y: b.y },
+          { x: b.x + b.w, y: b.y + b.h },
+          { x: b.x, y: b.y + b.h },
+        ];
+      }
+      return null;
+    }
+
+    const $ = (id) => document.getElementById(id);
+    const img = $("img");
+    const canvas = $("overlay");
+    const ctx = canvas.getContext("2d");
+
+    function setDirty(v) {
+      state.dirty = v;
+      $("saveStatus").textContent = v ? "有未保存更改" : "已同步";
+      $("saveStatus").style.borderColor = v ? "var(--warn)" : "var(--ok)";
+    }
+
+    function curAssetAnn() {
+      if (!state.ann || !state.file) return null;
+      return state.ann.assets[state.file];
+    }
+
+    function syncFieldsFromAnn() {
+      const a = curAssetAnn();
+      if (!a) return;
+      const f = a.fields || {};
+      $("fYear").value = f.handbook_year ?? "";
+      $("fPeople").value = f.people_count ?? "";
+      $("fTopic").value = f.topic_title ?? "";
+      $("fNames").value = Array.isArray(f.speaker_names) ? f.speaker_names.join(",") : (f.speaker_names || "");
+      $("fDate").value = f.meeting_date || "";
+      $("fTime").value = f.time_range || f.start_time || "";
+      $("fLoc").value = f.location || "";
+      $("fStores").value = Array.isArray(f.store_names) ? f.store_names.join(",") : (f.store_names || "");
+      $("fAudience").value = f.audience_count ?? "";
+      $("assetNotes").value = a.notes || "";
+      renderBoxList();
+      updateCountStat();
+    }
+
+    function writeFieldsToAnn() {
+      const a = curAssetAnn();
+      if (!a) return;
+      const split = (s) => s.split(/[,，、]/).map((x) => x.trim()).filter(Boolean);
+      a.fields = a.fields || {};
+      const year = $("fYear").value.trim();
+      const people = $("fPeople").value.trim();
+      const topic = $("fTopic").value.trim();
+      const names = $("fNames").value.trim();
+      const date = $("fDate").value.trim();
+      const time = $("fTime").value.trim();
+      const loc = $("fLoc").value.trim();
+      const stores = $("fStores").value.trim();
+      const audience = $("fAudience").value.trim();
+      if (year) a.fields.handbook_year = Number(year) || year;
+      else delete a.fields.handbook_year;
+      if (people !== "") a.fields.people_count = Number(people);
+      else if (a.declared_type === "PANORAMA") a.fields.people_count = (a.points || []).length;
+      else delete a.fields.people_count;
+      if (topic) a.fields.topic_title = topic; else delete a.fields.topic_title;
+      if (names) a.fields.speaker_names = split(names); else delete a.fields.speaker_names;
+      if (date) a.fields.meeting_date = date; else delete a.fields.meeting_date;
+      if (time) a.fields.time_range = time; else delete a.fields.time_range;
+      if (loc) a.fields.location = loc; else delete a.fields.location;
+      if (stores) a.fields.store_names = split(stores); else delete a.fields.store_names;
+      if (audience !== "") a.fields.audience_count = Number(audience); else delete a.fields.audience_count;
+      a.notes = $("assetNotes").value;
+    }
+
+    function renderSessions() {
+      const sel = $("sessionSel");
+      sel.innerHTML = state.sessions.map((s) =>
+        `<option value="${s.id}">${s.label} · ${s.done_count}/${s.asset_count}</option>`
+      ).join("");
+    }
+
+    function renderAssets() {
+      const ul = $("assetList");
+      if (!state.meta) return;
+      ul.innerHTML = state.meta.assets.map((a) => {
+        const done = state.ann?.assets?.[a.file]?.done;
+        const sel = state.file === a.file ? "sel" : "";
+        const dn = done ? "done" : "";
+        return `<li class="${sel} ${dn}" data-file="${a.file}">
+          <div>${a.file}</div>
+          <span class="type-tag">${a.declared_type}${a.speaker_shot_kind ? " · " + a.speaker_shot_kind : ""}</span>
+        </li>`;
+      }).join("");
+      ul.querySelectorAll("li").forEach((li) => {
+        li.onclick = () => selectAsset(li.dataset.file);
+      });
+    }
+
+    function renderLabels() {
+      const a = state.asset;
+      state.labels = a?.labels || [];
+      const boxLabels = state.labels.filter((x) => x.mode === "box");
+      $("labelSel").innerHTML = boxLabels.map((l) =>
+        `<option value="${l.id}">${l.id}</option>`
+      ).join("");
+      $("labelChips").innerHTML = boxLabels.map((l) =>
+        `<button type="button" data-id="${l.id}">${l.id}</button>`
+      ).join("");
+      $("labelChips").querySelectorAll("button").forEach((b) => {
+        b.onclick = () => setLabel(b.dataset.id);
+      });
+      if (boxLabels.length) setLabel(boxLabels[0].id);
+      else {
+        state.label = null;
+        $("labelHint").textContent = a?.declared_type === "PANORAMA"
+          ? "全景请用「点人头」工具"
+          : "无预设框标签";
+      }
+      // auto tool
+      if (a?.declared_type === "PANORAMA") setTool("point");
+      else setTool("box");
+    }
+
+    function setLabel(id) {
+      state.label = id;
+      $("labelSel").value = id;
+      const meta = state.labels.find((x) => x.id === id);
+      $("labelHint").textContent = meta?.hint || "";
+      $("labelChips").querySelectorAll("button").forEach((b) => {
+        b.classList.toggle("on", b.dataset.id === id);
+      });
+    }
+
+    function setTool(tool) {
+      state.tool = tool;
+      ["box", "point", "pan"].forEach((t) => {
+        const el = document.getElementById("tool" + t[0].toUpperCase() + t.slice(1));
+        if (el) el.classList.toggle("active", tool === t);
+      });
+      $("stage").style.cursor = tool === "pan" ? "grab" : "crosshair";
+    }
+
+    function updateCountStat() {
+      const a = curAssetAnn();
+      if (!a) { $("countStat").textContent = ""; return; }
+      const nBox = (a.boxes || []).length;
+      const nPt = (a.points || []).length;
+      const draft = state.quadDraft.length
+        ? ` · 定点 ${state.quadDraft.length}/4`
+        : "";
+      $("countStat").textContent = `框 ${nBox} · 点 ${nPt}${draft}` +
+        (a.declared_type === "PANORAMA" ? ` · 人数 ${a.fields?.people_count ?? nPt}` : "");
+    }
+
+    function renderBoxList() {
+      const a = curAssetAnn();
+      const list = $("boxList");
+      if (!a) { list.innerHTML = ""; return; }
+      list.innerHTML = (a.boxes || []).map((b, i) => {
+        const sel = i === state.selectedBox ? " style='color:var(--accent)'" : "";
+        return `<div${sel}><span>#${i + 1} ${b.label}${b.text ? " 「" + b.text + "」" : ""}</span>
+          <button data-i="${i}" class="danger" style="padding:.1rem .35rem">删</button></div>`;
+      }).join("");
+      list.querySelectorAll("button").forEach((btn) => {
+        btn.onclick = () => {
+          a.boxes.splice(Number(btn.dataset.i), 1);
+          state.selectedBox = -1;
+          setDirty(true);
+          draw();
+          renderBoxList();
+          updateCountStat();
+        };
+      });
+      list.querySelectorAll("div").forEach((div, i) => {
+        div.onclick = (e) => {
+          if (e.target.tagName === "BUTTON") return;
+          state.selectedBox = i;
+          $("boxText").value = a.boxes[i].text || "";
+          draw();
+          renderBoxList();
+        };
+      });
+    }
+
+    function resizeCanvas() {
+      const r = img.getBoundingClientRect();
+      canvas.width = img.clientWidth;
+      canvas.height = img.clientHeight;
+      canvas.style.width = img.clientWidth + "px";
+      canvas.style.height = img.clientHeight + "px";
+      draw();
+    }
+
+    function drawQuad(quad, selected, label, text) {
+      const W = canvas.width, H = canvas.height;
+      const pts = quad.map((p) => ({ x: p.x * W, y: p.y * H }));
+      ctx.beginPath();
+      pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+      ctx.closePath();
+      ctx.strokeStyle = selected ? "#ffe08a" : "#5ec4ff";
+      ctx.lineWidth = selected ? 2.5 : 1.5;
+      ctx.stroke();
+      ctx.fillStyle = selected ? "rgba(255,224,138,.15)" : "rgba(94,196,255,.12)";
+      ctx.fill();
+      pts.forEach((p, i) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, selected ? 7 : 5, 0, Math.PI * 2);
+        ctx.fillStyle = selected ? "#ffe08a" : "#5ec4ff";
+        ctx.fill();
+        ctx.strokeStyle = "#0f1419";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        if (selected) {
+          ctx.fillStyle = "#e9eef4";
+          ctx.font = "600 11px JetBrains Mono";
+          ctx.fillText(CORNER_LABELS[i], p.x + 9, p.y - 8);
+        }
+      });
+      const top = Math.min(...pts.map((p) => p.y));
+      const left = Math.min(...pts.map((p) => p.x));
+      ctx.fillStyle = selected ? "#ffe08a" : "#5ec4ff";
+      ctx.font = "12px DM Sans";
+      ctx.fillText((label || "") + (text ? ":" + text : ""), left + 4, Math.max(12, top - 4));
+    }
+
+    function draw() {
+      const a = curAssetAnn();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!a) return;
+      const W = canvas.width, H = canvas.height;
+      (a.boxes || []).forEach((b, i) => {
+        const quad = ensureQuad(b);
+        if (!quad) return;
+        drawQuad(quad, i === state.selectedBox, b.label, b.text);
+      });
+      (a.points || []).forEach((p, i) => {
+        const x = p.x * W, y = p.y * H;
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = "#ff6b8a";
+        ctx.fill();
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = "#fff";
+        ctx.font = "10px JetBrains Mono";
+        ctx.fillText(String(i + 1), x + 7, y - 7);
+      });
+      // 正在点的草稿四点
+      if (state.quadDraft.length) {
+        const pts = state.quadDraft.map((p) => ({ x: p.x * W, y: p.y * H }));
+        ctx.beginPath();
+        pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+        ctx.strokeStyle = "#ffe08a";
+        ctx.setLineDash([6, 4]);
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.setLineDash([]);
+        pts.forEach((p, i) => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffe08a";
+          ctx.fill();
+          ctx.fillStyle = "#fff";
+          ctx.font = "600 11px JetBrains Mono";
+          ctx.fillText(CORNER_LABELS[i] + ` ${i + 1}/4`, p.x + 9, p.y - 8);
+        });
+      }
+    }
+
+    function hitCorner(px, py) {
+      const a = curAssetAnn();
+      if (!a) return null;
+      const W = canvas.width, H = canvas.height;
+      const R = 10;
+      // 优先选中框的顶点
+      const order = [];
+      if (state.selectedBox >= 0) order.push(state.selectedBox);
+      for (let i = 0; i < (a.boxes || []).length; i++) {
+        if (i !== state.selectedBox) order.push(i);
+      }
+      for (const bi of order) {
+        const quad = ensureQuad(a.boxes[bi]);
+        if (!quad) continue;
+        for (let ci = 0; ci < 4; ci++) {
+          const dx = quad[ci].x * W - px;
+          const dy = quad[ci].y * H - py;
+          if (dx * dx + dy * dy <= R * R) return { boxIndex: bi, cornerIndex: ci };
+        }
+      }
+      return null;
+    }
+
+    function relPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - rect.left) / rect.width,
+        y: (e.clientY - rect.top) / rect.height,
+        px: e.clientX - rect.left,
+        py: e.clientY - rect.top,
+      };
+    }
+
+    async function loadSession(id) {
+      writeFieldsToAnn();
+      state.sessionId = id;
+      state.meta = await fetch(`/v1/annotate/sessions/${id}`).then((r) => r.json());
+      state.ann = await fetch(`/v1/annotate/sessions/${id}/annotations`).then((r) => r.json());
+      $("sessionHint").textContent =
+        `${state.meta.project_type} · 保存至 ${state.meta.annotation_path}`;
+      renderAssets();
+      const first = state.meta.assets.find((a) => a.exists)?.file || state.meta.assets[0]?.file;
+      if (first) await selectAsset(first);
+      setDirty(false);
+    }
+
+    async function selectAsset(file) {
+      writeFieldsToAnn();
+      state.file = file;
+      state.asset = state.meta.assets.find((a) => a.file === file);
+      state.selectedBox = -1;
+      state.quadDraft = [];
+      state.dragCorner = null;
+      $("assetTitle").textContent = file;
+      $("boxText").value = "";
+      renderAssets();
+      renderLabels();
+      const url = `/v1/annotate/sessions/${state.sessionId}/image?file=${encodeURIComponent(file)}`;
+      img.onload = () => {
+        state.imgNatural = { w: img.naturalWidth, h: img.naturalHeight };
+        resizeCanvas();
+        syncFieldsFromAnn();
+      };
+      img.src = url + "&t=" + Date.now();
+    }
+
+    async function saveAll() {
+      writeFieldsToAnn();
+      // panorama people_count sync
+      Object.values(state.ann.assets).forEach((a) => {
+        if (a.declared_type === "PANORAMA") {
+          a.fields = a.fields || {};
+          if (a.fields.people_count == null) a.fields.people_count = (a.points || []).length;
+        }
+      });
+      const res = await fetch(`/v1/annotate/sessions/${state.sessionId}/annotations`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assets: state.ann.assets, notes: state.ann.session_notes || "" }),
+      }).then((r) => r.json());
+      setDirty(false);
+      $("saveStatus").textContent = `已保存 ${res.done_count}/${res.total} · ${res.path}`;
+      // refresh session list counts
+      state.sessions = (await fetch("/v1/annotate/sessions").then((r) => r.json())).sessions;
+      renderSessions();
+      $("sessionSel").value = state.sessionId;
+      renderAssets();
+    }
+
+    // events
+    $("sessionSel").onchange = () => loadSession($("sessionSel").value);
+    $("labelSel").onchange = () => setLabel($("labelSel").value);
+    document.querySelectorAll("[data-tool]").forEach((b) => {
+      b.onclick = () => setTool(b.dataset.tool);
+    });
+    $("btnSave").onclick = saveAll;
+    $("btnExport").onclick = () => {
+      writeFieldsToAnn();
+      const blob = new Blob([JSON.stringify(state.ann, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${state.sessionId}-annotations.json`;
+      a.click();
+    };
+    $("btnDone").onclick = () => {
+      writeFieldsToAnn();
+      const a = curAssetAnn();
+      if (!a) return;
+      a.done = true;
+      if (a.declared_type === "PANORAMA") a.fields.people_count = (a.points || []).length;
+      setDirty(true);
+      renderAssets();
+    };
+    $("btnUndone").onclick = () => {
+      const a = curAssetAnn();
+      if (!a) return;
+      a.done = false;
+      setDirty(true);
+      renderAssets();
+    };
+    $("btnCancelQuad").onclick = () => {
+      state.quadDraft = [];
+      draw();
+      updateCountStat();
+    };
+    $("btnClearBox").onclick = () => {
+      const a = curAssetAnn();
+      if (!a) return;
+      a.boxes = [];
+      state.selectedBox = -1;
+      state.quadDraft = [];
+      setDirty(true); draw(); renderBoxList(); updateCountStat();
+    };
+    $("btnClearPts").onclick = () => {
+      const a = curAssetAnn();
+      if (!a) return;
+      a.points = [];
+      if (a.declared_type === "PANORAMA") a.fields.people_count = 0;
+      $("fPeople").value = "0";
+      setDirty(true); draw(); updateCountStat();
+    };
+    $("btnUndo").onclick = () => {
+      const a = curAssetAnn();
+      if (!a) return;
+      if (state.quadDraft.length) {
+        state.quadDraft.pop();
+      } else if (state.tool === "point" && a.points?.length) {
+        a.points.pop();
+      } else if (a.boxes?.length) {
+        a.boxes.pop();
+        state.selectedBox = -1;
+      }
+      if (a.declared_type === "PANORAMA") {
+        a.fields.people_count = a.points.length;
+        $("fPeople").value = String(a.points.length);
+      }
+      setDirty(true); draw(); renderBoxList(); updateCountStat();
+    };
+    $("boxText").oninput = () => {
+      const a = curAssetAnn();
+      if (!a || state.selectedBox < 0) return;
+      a.boxes[state.selectedBox].text = $("boxText").value;
+      setDirty(true); draw(); renderBoxList();
+    };
+    ["fYear","fPeople","fTopic","fNames","fDate","fTime","fLoc","fStores","fAudience","assetNotes"].forEach((id) => {
+      $(id).addEventListener("change", () => { writeFieldsToAnn(); setDirty(true); updateCountStat(); });
+    });
+
+    let panStart = null;
+    canvas.addEventListener("mousedown", (e) => {
+      const a = curAssetAnn();
+      if (!a) return;
+      const p = relPos(e);
+      if (state.tool === "pan") {
+        panStart = { x: e.clientX, y: e.clientY, sl: $("host").scrollLeft, st: $("host").scrollTop };
+        return;
+      }
+      if (state.tool === "point") {
+        a.points = a.points || [];
+        a.points.push({ id: a.points.length + 1, x: +p.x.toFixed(5), y: +p.y.toFixed(5) });
+        a.fields = a.fields || {};
+        a.fields.people_count = a.points.length;
+        $("fPeople").value = String(a.points.length);
+        setDirty(true); draw(); updateCountStat();
+        return;
+      }
+      if (state.tool === "box") {
+        // 先尝试拖已有顶点
+        const hit = hitCorner(p.px, p.py);
+        if (hit) {
+          state.selectedBox = hit.boxIndex;
+          state.dragCorner = hit;
+          state.quadDraft = [];
+          $("boxText").value = a.boxes[hit.boxIndex].text || "";
+          draw();
+          renderBoxList();
+          return;
+        }
+        if (!state.label) return;
+        // 依次点四个顶点
+        state.quadDraft.push({
+          x: +Math.min(1, Math.max(0, p.x)).toFixed(5),
+          y: +Math.min(1, Math.max(0, p.y)).toFixed(5),
+        });
+        if (state.quadDraft.length === 4) {
+          const quad = state.quadDraft.map((q) => ({ ...q }));
+          const aabb = aabbFromQuad(quad);
+          a.boxes = a.boxes || [];
+          a.boxes.push({
+            label: state.label,
+            quad,
+            ...aabb,
+            text: "",
+          });
+          state.selectedBox = a.boxes.length - 1;
+          state.quadDraft = [];
+          $("boxText").value = "";
+          $("boxText").focus();
+          setDirty(true);
+          renderBoxList();
+        }
+        draw();
+        updateCountStat();
+      }
+    });
+    window.addEventListener("mousemove", (e) => {
+      if (panStart) {
+        $("host").scrollLeft = panStart.sl - (e.clientX - panStart.x);
+        $("host").scrollTop = panStart.st - (e.clientY - panStart.y);
+        return;
+      }
+      if (!state.dragCorner) return;
+      const a = curAssetAnn();
+      if (!a) return;
+      const p = relPos(e);
+      const b = a.boxes[state.dragCorner.boxIndex];
+      let quad = ensureQuad(b);
+      if (!quad) return;
+      quad = quad.map((q) => ({ ...q }));
+      quad[state.dragCorner.cornerIndex] = {
+        x: +Math.min(1, Math.max(0, p.x)).toFixed(5),
+        y: +Math.min(1, Math.max(0, p.y)).toFixed(5),
+      };
+      b.quad = quad;
+      Object.assign(b, aabbFromQuad(quad));
+      setDirty(true);
+      draw();
+    });
+    window.addEventListener("mouseup", () => {
+      if (panStart) { panStart = null; return; }
+      if (state.dragCorner) {
+        state.dragCorner = null;
+        renderBoxList();
+      }
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.target.matches("input, textarea, select")) {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+          e.preventDefault(); saveAll();
+        }
+        return;
+      }
+      if (e.key === "Delete" || e.key === "Backspace") {
+        const a = curAssetAnn();
+        if (!a) return;
+        if (state.selectedBox >= 0) {
+          a.boxes.splice(state.selectedBox, 1);
+          state.selectedBox = -1;
+          setDirty(true); draw(); renderBoxList(); updateCountStat();
+        }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault(); saveAll();
+      }
+      if (e.key === "b") setTool("box");
+      if (e.key === "p") setTool("point");
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+
+    (async function init() {
+      const data = await fetch("/v1/annotate/sessions").then((r) => r.json());
+      state.sessions = data.sessions;
+      renderSessions();
+      await loadSession(state.sessions[0]?.id || "hall-183");
+    })();
+  </script>
+</body>
+</html>

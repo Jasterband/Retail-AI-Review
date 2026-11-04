@@ -1,0 +1,769 @@
+openapi: 3.0.3
+info:
+  title: 药师会零售会议材料检查 API
+  description: |
+    PE → AI 零售会议材料检查服务。异步提交检查任务，轮询或回调获取结果。
+    人读文档见 ../PE接口文档-v1.8.md。
+    主路径：/v1/retail_meeting_checks。
+    主题重复=OCR文字比；照片盗用=pHash/embedding仅跨会议（不查会内）。
+  version: 1.1.0
+  contact:
+    name: Retail Meeting Check Team
+
+servers:
+  - url: https://retail-meeting-check-test.example.com
+    description: 测试环境
+  - url: https://retail-meeting-check.example.com
+    description: 生产环境
+
+tags:
+  - name: RetailMeetingChecks
+    description: 零售会议材料检查 · 提交与查询
+
+security:
+  - bearerAuth: []
+
+paths:
+  /health:
+    get:
+      tags: [RetailMeetingChecks]
+      operationId: healthCheck
+      summary: 健康检查
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 服务正常
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/retail_meeting_checks:
+    post:
+      tags: [RetailMeetingChecks]
+      operationId: createRetailMeetingCheck
+      summary: 提交零售会议材料检查
+      description: |
+        受理一场会议的材料检查任务。相同 request_id 幂等，不重复计次。
+        材料仅传 s3_uri，AI 侧拉取对象。
+      parameters:
+        - name: X-Callback-URL
+          in: header
+          required: false
+          schema:
+            type: string
+            format: uri
+          description: 检查完成后回调的 HTTPS URL
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+          description: 须与 body.request_id 一致（若传）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetailMeetingCheckRequest'
+            examples:
+              microSingle:
+                summary: 微型单讲者
+                $ref: '#/components/examples/MicroRequest'
+      responses:
+        '202':
+          description: 任务已受理
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetailMeetingCheckAccepted'
+              example:
+                request_id: req-micro-000090-001
+                job_id: 9001
+                status: ACCEPTED
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /v1/retail_meeting_checks/{request_id}:
+    get:
+      tags: [RetailMeetingChecks]
+      operationId: getRetailMeetingCheck
+      summary: 查询材料检查结果
+      description: |
+        返回进行中状态或终态结果（PASS / FAIL / NEED_HUMAN / ERROR）。
+        用 query `mode=simple|full` 选择返回详略：simple 给 PE 展示，full 给 AI debug。
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 64
+        - name: mode
+          in: query
+          required: false
+          description: 响应模式；默认 simple
+          schema:
+            type: string
+            enum: [simple, full]
+            default: simple
+      responses:
+        '200':
+          description: 查询成功（进行中或已完成）
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/RetailMeetingCheckResponse'
+                  - $ref: '#/components/schemas/RetailMeetingCheckRunning'
+              examples:
+                running:
+                  summary: 进行中
+                  value:
+                    request_id: req-micro-000090-001
+                    meeting_id: 1090
+                    job_id: 9001
+                    overall_status: null
+                    processing_status: RUNNING
+                    message: 审核进行中
+                    asset_results: []
+                    rule_results: []
+                pass:
+                  summary: 通过
+                  $ref: '#/components/examples/PassResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API Token
+      description: Authorization: Bearer <YOUR_API_TOKEN>
+
+  responses:
+    BadRequest:
+      description: 请求参数非法
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error:
+              code: SCHEMA_INVALID
+              message: meeting_subtype 在 project_type=MICRO 时必填
+              retryable: false
+    Unauthorized:
+      description: 未鉴权
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: 缺少或无效的 Authorization
+              retryable: false
+    Forbidden:
+      description: 无权限
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error:
+              code: NOT_FOUND
+              message: request_id 不存在
+              retryable: false
+    RateLimited:
+      description: 限流
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error:
+              code: RATE_LIMITED
+              message: 超过每分钟调用上限
+              retryable: true
+    InternalError:
+      description: 内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    ServiceUnavailable:
+      description: 依赖不可用
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error:
+              code: MODEL_UNAVAILABLE
+              message: 模型服务暂不可用
+              retryable: true
+
+  examples:
+    MicroRequest:
+      value:
+        request_id: req-micro-000090-001
+        meeting_id: 1090
+        session_no: "000090"
+        project_type: MICRO
+        meeting_subtype: SINGLE
+        period_id: 2
+        form:
+          meeting_name: 单讲师
+          meeting_date: "2026-05-27"
+          start_time: "14:00"
+          end_time: "14:35"
+          chain_or_store_name: 老百姓大药房连锁（安徽）有限公司
+          location: 合肥市老百姓大药房连锁（安徽）有限公司淠河路店
+          total_attendees: 7
+          speakers:
+            - speaker_id: 1
+              speaker_name: 示例讲者
+              topic: 慢病管理
+              store_name: 淠河路店
+              service_minutes: 30
+        assets:
+          - asset_id: 301
+            asset_type: E_POSTER
+            s3_uri: s3://pe-meetings/micro/000090/agenda.png
+            content_type: image/png
+          - asset_id: 302
+            asset_type: E_POSTER_DISPLAY
+            s3_uri: s3://pe-meetings/micro/000090/display1.jpg
+            content_type: image/jpeg
+          - asset_id: 303
+            asset_type: PROJECT_INTRO_DISPLAY
+            s3_uri: s3://pe-meetings/micro/000090/intro.jpg
+            content_type: image/jpeg
+          - asset_id: 304
+            asset_type: SPEAKER_PHOTO
+            s3_uri: s3://pe-meetings/micro/000090/speaker.jpg
+            content_type: image/jpeg
+            speaker_id: 1
+            speaker_shot_kind: TITLE_GROUP
+          - asset_id: 305
+            asset_type: PANORAMA
+            s3_uri: s3://pe-meetings/micro/000090/panorama.jpg
+            content_type: image/jpeg
+          - asset_id: 306
+            asset_type: SIGNIN
+            s3_uri: s3://pe-meetings/micro/000090/signin.pdf
+            content_type: application/pdf
+    PassResponse:
+      value:
+        request_id: req-hall-2-20260417-001
+        meeting_id: 1002
+        job_id: 9001
+        attempt_no: 1
+        overall_status: PASS
+        overall_confidence: 0.91
+        model_version: pe-rmc-v1.0.0
+        template_pack_version: "2026Q2"
+        summary_matched:
+          - 日程海报日期/时间/地点与表单一致
+          - 台卡四名与讲者名单一致
+        summary_failed: []
+        need_human_reasons: []
+        error: null
+        asset_results: []
+        rule_results:
+          - rule_code: NAME_CARD_SPEAKER_MATCH
+            status: PASS
+            confidence: 0.93
+            trigger_human: false
+            reason_text: 台卡姓名与系统讲者一致
+        finished_at: "2026-04-18T10:00:00+08:00"
+
+  schemas:
+    ErrorBody:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        retryable:
+          type: boolean
+          default: false
+
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorBody'
+
+    RetailMeetingCheckAccepted:
+      type: object
+      required: [request_id, job_id, status]
+      properties:
+        request_id:
+          type: string
+        job_id:
+          type: integer
+        status:
+          type: string
+          enum: [ACCEPTED]
+
+    RetailMeetingCheckRunning:
+      type: object
+      required: [request_id, processing_status]
+      properties:
+        request_id:
+          type: string
+        meeting_id:
+          type: integer
+        job_id:
+          type: integer
+        overall_status:
+          nullable: true
+        processing_status:
+          type: string
+          enum: [RUNNING, QUEUED]
+        message:
+          type: string
+        asset_results:
+          type: array
+          items: {}
+        rule_results:
+          type: array
+          items: {}
+
+    Speaker:
+      type: object
+      required: [speaker_id, speaker_name, topic, store_name, service_minutes]
+      properties:
+        speaker_id:
+          type: integer
+          minimum: 1
+        role_title:
+          type: string
+          maxLength: 10
+        store_name:
+          type: string
+          maxLength: 50
+        speaker_name:
+          type: string
+          maxLength: 20
+        topic:
+          type: string
+          maxLength: 50
+        service_minutes:
+          type: integer
+          minimum: 1
+        fee:
+          type: number
+        tax:
+          type: number
+          nullable: true
+
+    MeetingForm:
+      type: object
+      required:
+        - meeting_name
+        - meeting_date
+        - start_time
+        - end_time
+        - chain_or_store_name
+        - location
+        - total_attendees
+        - speakers
+      properties:
+        meeting_name:
+          type: string
+          maxLength: 50
+        meeting_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          pattern: '^([01]\d|2[0-3]):[0-5]\d$'
+        end_time:
+          type: string
+          pattern: '^([01]\d|2[0-3]):[0-5]\d$'
+        chain_or_store_name:
+          type: string
+          maxLength: 50
+        location:
+          type: string
+          maxLength: 200
+          description: 会议地点；与海报/水印 OCR 比对
+        remark:
+          type: string
+          maxLength: 200
+          nullable: true
+        total_attendees:
+          type: integer
+          minimum: 0
+        speakers:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Speaker'
+
+    AssetItem:
+      type: object
+      required: [asset_id, asset_type, s3_uri, content_type]
+      properties:
+        asset_id:
+          type: integer
+          minimum: 1
+        asset_type:
+          type: string
+          enum:
+            - E_POSTER
+            - POSTER
+            - STAND
+            - NAME_CARD
+            - HANDBOOK
+            - SPEAKER_PHOTO
+            - PANORAMA
+            - SIGNIN
+            - E_POSTER_DISPLAY
+            - PROJECT_INTRO_DISPLAY
+        s3_uri:
+          type: string
+          pattern: '^s3://[\w.\-]+/.+'
+        content_type:
+          type: string
+          enum:
+            - image/jpeg
+            - image/png
+            - image/jpg
+            - application/pdf
+        sort_no:
+          type: integer
+          minimum: 1
+          default: 1
+        speaker_id:
+          type: integer
+          nullable: true
+        speaker_shot_kind:
+          type: string
+          nullable: true
+          enum: [TITLE_GROUP, LECTURING, null]
+
+    RetailMeetingCheckRequest:
+      type: object
+      required:
+        - request_id
+        - meeting_id
+        - session_no
+        - project_type
+        - period_id
+        - form
+        - assets
+      properties:
+        request_id:
+          type: string
+          minLength: 8
+          maxLength: 64
+        meeting_id:
+          type: integer
+          minimum: 1
+        session_no:
+          type: string
+          maxLength: 20
+        project_type:
+          type: string
+          enum: [LECTURE_HALL, MICRO]
+        meeting_subtype:
+          type: string
+          nullable: true
+          enum: [SINGLE, DUAL, null]
+          description: MICRO 必填；LECTURE_HALL 为 null
+        period_id:
+          type: integer
+          minimum: 1
+        form:
+          $ref: '#/components/schemas/MeetingForm'
+        assets:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AssetItem'
+        refs:
+          type: object
+          properties:
+            template_pack_version:
+              type: string
+            logo_ref_s3:
+              type: string
+            duplicate_search_scope:
+              type: string
+              enum: [period, all]
+              default: period
+        options:
+          type: object
+          properties:
+            clarity_threshold:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 0.6
+            human_confidence_threshold:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 0.75
+            watermark_time_skew_minutes:
+              type: integer
+              minimum: 0
+              default: 120
+            name_match_mode:
+              type: string
+              enum: [exact, fuzzy]
+              default: fuzzy
+            response_mode:
+              type: string
+              enum: [simple, full]
+              default: simple
+              description: 回调默认响应模式；查询可用 ?mode= 覆盖
+            image_phash_max_distance:
+              type: integer
+              minimum: 0
+              default: 10
+            image_similarity_threshold:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 0.92
+
+    RuleResult:
+      type: object
+      required: [rule_code, status]
+      properties:
+        rule_code:
+          type: string
+        passed:
+          type: boolean
+          nullable: true
+        status:
+          type: string
+          enum: [PASS, FAIL, SKIP, UNCERTAIN]
+        confidence:
+          type: number
+          nullable: true
+        trigger_human:
+          type: boolean
+          default: false
+        reason_code:
+          type: string
+          nullable: true
+        reason_text:
+          type: string
+          nullable: true
+        evidence:
+          type: object
+          nullable: true
+        related_asset_ids:
+          type: array
+          items:
+            type: integer
+
+    FailReason:
+      type: object
+      required: [reason_text]
+      properties:
+        check:
+          type: string
+          nullable: true
+        reason_code:
+          type: string
+          nullable: true
+        reason_text:
+          type: string
+
+    AssetResult:
+      type: object
+      required: [asset_id, declared_type, asset_status, fail_reasons]
+      description: |
+        simple：asset_id / declared_type / asset_status / fail_reasons。
+        full：另含 checks、ocr、detections、debug 类字段。
+      properties:
+        asset_id:
+          type: integer
+        declared_type:
+          type: string
+        asset_status:
+          type: string
+          enum: [PASS, FAIL, UNCERTAIN, ERROR]
+        fail_reasons:
+          type: array
+          items:
+            $ref: '#/components/schemas/FailReason'
+        detected_type:
+          type: string
+          nullable: true
+        type_match:
+          type: boolean
+          nullable: true
+        clarity_score:
+          type: number
+          nullable: true
+        is_clear:
+          type: boolean
+          nullable: true
+        is_blurry:
+          type: boolean
+          nullable: true
+        checks:
+          type: object
+          additionalProperties:
+            type: boolean
+            nullable: true
+        uncertain_checks:
+          type: array
+          items:
+            type: string
+        ocr_fields:
+          type: object
+          nullable: true
+        ocr_raw:
+          type: string
+          nullable: true
+        detections:
+          type: object
+          nullable: true
+        model_scores:
+          type: object
+          nullable: true
+        image_dup_hit:
+          type: boolean
+          default: false
+          description: 是否与其他会议混用照片（完全一致或近似相似）
+        image_dup_kind:
+          type: string
+          nullable: true
+          enum: [exact, similar, null]
+        image_dup_score:
+          type: number
+          nullable: true
+        image_dup_ref_meeting_id:
+          type: integer
+          nullable: true
+        image_dup_ref_session_no:
+          type: string
+          nullable: true
+        topic_reuse_hit:
+          type: boolean
+          default: false
+          description: 仅讲者照：标题是否与历史主题重复
+        topic_reuse_ref_session_no:
+          type: string
+          nullable: true
+        topic_text_ocr:
+          type: string
+          nullable: true
+        fetch_error:
+          $ref: '#/components/schemas/ErrorBody'
+          nullable: true
+
+    RetailMeetingCheckResponse:
+      type: object
+      required:
+        - response_mode
+        - request_id
+        - meeting_id
+        - overall_status
+        - asset_results
+        - rule_results
+      properties:
+        response_mode:
+          type: string
+          enum: [simple, full]
+        request_id:
+          type: string
+        meeting_id:
+          type: integer
+        job_id:
+          type: integer
+          nullable: true
+        attempt_no:
+          type: integer
+          nullable: true
+        overall_status:
+          type: string
+          enum: [PASS, FAIL, NEED_HUMAN, ERROR]
+        overall_confidence:
+          type: number
+          nullable: true
+        model_version:
+          type: string
+          nullable: true
+        template_pack_version:
+          type: string
+          nullable: true
+        summary_matched:
+          type: array
+          items:
+            type: string
+        summary_failed:
+          type: array
+          items:
+            type: string
+        need_human_reasons:
+          type: array
+          items:
+            type: string
+        error:
+          allOf:
+            - $ref: '#/components/schemas/ErrorBody'
+          nullable: true
+        asset_results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetResult'
+        rule_results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleResult'
+        debug:
+          type: object
+          nullable: true
+          description: 仅 full
+        finished_at:
+          type: string
+          format: date-time
+          nullable: true
+        processing_status:
+          type: string
+          enum: [SUCCEEDED]
+          description: 终态时可省略或标 SUCCEEDED

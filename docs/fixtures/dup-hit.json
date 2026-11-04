@@ -1,0 +1,31 @@
+{
+  "request_id": "req-dup-hit-001",
+  "meeting_id": 9999,
+  "session_no": "DUP1",
+  "project_type": "LECTURE_HALL",
+  "meeting_subtype": null,
+  "period_id": 1,
+  "form": {
+    "meeting_name": "查重测试场",
+    "meeting_date": "2026-04-18",
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "chain_or_store_name": "测试连锁",
+    "location": "测试酒店",
+    "total_attendees": 35,
+    "speakers": [
+      {
+        "speaker_id": 1,
+        "speaker_name": "测试",
+        "topic": "查重主题",
+        "store_name": "测试店",
+        "service_minutes": 30
+      }
+    ]
+  },
+  "assets": [
+    {"asset_id": 901, "asset_type": "POSTER", "s3_uri": "s3://pe-meetings/dup-test/poster.jpg", "content_type": "image/jpeg"}
+  ],
+  "refs": {"image_dup_search_scope": "period"},
+  "options": {"response_mode": "full"}
+}

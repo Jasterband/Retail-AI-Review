@@ -49,13 +49,13 @@ def main() -> int:
     fixture = json.loads(
         (ROOT / "docs/fixtures/hall-meirui-pass.json").read_text(encoding="utf-8")
     )
-    fixture["request_id"] = "req-smoke-nokey-001"
+    fixture["task_id"] = "req-smoke-nokey-001"
     db = SessionLocal()
     try:
         job = AiCheckJob(
             meeting_id=fixture["meeting_id"],
             attempt_no=1,
-            request_id=fixture["request_id"],
+            task_id=fixture["task_id"],
             pe_snapshot=fixture,
             processing_status="RUNNING",
         )

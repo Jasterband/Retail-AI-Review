@@ -1,7 +1,7 @@
 # AI 审核功能 · 开发前置条件
 
 > 开始写代码前需要齐备或对齐的事项。  
-> 相关文档：[PE接口文档-v1.8.md](PE接口文档-v1.8.md) · [03-rule-matrix.md](03-rule-matrix.md) · [04-template-pack.md](04-template-pack.md) · [AI侧自查-InputOutput与PPT对照.md](AI侧自查-InputOutput与PPT对照.md)
+> 相关文档：[README-PE-simple对接.md](README-PE-simple对接.md)（PE 权威） · [CRM与AI-API字段对照.md](CRM与AI-API字段对照.md) · [03-rule-matrix.md](03-rule-matrix.md) · [04-template-pack.md](04-template-pack.md)
 
 ---
 
@@ -9,8 +9,8 @@
 
 | # | 前置条件 | 说明 | 状态 |
 |---|----------|------|------|
-| 1 | **接口约定冻结** | Input/Output、四种 `overall_status`、`asset_type` 枚举以 [PE接口文档-v1.8.md](PE接口文档-v1.8.md) 为准，与 PE 对齐后再大改字段 | ☐ |
-| 2 | **材料可读** | 约定 S3 桶/路径/读权限；本地开发可用样例目录模拟 `s3_uri` | ☐ |
+| 1 | **接口约定冻结** | PE simple 以 [README-PE-simple对接.md](README-PE-simple对接.md) 为准；四种 `overall_status`、`photo_type` 枚举与请求体对齐后再大改字段 | ☐ |
+| 2 | **材料可读** | 约定 S3 桶/路径/读权限；本地开发可用样例目录模拟 `file_url` | ☐ |
 | 3 | **合格样例 + 表单** | 大讲堂/微型合格照片，并整理成可构造的 `form`（日期、地点、讲者名等与图一致） | ☐ |
 | 4 | **规则实现优先级** | 先做哪些规则（建议：清晰度 → 类型核对 → Logo/人数 → 关键字段 → 台卡/手册/PPT），避免第一周铺开全部 | ☐ |
 | 5 | **运行与模型通道** | 可部署的服务环境；OCR/多模态/检测所需的 API Key 或内网模型可达 | ☐ |
@@ -59,8 +59,8 @@
 
 ## 5. 建议启动顺序（最小闭环）
 
-1. 起服务：`POST /v1/retail_meeting_checks` 校验并落库 → 返回 `202`；`GET /v1/retail_meeting_checks/{request_id}` 可查状态  
-2. 能按 `s3_uri`（或本地映射）下载到真实图片  
+1. 起服务：`POST /v1/retail_meeting_checks` 校验并落库 → 返回 `202`；`GET /v1/retail_meeting_checks/{task_id}` 可查状态  
+2. 能按 `file_url`（或本地映射）下载到真实图片  
 3. 接入 **一条** 真实规则（如清晰度或 Logo），写入 `rule_results`  
 4. 用一场微型样例跑通：提交 → 轮询 → 终态 `PASS`/`FAIL`  
 5. 再按 [03-rule-matrix.md](03-rule-matrix.md) 加台卡、人数、手册、PPT 模版等  
@@ -78,11 +78,12 @@
 
 | 用途 | 路径 |
 |------|------|
-| 对外接口 | [PE接口文档-v1.8.md](PE接口文档-v1.8.md) |
+| 对外接口（PE simple） | [README-PE-simple对接.md](README-PE-simple对接.md) |
+| 历史全文 / full 参考 | [PE接口文档-v1.8.md](PE接口文档-v1.8.md) |
 | 规则与阈值 | [03-rule-matrix.md](03-rule-matrix.md) |
 | 模版 crop | [04-template-pack.md](04-template-pack.md) |
 | 黄金集/负样本 | [05-golden-set.md](05-golden-set.md) |
-| 字段↔PPT | [AI侧自查-InputOutput与PPT对照.md](AI侧自查-InputOutput与PPT对照.md) |
+| 字段↔PPT | [CRM与AI-API字段对照.md](CRM与AI-API字段对照.md) |
 | 表结构参考 | [sql/schema.sql](sql/schema.sql) |
 | 技术栈与存中间/最终结果 | [技术选型与数据存储.md](技术选型与数据存储.md) |
 | 本地样例 | `零售照片ai审核/药师大讲堂/` · `零售照片ai审核/微型药师/` |

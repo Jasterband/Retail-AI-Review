@@ -17,8 +17,8 @@ def persist_histories(
     contexts: List[AssetContext],
 ) -> None:
     meeting_id = snap["meeting_id"]
-    session_no = snap.get("session_no")
-    period_id = snap.get("period_id")
+    meeting_no = snap.get("meeting_no")
+    project_id = snap.get("project_id")
     speakers = {
         s["speaker_id"]: s for s in (snap.get("form") or {}).get("speakers") or []
     }
@@ -28,20 +28,16 @@ def persist_histories(
             db.add(
                 ImageDupHistory(
                     meeting_id=meeting_id,
-                    session_no=session_no,
-                    period_id=period_id,
-                    asset_id=c.asset_id,
-                    asset_type=c.declared_type,
+                    meeting_no=meeting_no,
+                    project_id=project_id,
+                    photo_id=c.photo_id,
+                    photo_type=c.photo_type,
                     phash=c.phash,
                     embedding=c.embedding,
                 )
             )
 
-        if (
-            c.declared_type == "SPEAKER_PHOTO"
-            and c.ok
-            and (not c.speaker_shot_kind or c.speaker_shot_kind == "TITLE_GROUP")
-        ):
+        if c.photo_type == "SpeakerTitle" and c.ok:
             topic = (c.ocr_fields() or {}).get("topic_title")
             if not topic:
                 continue
@@ -49,9 +45,9 @@ def persist_histories(
             db.add(
                 TopicHistory(
                     meeting_id=meeting_id,
-                    session_no=session_no,
-                    period_id=period_id,
-                    asset_id=c.asset_id,
+                    meeting_no=meeting_no,
+                    project_id=project_id,
+                    photo_id=c.photo_id,
                     speaker_name=sp.get("speaker_name") or "",
                     topic_raw=topic,
                     topic_normalized=normalize_topic(topic),

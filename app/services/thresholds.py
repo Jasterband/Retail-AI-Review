@@ -40,19 +40,19 @@ def merge_thresholds(options: Optional[dict] = None) -> Dict[str, Any]:
     return out
 
 
-def panorama_need(project_type: str, meeting_subtype: Optional[str], thr: dict) -> int:
+def panorama_need(project_type: str, meeting_type: Optional[str], thr: dict) -> int:
     if project_type == "LECTURE_HALL":
         return int(thr["panorama_need_lecture_hall"])
-    if meeting_subtype == "DUAL":
+    if meeting_type == "DUAL":
         return int(thr["panorama_need_micro_dual"])
     return int(thr["panorama_need_micro_single"])
 
 
 def signin_duration_need(
-    project_type: str, meeting_subtype: Optional[str], thr: dict
+    project_type: str, meeting_type: Optional[str], thr: dict
 ) -> int:
     if project_type == "LECTURE_HALL":
         return int(thr["signin_duration_lecture_hall"])
-    if meeting_subtype == "DUAL":
+    if meeting_type == "DUAL":
         return int(thr["signin_duration_micro_dual"])
     return int(thr["signin_duration_micro_single"])

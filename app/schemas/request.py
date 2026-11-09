@@ -1,48 +1,100 @@
 from __future__ import annotations
 
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Set
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+ProjectType = Literal["LECTURE_HALL", "MICRO"]
+MeetingType = Literal["SINGLE", "DUAL"]  # CRM MeetingType 1/2；大讲堂请求里必须 null
+
+# 与 CRM r_Seminar_Photo.PhotoType 一致
+PhotoType = Literal[
+    "EDM",
+    "Poster",
+    "Stand",
+    "TableCard",
+    "Manual",
+    "EDMDisplay",
+    "ProjectIntro",
+    "Panorama",
+    "SignSheet",
+    "SpeakerTitle",
+    "SpeakerLecture",
+]
+ContentType = Literal["image/jpeg", "image/jpg", "image/png", "application/pdf"]
+ResponseMode = Literal["simple", "full"]
+
+SPEAKER_PHOTO_TYPES: Set[str] = {"SpeakerTitle", "SpeakerLecture"}
+
+HALL_PHOTO_TYPES: Set[str] = {
+    "EDM",
+    "Poster",
+    "Stand",
+    "TableCard",
+    "Manual",
+    "SpeakerTitle",
+    "SpeakerLecture",
+    "Panorama",
+    "SignSheet",
+}
+MICRO_PHOTO_TYPES: Set[str] = {
+    "EDM",
+    "EDMDisplay",
+    "ProjectIntro",
+    "SpeakerTitle",
+    "Panorama",
+    "SignSheet",
+}
 
 class Speaker(BaseModel):
-    speaker_id: int
-    speaker_name: str
-    topic: str
-    store_name: str
-    service_minutes: int
-    role_title: Optional[str] = None
-    fee: Optional[float] = None
-    tax: Optional[float] = None
+    speaker_id: str = Field(min_length=1, max_length=36)  # CRM SpeakerID
+    speaker_name: str = Field(max_length=20)  # SpeakerName
+    topic: str = Field(max_length=50)  # Topic
+    store_name: str = Field(max_length=50)  # StoreName
+    service_minutes: int  # ServiceMinutes
+    identity_name: str = Field(max_length=10)  # CRM IdentityName NotNull
+    lecture_fee: float  # CRM LectureFee NotNull
+    tax: float  # CRM Tax NotNull
 
 
 class MeetingForm(BaseModel):
-    meeting_name: str = Field(max_length=50)
-    meeting_date: str
-    start_time: str
-    end_time: str
-    chain_or_store_name: str
-    location: str
-    remark: Optional[str] = None
-    total_attendees: int
+    meeting_name: str = Field(max_length=50)  # MeetingName
+    meeting_date: str = Field(
+        pattern=r"^\d{4}-\d{2}-\d{2}$",
+        description="YYYY-MM-DD；CRM MeetingDate",
+    )
+    start_time: str = Field(max_length=5, pattern=r"^\d{2}:\d{2}$")  # StartTime
+    end_time: str = Field(max_length=5, pattern=r"^\d{2}:\d{2}$")  # EndTime
+    # CRM 为 ChainName + PharmacyName 两列；API 合成一列由 PE 按项目类型填入
+    chain_or_store_name: str = Field(max_length=50)
+    meeting_location: str = Field(max_length=200)  # MeetingLocation
+    remark: Optional[str] = Field(default=None, max_length=200)  # Remark
+    total_attendees: int  # TotalAttendees
     speakers: List[Speaker] = Field(min_length=1)
 
 
-class AssetItem(BaseModel):
-    asset_id: int
-    asset_type: str
-    s3_uri: str
-    content_type: str
-    sort_no: Optional[int] = None
-    speaker_id: Optional[int] = None
-    speaker_shot_kind: Optional[Literal["TITLE_GROUP", "LECTURING"]] = None
+class PhotoItem(BaseModel):
+    photo_id: str = Field(min_length=1, max_length=36)  # PhotoID
+    photo_type: PhotoType  # 与 CRM PhotoType 同值
+    file_url: str = Field(max_length=1000)  # FileUrl；须 s3://
+    content_type: ContentType  # 由 FileExt 映射的 MIME
+    sort: int = Field(ge=1)  # CRM Sort NotNull
+    speaker_id: Optional[str] = Field(default=None, max_length=36)
 
-    @field_validator("s3_uri")
+    @field_validator("file_url")
     @classmethod
     def must_be_s3(cls, v: str) -> str:
         if not v.startswith("s3://"):
-            raise ValueError("s3_uri must start with s3://")
+            raise ValueError("file_url must start with s3://")
         return v
+
+    @model_validator(mode="after")
+    def speaker_fields(self) -> "PhotoItem":
+        if self.photo_type in SPEAKER_PHOTO_TYPES and self.speaker_id is None:
+            raise ValueError(
+                "{0} 须带 speaker_id".format(self.photo_type)
+            )
+        return self
 
 
 class Refs(BaseModel):
@@ -58,7 +110,7 @@ class Options(BaseModel):
     human_confidence_threshold: float = 0.75
     watermark_time_skew_minutes: int = 120
     name_match_mode: Literal["exact", "fuzzy"] = "fuzzy"
-    response_mode: Literal["simple", "full"] = "simple"
+    response_mode: ResponseMode = "simple"
     image_phash_max_distance: int = 10
     image_similarity_threshold: float = 0.92
     template_similarity_pass: float = 0.85
@@ -74,24 +126,44 @@ class Options(BaseModel):
 
 
 class RetailMeetingCheckRequest(BaseModel):
-    request_id: str = Field(min_length=8, max_length=64)
-    meeting_id: int = Field(ge=1)
-    session_no: str = Field(max_length=20)
-    project_type: Literal["LECTURE_HALL", "MICRO"]
-    meeting_subtype: Optional[Literal["SINGLE", "DUAL"]] = None
-    period_id: int = Field(ge=1)
+    """POST /v1/retail_meeting_checks 请求体。
+
+    字段名与 photo_type 枚举对齐 CRM 数据字典。
+    """
+
+    task_id: str = Field(min_length=8, max_length=50)  # CRM TaskID / 幂等键
+    meeting_id: str = Field(min_length=1, max_length=36)  # MeetingID
+    meeting_no: str = Field(max_length=20)  # MeetingNo
+    project_type: ProjectType  # ProjectType（值：LECTURE_HALL|MICRO）
+    meeting_type: Optional[MeetingType] = None  # MeetingType → SINGLE|DUAL；大讲堂 null
+    project_id: str = Field(min_length=1, max_length=36)  # ProjectID
     form: MeetingForm
-    assets: List[AssetItem] = Field(min_length=1)
+    photos: List[PhotoItem] = Field(min_length=1)
     refs: Optional[Refs] = None
     options: Optional[Options] = None
 
     @model_validator(mode="after")
-    def check_subtype(self) -> "RetailMeetingCheckRequest":
-        if self.project_type == "MICRO" and self.meeting_subtype not in (
+    def check_type_and_photos(self) -> "RetailMeetingCheckRequest":
+        if self.project_type == "MICRO" and self.meeting_type not in (
             "SINGLE",
             "DUAL",
         ):
-            raise ValueError("meeting_subtype is required for MICRO (SINGLE|DUAL)")
-        if self.project_type == "LECTURE_HALL" and self.meeting_subtype is not None:
-            raise ValueError("meeting_subtype must be null for LECTURE_HALL")
+            raise ValueError("meeting_type is required for MICRO (SINGLE|DUAL)")
+        if self.project_type == "LECTURE_HALL" and self.meeting_type is not None:
+            raise ValueError("meeting_type must be null for LECTURE_HALL")
+
+        allowed = (
+            HALL_PHOTO_TYPES
+            if self.project_type == "LECTURE_HALL"
+            else MICRO_PHOTO_TYPES
+        )
+        bad = sorted(
+            {p.photo_type for p in self.photos if p.photo_type not in allowed}
+        )
+        if bad:
+            raise ValueError(
+                "photo_type 与 project_type={0} 不匹配: {1}".format(
+                    self.project_type, ", ".join(bad)
+                )
+            )
         return self

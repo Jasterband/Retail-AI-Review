@@ -356,7 +356,6 @@
       name_card_count_ok: "台卡人数与讲者人数一致",
       name_set_matches_speakers: "台卡姓名集合 = 讲者集合",
       name_card_template_ok: "台卡版式与模版一致",
-      speaker_shot_kind_ok: "合影/讲课类型与声明一致",
       topic_matches_form: "课件标题与表单 topic 一致",
       topic_not_reused_in_period: "主题未在同期重复",
       people_count_recorded: "成功得到本张人数",
@@ -368,10 +367,11 @@
       watermark_location_ok: "水印地点与表单一致",
     };
     const TYPE_LABEL = {
-      POSTER: "日程海报", STAND: "日程展架", NAME_CARD: "台卡", HANDBOOK: "手册",
-      E_POSTER: "电子日程海报", E_POSTER_DISPLAY: "电子海报展示",
-      PROJECT_INTRO_DISPLAY: "项目介绍展示", SPEAKER_PHOTO: "讲者照",
-      PANORAMA: "全景", SIGNIN: "签到表",
+      EDM: "电子日程海报", Poster: "日程海报", Stand: "日程展架",
+      TableCard: "台卡", Manual: "手册",
+      EDMDisplay: "电子海报展示", ProjectIntro: "项目介绍展示",
+      SpeakerTitle: "讲者标题合影", SpeakerLecture: "讲者讲课照",
+      Panorama: "全景", SignSheet: "签到表",
     };
     const STATUS_LABEL = { blocked: "阻塞", todo: "待做", wip: "进行中", done: "完成" };
 
@@ -394,7 +394,7 @@
 
     function scenarioMeta() {
       if (!currentSessionId || !scenarios[currentSessionId]) {
-        return { id: null, label: "请先选择场次", photo_base: "", assets_meta: [], fixture: null, auditable: false, expect: null };
+        return { id: null, label: "请先选择场次", photo_base: "", photos_meta: [], fixture: null, auditable: false, expect: null };
       }
       return scenarios[currentSessionId];
     }
@@ -415,13 +415,13 @@
 
     function assetScore(ar) {
       if (!ar) return "mix";
-      if (ar.asset_status === "FAIL" || ar.asset_status === "ERROR") return "bad";
-      if (ar.asset_status === "UNCERTAIN") return "mix";
+      if (ar.photo_status === "FAIL" || ar.photo_status === "ERROR") return "bad";
+      if (ar.photo_status === "UNCERTAIN") return "mix";
       const vals = Object.values(ar.checks || {});
       if (vals.some((v) => v === false)) return "bad";
       if (ar.fail_reasons && ar.fail_reasons.length) return "bad";
       if (vals.length && vals.every((v) => v === true || v === null)) return "ok";
-      if (ar.asset_status === "PASS") return "ok";
+      if (ar.photo_status === "PASS") return "ok";
       return "mix";
     }
 
@@ -436,10 +436,10 @@
       return "null";
     }
     function metaOf(pack, assetId) {
-      return (pack.assets_meta || []).find((a) => a.asset_id === assetId);
+      return (pack.photos_meta || []).find((a) => a.photo_id === assetId);
     }
     function resultOf(pack, assetId) {
-      return ((pack.response && pack.response.asset_results) || []).find((a) => a.asset_id === assetId);
+      return ((pack.response && pack.response.photo_results) || []).find((a) => a.photo_id === assetId);
     }
     function ruleStatus(pack, ruleCode) {
       if (!pack || !pack.response) return null;
@@ -500,18 +500,18 @@
         source: "live",
         label: meta.label || meta.id,
         photo_base: meta.photo_base || "",
-        assets_meta: meta.assets_meta || [],
+        photos_meta: meta.photos_meta || [],
         expect: meta.expect || null,
         request: {
           project_type: currentProject,
-          meeting_subtype: meta.meeting_subtype || null,
+          meeting_type: meta.meeting_type || null,
           form: {},
-          session_no: meta.session_no || "—",
+          meeting_no: meta.meeting_no || "—",
         },
         response: {
           overall_status: null,
           processing_status: "IDLE",
-          asset_results: [],
+          photo_results: [],
           rule_results: [],
           summary_matched: [],
           summary_failed: [],
@@ -532,7 +532,7 @@
         el.innerHTML = "<strong>浏览场次：</strong>" + escapeHtml(meta.note || "无 Live 夹具，可查看材料命名与缺材。补 form 后改为可审。");
         return;
       }
-      if (!pack || !pack.response || !pack.response.request_id) {
+      if (!pack || !pack.response || !pack.response.task_id) {
         el.className = "banner warn";
         el.innerHTML = "<strong>真实审核：</strong>选好场次后点「开始真实审核」。需配置 <code>OPENAI_API_KEY</code>。期望 overall=<code>" +
           escapeHtml((meta.expect && meta.expect.overall_status) || "—") + "</code>";
@@ -540,7 +540,7 @@
       }
       el.className = "banner live";
       el.innerHTML = `<strong>Live 结果：</strong>${escapeHtml(pack.label)} ·
-        request_id=<code>${escapeHtml(pack.response.request_id || "")}</code> ·
+        task_id=<code>${escapeHtml(pack.response.task_id || "")}</code> ·
         model=<code>${escapeHtml(pack.response.model_version || "—")}</code> ·
         response_mode=<code>${escapeHtml(pack.response.response_mode || "full")}</code>`;
     }
@@ -587,9 +587,9 @@
         <div class="badge ${status}">${escapeHtml(status)}</div>
         <div>
           <dl class="meta-grid">
-            <div><dt>project_type</dt><dd style="font-family:var(--mono)">${escapeHtml(req.project_type || currentProject || "—")}${req.meeting_subtype ? ` / ${escapeHtml(req.meeting_subtype)}` : ""}</dd></div>
+            <div><dt>project_type</dt><dd style="font-family:var(--mono)">${escapeHtml(req.project_type || currentProject || "—")}${req.meeting_type ? ` / ${escapeHtml(req.meeting_type)}` : ""}</dd></div>
             <div><dt>场景</dt><dd>${escapeHtml(pack.label || "")}</dd></div>
-            <div><dt>session_no</dt><dd>${escapeHtml(req.session_no || scenarioMeta().session_no || "—")}</dd></div>
+            <div><dt>meeting_no</dt><dd>${escapeHtml(req.meeting_no || scenarioMeta().meeting_no || "—")}</dd></div>
             ${expectLine}
             <div><dt>会议日期</dt><dd>${escapeHtml(f.meeting_date || "—")} ${escapeHtml(f.start_time || "")}–${escapeHtml(f.end_time || "")}</dd></div>
             <div><dt>连锁/药店</dt><dd>${escapeHtml(f.chain_or_store_name || "—")}</dd></div>
@@ -612,7 +612,7 @@
       const url = photoUrl(pack, m.file);
       if (isPdf(m)) {
         return `<div style="color:#cfe0d6;text-align:center;padding:24px;line-height:1.6">
-          <div style="font-family:var(--mono);font-size:13px;margin-bottom:8px">SIGNIN · PDF</div>
+          <div style="font-family:var(--mono);font-size:13px;margin-bottom:8px">SignSheet · PDF</div>
           <a href="${url}" target="_blank" rel="noopener" style="color:#7dcea0;font-size:13px">打开 PDF</a>
         </div>`;
       }
@@ -621,22 +621,21 @@
 
     function renderAssetList(pack) {
       const list = document.getElementById("asset-list");
-      if (!pack || !(pack.assets_meta || []).length) {
+      if (!pack || !(pack.photos_meta || []).length) {
         list.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px">无材料</div>`;
         return;
       }
-      list.innerHTML = pack.assets_meta.map((m) => {
-        const ar = resultOf(pack, m.asset_id) || { checks: {} };
+      list.innerHTML = pack.photos_meta.map((m) => {
+        const ar = resultOf(pack, m.photo_id) || { checks: {} };
         const score = assetScore(ar);
-        const shot = m.speaker_shot_kind ? ` · ${m.speaker_shot_kind}` : "";
         const who = m.speaker_name ? ` · ${m.speaker_name}` : "";
-        const active = m.asset_id === currentAssetId ? " active" : "";
+        const active = m.photo_id === currentAssetId ? " active" : "";
         return `
-          <button type="button" class="asset-item${active}" data-id="${m.asset_id}">
+          <button type="button" class="asset-item${active}" data-id="${m.photo_id}">
             ${thumbHtml(pack, m)}
             <div>
-              <div class="t">${TYPE_LABEL[m.declared_type] || m.declared_type}${who}</div>
-              <div class="s">#${m.asset_id}${shot} · ${escapeHtml(ar.asset_status || "—")}</div>
+              <div class="t">${TYPE_LABEL[m.photo_type] || m.photo_type}${who}</div>
+              <div class="s">#${m.photo_id} · ${escapeHtml(ar.photo_status || "—")}</div>
             </div>
             <span class="pill ${score}">${score === "bad" ? "fail" : score === "ok" ? "ok" : "mix"}</span>
           </button>`;
@@ -666,7 +665,7 @@
       const preview = `
         <div class="preview">
           ${previewHtml(pack, m)}
-          <div class="cap">${escapeHtml(m.file)} · ${escapeHtml(m.declared_type)}${ar ? ` → ${escapeHtml(ar.detected_type || "—")} · clarity ${ar.clarity_score ?? "—"}` : ""}</div>
+          <div class="cap">${escapeHtml(m.file)} · ${escapeHtml(m.photo_type)}${ar ? ` → ${escapeHtml(ar.detected_type || "—")} · clarity ${ar.clarity_score ?? "—"}` : ""}</div>
         </div>`;
       if (!ar) {
         box.innerHTML = preview + `<div class="checks-pane"><p class="sub">尚无该材料审核结果（浏览场次或未跑审核）</p></div>`;
@@ -687,7 +686,7 @@
         ${preview}
         <div class="checks-pane">
           <h2>checks · 本张检测点</h2>
-          <p class="sub">asset_id=${ar.asset_id} · status=${escapeHtml(ar.asset_status || "—")} · type_match=${ar.type_match} · is_clear=${ar.is_clear}</p>
+          <p class="sub">photo_id=${ar.photo_id} · status=${escapeHtml(ar.photo_status || "—")} · type_match=${ar.type_match} · is_clear=${ar.is_clear}</p>
           <div class="check-legend">
             <span><i class="dot t"></i> true</span>
             <span><i class="dot f"></i> false</span>
@@ -712,12 +711,12 @@
       }
       grid.innerHTML = rules.map((rr) => {
         const passed = rr.passed === true ? "true" : rr.passed === false ? "false" : "null";
-        const ids = (rr.related_asset_ids || []).join(", ") || "—";
+        const ids = (rr.related_photo_ids || []).join(", ") || "—";
         return `<div class="rule">
           <div class="code">${escapeHtml(rr.rule_code)}<div style="margin-top:6px;font-size:11px;color:var(--muted);font-weight:400">passed=${passed}</div></div>
           <div class="st ${rr.status}">${escapeHtml(rr.status)}</div>
           <div class="reason">${escapeHtml(rr.reason_text || "")}
-            <div class="ids">related_asset_ids: [${ids}]</div>
+            <div class="ids">related_photo_ids: [${ids}]</div>
           </div>
         </div>`;
       }).join("");
@@ -811,7 +810,7 @@
       const ar = pack && currentAssetId != null ? resultOf(pack, currentAssetId) : null;
       document.getElementById("json-view").textContent = ar
         ? JSON.stringify(ar, null, 2)
-        : (pack && pack.response && pack.response.request_id
+        : (pack && pack.response && pack.response.task_id
           ? JSON.stringify({
               overall_status: pack.response.overall_status,
               rule_results: pack.response.rule_results,
@@ -860,8 +859,8 @@
         return;
       }
       const pack = currentPack() || emptyLiveShell();
-      if (!currentAssetId || !(pack.assets_meta || []).some((a) => a.asset_id === currentAssetId)) {
-        currentAssetId = (pack.assets_meta && pack.assets_meta[0] && pack.assets_meta[0].asset_id) || null;
+      if (!currentAssetId || !(pack.photos_meta || []).some((a) => a.photo_id === currentAssetId)) {
+        currentAssetId = (pack.photos_meta && pack.photos_meta[0] && pack.photos_meta[0].photo_id) || null;
       }
       renderBanner(pack);
       renderStatus(pack);
@@ -901,7 +900,7 @@
         return r.json();
       });
       const body = JSON.parse(JSON.stringify(fixture));
-      body.request_id = "req-demo-" + Date.now() + "-" + (meta.session_no || meta.id);
+      body.task_id = "req-demo-" + Date.now() + "-" + (meta.meeting_no || meta.id);
       body.options = Object.assign({}, body.options || {}, { response_mode: "full" });
       const post = await fetch("/v1/retail_meeting_checks", {
         method: "POST",
@@ -912,7 +911,7 @@
       if (!post.ok) {
         throw new Error((accepted.error && accepted.error.message) || ("提交失败 HTTP " + post.status));
       }
-      const requestId = accepted.request_id || body.request_id;
+      const requestId = accepted.task_id || body.task_id;
       const result = await pollResult(requestId);
       return { body, result };
     }
@@ -934,7 +933,7 @@
           source: "live",
           label: meta.label,
           photo_base: meta.photo_base,
-          assets_meta: meta.assets_meta,
+          photos_meta: meta.photos_meta,
           expect: meta.expect || null,
           request: body,
           response: result,
@@ -980,7 +979,7 @@
               source: "live",
               label: meta.label,
               photo_base: meta.photo_base,
-              assets_meta: meta.assets_meta,
+              photos_meta: meta.photos_meta,
               expect: meta.expect || null,
               request: body,
               response: result,

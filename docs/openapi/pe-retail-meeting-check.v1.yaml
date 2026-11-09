@@ -3,10 +3,13 @@ info:
   title: 药师会零售会议材料检查 API
   description: |
     PE → AI 零售会议材料检查服务。异步提交检查任务，轮询或回调获取结果。
-    人读文档见 ../PE接口文档-v1.8.md。
+
+    **权威契约（PE simple）：../README-PE-simple对接.md**
+    本 YAML 为机器可读草稿，响应形状可能仍含旧字段（response_mode / rule_results /
+    reason_text / photo_type 等）；与对接文档冲突时以对接文档 + app/services/projection.py 为准。
+    历史全文 / full 排障：../PE接口文档-v1.8.md。
     主路径：/v1/retail_meeting_checks。
-    主题重复=OCR文字比；照片盗用=pHash/embedding仅跨会议（不查会内）。
-  version: 1.1.0
+  version: 1.1.1
   contact:
     name: Retail Meeting Check Team
 
@@ -51,8 +54,8 @@ paths:
       operationId: createRetailMeetingCheck
       summary: 提交零售会议材料检查
       description: |
-        受理一场会议的材料检查任务。相同 request_id 幂等，不重复计次。
-        材料仅传 s3_uri，AI 侧拉取对象。
+        受理一场会议的材料检查任务。相同 task_id 幂等，不重复计次。
+        材料仅传 file_url，AI 侧拉取对象。
       parameters:
         - name: X-Callback-URL
           in: header
@@ -66,7 +69,7 @@ paths:
           required: false
           schema:
             type: string
-          description: 须与 body.request_id 一致（若传）
+          description: 须与 body.task_id 一致（若传）
       requestBody:
         required: true
         content:
@@ -85,7 +88,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RetailMeetingCheckAccepted'
               example:
-                request_id: req-micro-000090-001
+                task_id: req-micro-000090-001
                 job_id: 9001
                 status: ACCEPTED
         '400':
@@ -101,7 +104,7 @@ paths:
         '503':
           $ref: '#/components/responses/ServiceUnavailable'
 
-  /v1/retail_meeting_checks/{request_id}:
+  /v1/retail_meeting_checks/{task_id}:
     get:
       tags: [RetailMeetingChecks]
       operationId: getRetailMeetingCheck
@@ -110,13 +113,13 @@ paths:
         返回进行中状态或终态结果（PASS / FAIL / NEED_HUMAN / ERROR）。
         用 query `mode=simple|full` 选择返回详略：simple 给 PE 展示，full 给 AI debug。
       parameters:
-        - name: request_id
+        - name: task_id
           in: path
           required: true
           schema:
             type: string
             minLength: 8
-            maxLength: 64
+            maxLength: 50
         - name: mode
           in: query
           required: false
@@ -138,13 +141,13 @@ paths:
                 running:
                   summary: 进行中
                   value:
-                    request_id: req-micro-000090-001
-                    meeting_id: 1090
+                    task_id: req-micro-000090-001
+                    meeting_id: "1090"
                     job_id: 9001
                     overall_status: null
                     processing_status: RUNNING
                     message: 审核进行中
-                    asset_results: []
+                    photo_results: []
                     rule_results: []
                 pass:
                   summary: 通过
@@ -176,7 +179,7 @@ components:
           example:
             error:
               code: SCHEMA_INVALID
-              message: meeting_subtype 在 project_type=MICRO 时必填
+              message: meeting_type 在 project_type=MICRO 时必填
               retryable: false
     Unauthorized:
       description: 未鉴权
@@ -204,7 +207,7 @@ components:
           example:
             error:
               code: NOT_FOUND
-              message: request_id 不存在
+              message: task_id 不存在
               retryable: false
     RateLimited:
       description: 限流
@@ -238,57 +241,65 @@ components:
   examples:
     MicroRequest:
       value:
-        request_id: req-micro-000090-001
-        meeting_id: 1090
-        session_no: "000090"
+        task_id: req-micro-000090-001
+        meeting_id: "1090"
+        meeting_no: "000090"
         project_type: MICRO
-        meeting_subtype: SINGLE
-        period_id: 2
+        meeting_type: SINGLE
+        project_id: "2"
         form:
           meeting_name: 单讲师
           meeting_date: "2026-05-27"
           start_time: "14:00"
           end_time: "14:35"
           chain_or_store_name: 老百姓大药房连锁（安徽）有限公司
-          location: 合肥市老百姓大药房连锁（安徽）有限公司淠河路店
+          meeting_location: 合肥市老百姓大药房连锁（安徽）有限公司淠河路店
           total_attendees: 7
           speakers:
-            - speaker_id: 1
+            - speaker_id: "1"
               speaker_name: 示例讲者
               topic: 慢病管理
               store_name: 淠河路店
               service_minutes: 30
-        assets:
-          - asset_id: 301
-            asset_type: E_POSTER
-            s3_uri: s3://pe-meetings/micro/000090/agenda.png
+              identity_name: 药师
+              lecture_fee: 0
+              tax: 0
+        photos:
+          - photo_id: "301"
+            photo_type: EDM
+            file_url: s3://pe-meetings/micro/000090/agenda.png
             content_type: image/png
-          - asset_id: 302
-            asset_type: E_POSTER_DISPLAY
-            s3_uri: s3://pe-meetings/micro/000090/display1.jpg
+            sort: 1
+          - photo_id: "302"
+            photo_type: EDMDisplay
+            file_url: s3://pe-meetings/micro/000090/display1.jpg
             content_type: image/jpeg
-          - asset_id: 303
-            asset_type: PROJECT_INTRO_DISPLAY
-            s3_uri: s3://pe-meetings/micro/000090/intro.jpg
+            sort: 2
+          - photo_id: "303"
+            photo_type: ProjectIntro
+            file_url: s3://pe-meetings/micro/000090/intro.jpg
             content_type: image/jpeg
-          - asset_id: 304
-            asset_type: SPEAKER_PHOTO
-            s3_uri: s3://pe-meetings/micro/000090/speaker.jpg
+            sort: 3
+          - photo_id: "304"
+            photo_type: SpeakerTitle
+            file_url: s3://pe-meetings/micro/000090/speaker.jpg
             content_type: image/jpeg
-            speaker_id: 1
-            speaker_shot_kind: TITLE_GROUP
-          - asset_id: 305
-            asset_type: PANORAMA
-            s3_uri: s3://pe-meetings/micro/000090/panorama.jpg
+            sort: 4
+            speaker_id: "1"
+          - photo_id: "305"
+            photo_type: Panorama
+            file_url: s3://pe-meetings/micro/000090/panorama.jpg
             content_type: image/jpeg
-          - asset_id: 306
-            asset_type: SIGNIN
-            s3_uri: s3://pe-meetings/micro/000090/signin.pdf
+            sort: 5
+          - photo_id: "306"
+            photo_type: SignSheet
+            file_url: s3://pe-meetings/micro/000090/signin.pdf
             content_type: application/pdf
+            sort: 6
     PassResponse:
       value:
-        request_id: req-hall-2-20260417-001
-        meeting_id: 1002
+        task_id: req-hall-2-20260417-001
+        meeting_id: "1002"
         job_id: 9001
         attempt_no: 1
         overall_status: PASS
@@ -301,7 +312,7 @@ components:
         summary_failed: []
         need_human_reasons: []
         error: null
-        asset_results: []
+        photo_results: []
         rule_results:
           - rule_code: NAME_CARD_SPEAKER_MATCH
             status: PASS
@@ -332,9 +343,9 @@ components:
 
     RetailMeetingCheckAccepted:
       type: object
-      required: [request_id, job_id, status]
+      required: [task_id, job_id, status]
       properties:
-        request_id:
+        task_id:
           type: string
         job_id:
           type: integer
@@ -344,12 +355,14 @@ components:
 
     RetailMeetingCheckRunning:
       type: object
-      required: [request_id, processing_status]
+      required: [task_id, processing_status]
       properties:
-        request_id:
+        task_id:
           type: string
         meeting_id:
-          type: integer
+          type: string
+          minLength: 1
+          maxLength: 36
         job_id:
           type: integer
         overall_status:
@@ -359,7 +372,7 @@ components:
           enum: [RUNNING, QUEUED]
         message:
           type: string
-        asset_results:
+        photo_results:
           type: array
           items: {}
         rule_results:
@@ -368,14 +381,17 @@ components:
 
     Speaker:
       type: object
-      required: [speaker_id, speaker_name, topic, store_name, service_minutes]
+      required: [speaker_id, speaker_name, topic, store_name, service_minutes, identity_name, lecture_fee, tax]
       properties:
         speaker_id:
-          type: integer
-          minimum: 1
-        role_title:
+          type: string
+          minLength: 1
+          maxLength: 36
+          description: 对齐 CRM SpeakerID（nvarchar）
+        identity_name:
           type: string
           maxLength: 10
+          description: 对齐 CRM IdentityName NotNull
         store_name:
           type: string
           maxLength: 50
@@ -388,11 +404,12 @@ components:
         service_minutes:
           type: integer
           minimum: 1
-        fee:
+        lecture_fee:
           type: number
+          description: 对齐 CRM LectureFee NotNull
         tax:
           type: number
-          nullable: true
+          description: 对齐 CRM Tax NotNull
 
     MeetingForm:
       type: object
@@ -402,7 +419,7 @@ components:
         - start_time
         - end_time
         - chain_or_store_name
-        - location
+        - meeting_location
         - total_attendees
         - speakers
       properties:
@@ -421,7 +438,7 @@ components:
         chain_or_store_name:
           type: string
           maxLength: 50
-        location:
+        meeting_location:
           type: string
           maxLength: 200
           description: 会议地点；与海报/水印 OCR 比对
@@ -438,28 +455,32 @@ components:
           items:
             $ref: '#/components/schemas/Speaker'
 
-    AssetItem:
+    PhotoItem:
       type: object
-      required: [asset_id, asset_type, s3_uri, content_type]
+      required: [photo_id, photo_type, file_url, content_type, sort]
       properties:
-        asset_id:
-          type: integer
-          minimum: 1
-        asset_type:
+        photo_id:
+          type: string
+          minLength: 1
+          maxLength: 36
+          description: 对齐 CRM PhotoID（nvarchar）
+        photo_type:
           type: string
           enum:
-            - E_POSTER
-            - POSTER
-            - STAND
-            - NAME_CARD
-            - HANDBOOK
-            - SPEAKER_PHOTO
-            - PANORAMA
-            - SIGNIN
-            - E_POSTER_DISPLAY
-            - PROJECT_INTRO_DISPLAY
-        s3_uri:
+            - EDM
+            - Poster
+            - Stand
+            - TableCard
+            - Manual
+            - SpeakerTitle
+            - SpeakerLecture
+            - Panorama
+            - SignSheet
+            - EDMDisplay
+            - ProjectIntro
+        file_url:
           type: string
+          maxLength: 1000
           pattern: '^s3://[\w.\-]+/.+'
         content_type:
           type: string
@@ -468,57 +489,59 @@ components:
             - image/png
             - image/jpg
             - application/pdf
-        sort_no:
+        sort:
           type: integer
           minimum: 1
-          default: 1
+          description: 对齐 CRM Sort NotNull
         speaker_id:
-          type: integer
-          nullable: true
-        speaker_shot_kind:
           type: string
           nullable: true
-          enum: [TITLE_GROUP, LECTURING, null]
+          minLength: 1
+          maxLength: 36
 
     RetailMeetingCheckRequest:
       type: object
       required:
-        - request_id
+        - task_id
         - meeting_id
-        - session_no
+        - meeting_no
         - project_type
-        - period_id
+        - project_id
         - form
-        - assets
+        - photos
       properties:
-        request_id:
+        task_id:
           type: string
           minLength: 8
-          maxLength: 64
+          maxLength: 50
         meeting_id:
-          type: integer
-          minimum: 1
-        session_no:
+          type: string
+          minLength: 1
+          maxLength: 36
+          description: 对齐 CRM MeetingID（nvarchar）
+        meeting_no:
           type: string
           maxLength: 20
         project_type:
           type: string
           enum: [LECTURE_HALL, MICRO]
-        meeting_subtype:
+        meeting_type:
           type: string
           nullable: true
           enum: [SINGLE, DUAL, null]
           description: MICRO 必填；LECTURE_HALL 为 null
-        period_id:
-          type: integer
-          minimum: 1
+        project_id:
+          type: string
+          minLength: 1
+          maxLength: 36
+          description: 对齐 CRM ProjectID（nvarchar）
         form:
           $ref: '#/components/schemas/MeetingForm'
-        assets:
+        photos:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/AssetItem'
+            $ref: '#/components/schemas/PhotoItem'
         refs:
           type: object
           properties:
@@ -593,10 +616,10 @@ components:
         evidence:
           type: object
           nullable: true
-        related_asset_ids:
+        related_photo_ids:
           type: array
           items:
-            type: integer
+            type: string
 
     FailReason:
       type: object
@@ -613,16 +636,18 @@ components:
 
     AssetResult:
       type: object
-      required: [asset_id, declared_type, asset_status, fail_reasons]
+      required: [photo_id, photo_type, photo_status, fail_reasons]
       description: |
-        simple：asset_id / declared_type / asset_status / fail_reasons。
+        simple：photo_id / photo_type / photo_status / fail_reasons。
         full：另含 checks、ocr、detections、debug 类字段。
       properties:
-        asset_id:
-          type: integer
-        declared_type:
+        photo_id:
           type: string
-        asset_status:
+          minLength: 1
+          maxLength: 36
+        photo_type:
+          type: string
+        photo_status:
           type: string
           enum: [PASS, FAIL, UNCERTAIN, ERROR]
         fail_reasons:
@@ -677,16 +702,16 @@ components:
           type: number
           nullable: true
         image_dup_ref_meeting_id:
-          type: integer
+          type: string
           nullable: true
-        image_dup_ref_session_no:
+        image_dup_ref_meeting_no:
           type: string
           nullable: true
         topic_reuse_hit:
           type: boolean
           default: false
           description: 仅讲者照：标题是否与历史主题重复
-        topic_reuse_ref_session_no:
+        topic_reuse_ref_meeting_no:
           type: string
           nullable: true
         topic_text_ocr:
@@ -700,19 +725,21 @@ components:
       type: object
       required:
         - response_mode
-        - request_id
+        - task_id
         - meeting_id
         - overall_status
-        - asset_results
+        - photo_results
         - rule_results
       properties:
         response_mode:
           type: string
           enum: [simple, full]
-        request_id:
+        task_id:
           type: string
         meeting_id:
-          type: integer
+          type: string
+          minLength: 1
+          maxLength: 36
         job_id:
           type: integer
           nullable: true
@@ -747,7 +774,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/ErrorBody'
           nullable: true
-        asset_results:
+        photo_results:
           type: array
           items:
             $ref: '#/components/schemas/AssetResult'

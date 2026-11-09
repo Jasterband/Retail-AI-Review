@@ -1,14 +1,12 @@
 {
   "session_id": "hall-183",
   "project_type": "LECTURE_HALL",
-  "session_no": "183",
   "label": "大讲堂 · 江苏大众 183",
-  "updated_at": "2026-11-03T08:01:30.457647+00:00",
-  "assets": {
+  "updated_at": "2026-11-06T07:42:19.698724+00:00",
+  "session_notes": "",
+  "photos": {
     "1手册.jpg": {
-      "declared_type": "HANDBOOK",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "handbook_cover",
@@ -68,12 +66,11 @@
         "handbook_year": 2026
       },
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "Manual"
     },
     "183.png": {
-      "declared_type": "E_POSTER",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "date",
@@ -181,14 +178,23 @@
         }
       ],
       "points": [],
-      "fields": {},
+      "fields": {
+        "meeting_date": "2026年6月30日",
+        "time_range": "9:00-11:10",
+        "location": "江阴市站西路183号三楼会议室",
+        "speaker_names": [
+          "陈丽娟",
+          "曹兰飞",
+          "单丽丽",
+          "杨燕"
+        ]
+      },
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "EDM"
     },
     "2权益-海报.jpg": {
-      "declared_type": "POSTER",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "bayer_logo",
@@ -220,12 +226,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "Poster"
     },
     "3权益-展架.jpg": {
-      "declared_type": "STAND",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "bayer_logo",
@@ -257,12 +262,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "Stand"
     },
     "4台卡-1.jpg": {
-      "declared_type": "NAME_CARD",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "name_card",
@@ -320,12 +324,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "TableCard"
     },
     "4台卡-2.jpg": {
-      "declared_type": "NAME_CARD",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "name_card",
@@ -383,12 +386,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "TableCard"
     },
     "5讲者1-陈丽娟1.jpg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": "陈丽娟",
-      "speaker_shot_kind": "TITLE_GROUP",
       "boxes": [
         {
           "label": "ppt_region",
@@ -474,12 +476,11 @@
         "people_count": 0
       },
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerTitle"
     },
     "5讲者1-陈丽娟2.jpg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": "陈丽娟",
-      "speaker_shot_kind": "LECTURING",
       "boxes": [
         {
           "label": "speaker",
@@ -537,12 +538,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerLecture"
     },
     "6讲者2-曹兰飞1.jpg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": "曹兰飞",
-      "speaker_shot_kind": "TITLE_GROUP",
       "boxes": [
         {
           "label": "speaker",
@@ -626,12 +626,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerTitle"
     },
     "6讲者2-曹兰飞2.jpg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": "曹兰飞",
-      "speaker_shot_kind": "LECTURING",
       "boxes": [
         {
           "label": "speaker",
@@ -689,12 +688,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerLecture"
     },
     "7讲者3-单丽丽1.jpg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": "单丽丽",
-      "speaker_shot_kind": "TITLE_GROUP",
       "boxes": [
         {
           "label": "speaker",
@@ -778,12 +776,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerTitle"
     },
     "7讲者3-单丽丽2.jpg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": "单丽丽",
-      "speaker_shot_kind": "LECTURING",
       "boxes": [
         {
           "label": "speaker",
@@ -841,12 +838,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerLecture"
     },
     "8讲者4-杨燕1.jpg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": "杨燕",
-      "speaker_shot_kind": "TITLE_GROUP",
       "boxes": [
         {
           "label": "speaker",
@@ -930,12 +926,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerTitle"
     },
     "8讲者4-杨燕2.jpg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": "杨燕",
-      "speaker_shot_kind": "LECTURING",
       "boxes": [
         {
           "label": "speaker",
@@ -993,12 +988,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerLecture"
     },
     "9全景照片（36）.jpg": {
-      "declared_type": "PANORAMA",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [],
       "points": [
         {
@@ -1181,12 +1175,11 @@
         "people_count": 35
       },
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "Panorama"
     },
     "10签到表1（35）.jpg": {
-      "declared_type": "SIGNIN",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "start_time",
@@ -1270,12 +1263,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SignSheet"
     },
     "10签到表2（35）.png": {
-      "declared_type": "SIGNIN",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "audience_block",
@@ -1307,8 +1299,10 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SignSheet"
     }
   },
-  "session_notes": ""
+  "meeting_no": "183",
+  "meeting_notes": ""
 }

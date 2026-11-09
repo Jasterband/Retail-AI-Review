@@ -6,22 +6,29 @@
       "project_type": "LECTURE_HALL",
       "template_kind": "LOGO_BAYER",
       "s3_uri": "s3://pe-templates/2026Q2/logo/bayer_logo.png",
-      "crop_meta": { "note": "拜耳Logo标准参考" }
+      "crop_meta": {
+        "note": "拜耳Logo标准参考"
+      }
     },
     {
       "project_type": "LECTURE_HALL",
-      "template_kind": "POSTER",
+      "template_kind": "Poster",
       "s3_uri": "s3://pe-templates/2026Q2/lecture_hall/poster_footer_wave_crop.jpg",
       "crop_meta": {
         "source_local_path": "药师大讲堂/2-2026-4-17-河南美锐大药房连锁有限公司/1权益-海报.jpg",
         "coord_space": "normalized",
-        "box": { "x": 0.0, "y": 0.85, "w": 1.0, "h": 0.15 },
+        "box": {
+          "x": 0.0,
+          "y": 0.85,
+          "w": 1.0,
+          "h": 0.15
+        },
         "note": "海报底部波浪装饰"
       }
     },
     {
       "project_type": "LECTURE_HALL",
-      "template_kind": "NAME_CARD",
+      "template_kind": "TableCard",
       "s3_uri": "s3://pe-templates/2026Q2/lecture_hall/name_card_border_crop.jpg",
       "crop_meta": {
         "source_local_path": "药师大讲堂/2-2026-4-17-河南美锐大药房连锁有限公司/3台卡.jpg",
@@ -30,7 +37,7 @@
     },
     {
       "project_type": "LECTURE_HALL",
-      "template_kind": "HANDBOOK",
+      "template_kind": "Manual",
       "s3_uri": "s3://pe-templates/2026Q2/lecture_hall/handbook_cover_current.jpg",
       "crop_meta": {
         "note": "TODO：从 Teams 补手册封面合格样例后替换"
@@ -42,7 +49,10 @@
       "s3_uri": "s3://pe-templates/2026Q2/micro/ppt_intro_footer_wave_crop.jpg",
       "crop_meta": {
         "source_local_path": "微型药师/000090-2026-05-27-合肥市-老百姓大药房连锁（安徽）有限公司/权益照片1.jpg",
-        "preprocess": ["detect_screen", "perspective_correct"],
+        "preprocess": [
+          "detect_screen",
+          "perspective_correct"
+        ],
         "note": "项目介绍页底部波浪"
       }
     },
@@ -52,7 +62,10 @@
       "s3_uri": "s3://pe-templates/2026Q2/micro/ppt_agenda_header_crop.jpg",
       "crop_meta": {
         "source_local_path": "微型药师/000090-2026-05-27-合肥市-老百姓大药房连锁（安徽）有限公司/权益照片2.jpg",
-        "preprocess": ["detect_screen", "perspective_correct"],
+        "preprocess": [
+          "detect_screen",
+          "perspective_correct"
+        ],
         "note": "电子日程展示页标题区"
       }
     }

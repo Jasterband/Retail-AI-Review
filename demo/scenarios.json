@@ -4,7 +4,7 @@
     "project_type": "LECTURE_HALL",
     "auditable": true,
     "label": "合格 · 大讲堂 · 广州东兴堂 143",
-    "session_no": "143",
+    "meeting_no": "143",
     "tags": [
       "golden",
       "pass"
@@ -24,102 +24,94 @@
         "SPEAKER_SHOT_PAIR": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 199,
+        "photo_id": "199",
         "file": "143.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 200,
+        "photo_id": "200",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 201,
+        "photo_id": "201",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 202,
+        "photo_id": "202",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 203,
+        "photo_id": "203",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 210,
+        "photo_id": "210",
         "file": "5讲者1-任池1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "任池",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "任池"
       },
       {
-        "asset_id": 211,
+        "photo_id": "211",
         "file": "5讲者1-任池2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "任池",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "任池"
       },
       {
-        "asset_id": 212,
+        "photo_id": "212",
         "file": "6讲者2-谢爱华1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "谢爱华",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "谢爱华"
       },
       {
-        "asset_id": 213,
+        "photo_id": "213",
         "file": "6讲者2-谢爱华2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "谢爱华",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "谢爱华"
       },
       {
-        "asset_id": 214,
+        "photo_id": "214",
         "file": "7讲者3-陈秋英1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈秋英",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "陈秋英"
       },
       {
-        "asset_id": 215,
+        "photo_id": "215",
         "file": "7讲者3-陈秋英2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈秋英",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "陈秋英"
       },
       {
-        "asset_id": 216,
+        "photo_id": "216",
         "file": "8讲者4-邓永莉1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "邓永莉",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "邓永莉"
       },
       {
-        "asset_id": 217,
+        "photo_id": "217",
         "file": "8讲者4-邓永莉2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "邓永莉",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "邓永莉"
       },
       {
-        "asset_id": 220,
+        "photo_id": "220",
         "file": "9全景照片（35）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 230,
+        "photo_id": "230",
         "file": "10签到表1（35）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 231,
+        "photo_id": "231",
         "file": "10签到表2（35）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       }
     ]
   },
@@ -128,7 +120,7 @@
     "project_type": "LECTURE_HALL",
     "auditable": true,
     "label": "合格 · 大讲堂 · 新疆济康 204",
-    "session_no": "204",
+    "meeting_no": "204",
     "tags": [
       "golden",
       "pass"
@@ -148,107 +140,99 @@
         "SPEAKER_SHOT_PAIR": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 20401,
+        "photo_id": "20401",
         "file": "0630.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 20411,
+        "photo_id": "20411",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 20412,
+        "photo_id": "20412",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 20413,
+        "photo_id": "20413",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 20414,
+        "photo_id": "20414",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 20453,
+        "photo_id": "20453",
         "file": "5讲者1-李鹏启1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "李鹏启",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "李鹏启"
       },
       {
-        "asset_id": 20454,
+        "photo_id": "20454",
         "file": "5讲者1-李鹏启2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "李鹏启",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "李鹏启"
       },
       {
-        "asset_id": 20455,
+        "photo_id": "20455",
         "file": "6讲者2-周芸倩1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "周芸倩",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "周芸倩"
       },
       {
-        "asset_id": 20456,
+        "photo_id": "20456",
         "file": "6讲者2-周芸倩2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "周芸倩",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "周芸倩"
       },
       {
-        "asset_id": 20457,
+        "photo_id": "20457",
         "file": "7讲者3-吴梦婷1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "吴梦婷",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "吴梦婷"
       },
       {
-        "asset_id": 20458,
+        "photo_id": "20458",
         "file": "7讲者3-吴梦婷2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "吴梦婷",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "吴梦婷"
       },
       {
-        "asset_id": 20459,
+        "photo_id": "20459",
         "file": "8讲者4-陈霞1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈霞",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "陈霞"
       },
       {
-        "asset_id": 20460,
+        "photo_id": "20460",
         "file": "8讲者4-陈霞2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈霞",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "陈霞"
       },
       {
-        "asset_id": 20480,
+        "photo_id": "20480",
         "file": "9全景照片（62）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 20491,
+        "photo_id": "20491",
         "file": "10签到表1（62）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 20492,
+        "photo_id": "20492",
         "file": "10签到表2（62）.png",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 20493,
+        "photo_id": "20493",
         "file": "10签到表3（62）.png",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       }
     ]
   },
@@ -257,7 +241,7 @@
     "project_type": "LECTURE_HALL",
     "auditable": true,
     "label": "合格 · 大讲堂 · 康佰家 208",
-    "session_no": "208",
+    "meeting_no": "208",
     "tags": [
       "golden",
       "pass"
@@ -277,102 +261,94 @@
         "SPEAKER_SHOT_PAIR": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 20801,
+        "photo_id": "20801",
         "file": "0710.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 20811,
+        "photo_id": "20811",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 20812,
+        "photo_id": "20812",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 20813,
+        "photo_id": "20813",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 20814,
+        "photo_id": "20814",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 20853,
+        "photo_id": "20853",
         "file": "5讲者1-彭艳梅1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "彭艳梅",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "彭艳梅"
       },
       {
-        "asset_id": 20854,
+        "photo_id": "20854",
         "file": "5讲者1-彭艳梅2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "彭艳梅",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "彭艳梅"
       },
       {
-        "asset_id": 20855,
+        "photo_id": "20855",
         "file": "6讲者2-蔡诗晴1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "蔡诗晴",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "蔡诗晴"
       },
       {
-        "asset_id": 20856,
+        "photo_id": "20856",
         "file": "6讲者2-蔡诗晴2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "蔡诗晴",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "蔡诗晴"
       },
       {
-        "asset_id": 20857,
+        "photo_id": "20857",
         "file": "7讲者3-郭雅惠1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "郭雅惠",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "郭雅惠"
       },
       {
-        "asset_id": 20858,
+        "photo_id": "20858",
         "file": "7讲者3-郭雅惠2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "郭雅惠",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "郭雅惠"
       },
       {
-        "asset_id": 20859,
+        "photo_id": "20859",
         "file": "8讲者4-蔡黎宁1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "蔡黎宁",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "蔡黎宁"
       },
       {
-        "asset_id": 20860,
+        "photo_id": "20860",
         "file": "8讲者4-蔡黎宁2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "蔡黎宁",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "蔡黎宁"
       },
       {
-        "asset_id": 20880,
+        "photo_id": "20880",
         "file": "9全景照片（36，含1名讲者）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 20891,
+        "photo_id": "20891",
         "file": "10签到表1（35）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 20892,
+        "photo_id": "20892",
         "file": "10签到表2（35）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       }
     ]
   },
@@ -381,7 +357,7 @@
     "project_type": "LECTURE_HALL",
     "auditable": true,
     "label": "合格 · 大讲堂 · 厦门九鼎 209",
-    "session_no": "209",
+    "meeting_no": "209",
     "tags": [
       "golden",
       "pass"
@@ -401,97 +377,89 @@
         "SPEAKER_SHOT_PAIR": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 20901,
+        "photo_id": "20901",
         "file": "0715.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 20911,
+        "photo_id": "20911",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 20912,
+        "photo_id": "20912",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 20913,
+        "photo_id": "20913",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 20914,
+        "photo_id": "20914",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 20953,
+        "photo_id": "20953",
         "file": "5讲者1-党雪玲1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "党雪玲",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "党雪玲"
       },
       {
-        "asset_id": 20954,
+        "photo_id": "20954",
         "file": "5讲者1-党雪玲2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "党雪玲",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "党雪玲"
       },
       {
-        "asset_id": 20955,
+        "photo_id": "20955",
         "file": "6讲者2-张小娴1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "张小娴",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "张小娴"
       },
       {
-        "asset_id": 20956,
+        "photo_id": "20956",
         "file": "6讲者2-张小娴2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "张小娴",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "张小娴"
       },
       {
-        "asset_id": 20957,
+        "photo_id": "20957",
         "file": "7讲者3-吴晶晶1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "吴晶晶",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "吴晶晶"
       },
       {
-        "asset_id": 20958,
+        "photo_id": "20958",
         "file": "7讲者3-吴晶晶2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "吴晶晶",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "吴晶晶"
       },
       {
-        "asset_id": 20959,
+        "photo_id": "20959",
         "file": "8讲者4-陈雪霞1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈雪霞",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "陈雪霞"
       },
       {
-        "asset_id": 20960,
+        "photo_id": "20960",
         "file": "8讲者4-陈雪霞2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈雪霞",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "陈雪霞"
       },
       {
-        "asset_id": 20980,
+        "photo_id": "20980",
         "file": "9全景照片（41）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 20991,
+        "photo_id": "20991",
         "file": "10签到表（41）.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       }
     ]
@@ -501,7 +469,7 @@
     "project_type": "LECTURE_HALL",
     "auditable": true,
     "label": "合格 · 大讲堂 · 高济海棠 224",
-    "session_no": "224",
+    "meeting_no": "224",
     "tags": [
       "golden",
       "pass"
@@ -521,97 +489,89 @@
         "SPEAKER_SHOT_PAIR": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 22401,
+        "photo_id": "22401",
         "file": "224.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 22411,
+        "photo_id": "22411",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 22412,
+        "photo_id": "22412",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 22413,
+        "photo_id": "22413",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 22414,
+        "photo_id": "22414",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 22453,
+        "photo_id": "22453",
         "file": "5讲者1-唐燕1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "唐燕",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "唐燕"
       },
       {
-        "asset_id": 22454,
+        "photo_id": "22454",
         "file": "5讲者1-唐燕2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "唐燕",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "唐燕"
       },
       {
-        "asset_id": 22455,
+        "photo_id": "22455",
         "file": "6讲者2-宋敏绘1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "宋敏绘",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "宋敏绘"
       },
       {
-        "asset_id": 22456,
+        "photo_id": "22456",
         "file": "6讲者2-宋敏绘2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "宋敏绘",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "宋敏绘"
       },
       {
-        "asset_id": 22457,
+        "photo_id": "22457",
         "file": "7讲者3-虞海燕1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "虞海燕",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "虞海燕"
       },
       {
-        "asset_id": 22458,
+        "photo_id": "22458",
         "file": "7讲者3-虞海燕2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "虞海燕",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "虞海燕"
       },
       {
-        "asset_id": 22459,
+        "photo_id": "22459",
         "file": "8讲者4-刘双1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "刘双",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "刘双"
       },
       {
-        "asset_id": 22460,
+        "photo_id": "22460",
         "file": "8讲者4-刘双2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "刘双",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "刘双"
       },
       {
-        "asset_id": 22480,
+        "photo_id": "22480",
         "file": "9全景照片（35）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 22491,
+        "photo_id": "22491",
         "file": "10签到表（35）.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       }
     ]
@@ -621,7 +581,7 @@
     "project_type": "LECTURE_HALL",
     "auditable": true,
     "label": "不合格 · 大讲堂 · 嘉伦光彩 185（缺全景/台卡）",
-    "session_no": "185",
+    "meeting_no": "185",
     "tags": [
       "negative",
       "fail",
@@ -641,92 +601,84 @@
         "缺真实台卡"
       ]
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 18500,
+        "photo_id": "18500",
         "file": "0706.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 18501,
+        "photo_id": "18501",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 18502,
+        "photo_id": "18502",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 18503,
+        "photo_id": "18503",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 18523,
+        "photo_id": "18523",
         "file": "5讲者1-李玉侠1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "李玉侠",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "李玉侠"
       },
       {
-        "asset_id": 18524,
+        "photo_id": "18524",
         "file": "5讲者1-李玉侠2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "李玉侠",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "李玉侠"
       },
       {
-        "asset_id": 18525,
+        "photo_id": "18525",
         "file": "6讲者2-高秀林1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "高秀林",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "高秀林"
       },
       {
-        "asset_id": 18526,
+        "photo_id": "18526",
         "file": "6讲者2-高秀林2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "高秀林",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "高秀林"
       },
       {
-        "asset_id": 18527,
+        "photo_id": "18527",
         "file": "7讲者3-翁蓉蔚1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "翁蓉蔚",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "翁蓉蔚"
       },
       {
-        "asset_id": 18528,
+        "photo_id": "18528",
         "file": "7讲者3-翁蓉蔚2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "翁蓉蔚",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "翁蓉蔚"
       },
       {
-        "asset_id": 18529,
+        "photo_id": "18529",
         "file": "8讲者4-徐云云1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "徐云云",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "徐云云"
       },
       {
-        "asset_id": 18530,
+        "photo_id": "18530",
         "file": "8讲者4-徐云云2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "徐云云",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "徐云云"
       },
       {
-        "asset_id": 18591,
+        "photo_id": "18591",
         "file": "10签到表1（35）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 18592,
+        "photo_id": "18592",
         "file": "10签到表2（35）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       }
     ]
   },
@@ -734,14 +686,14 @@
     "id": "hall-negatives",
     "project_type": "LECTURE_HALL",
     "auditable": true,
-    "label": "不合格 · 大讲堂 · 负样本图包（模糊/人数不够等）",
-    "session_no": "NEG-HALL",
+    "label": "不合格 · 大讲堂 · 负样本拼盘（展架/全景/讲者）",
+    "meeting_no": "NEG-HALL",
     "tags": [
       "negative",
       "fail"
     ],
     "fixture": "/fixtures/hall-negative-samples-fail.json",
-    "photo_base": "/samples/hall/不合格照片(1)/不合格照片/",
+    "photo_base": "/samples/hall/20场有不合格照片场次&对应执行报告/",
     "expect": {
       "overall_status": "FAIL",
       "rules": {
@@ -750,36 +702,43 @@
         "KEY_FIELD_MATCH": "FAIL"
       },
       "fail_notes": [
-        "模糊/信息不全/人数不够/手册重叠/特写"
+        "146展架无时间",
+        "241展架不完整",
+        "143全景人数不够",
+        "282讲者模糊",
+        "243讲者未拍到脸"
       ]
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 9000,
-        "file": "展架海报信息模糊.jpg",
-        "declared_type": "STAND"
+        "photo_id": "9000",
+        "file": "3权益-展架.jpg",
+        "photo_type": "Stand",
+        "from_session": "146"
       },
       {
-        "asset_id": 9001,
-        "file": "展架信息不完善.jpg",
-        "declared_type": "STAND"
+        "photo_id": "9001",
+        "file": "3权益-展架.jpg",
+        "photo_type": "Stand",
+        "from_session": "241"
       },
       {
-        "asset_id": 9002,
-        "file": "全景人数不够.jpg",
-        "declared_type": "PANORAMA"
+        "photo_id": "9002",
+        "file": "9全景照片.jpg",
+        "photo_type": "Panorama",
+        "from_session": "143"
       },
       {
-        "asset_id": 9003,
-        "file": "手册重叠拍照.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_id": "9003",
+        "file": "5讲者1-邹丽哲2.jpg",
+        "photo_type": "SpeakerLecture",
+        "from_session": "282"
       },
       {
-        "asset_id": 9004,
-        "file": "特写只拍讲者.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "LECTURING",
-        "speaker_name": "测试讲者"
+        "photo_id": "9004",
+        "file": "5讲者1-吴淑荣1.jpg",
+        "photo_type": "SpeakerLecture",
+        "from_session": "243"
       }
     ]
   },
@@ -788,119 +747,111 @@
     "project_type": "LECTURE_HALL",
     "auditable": false,
     "label": "浏览 · 大讲堂 · 海王星辰 169（已修展架=号）",
-    "session_no": "169",
+    "meeting_no": "169",
     "tags": [
       "browse",
       "naming-fixed"
     ],
     "note": "命名已修；待补 form 夹具",
     "photo_base": "/samples/hall/大讲堂已上传过的50场会议核销资料/169~2026-6-23~江苏海王星辰健康药房连锁有限公司核销资料/",
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 16901,
+        "photo_id": "16901",
         "file": "0623.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 16902,
+        "photo_id": "16902",
         "file": "10签到表1（64）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 16903,
+        "photo_id": "16903",
         "file": "10签到表2（64）.png",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 16904,
+        "photo_id": "16904",
         "file": "10签到表3（64）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 16905,
+        "photo_id": "16905",
         "file": "10签到表4（64）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 16906,
+        "photo_id": "16906",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 16907,
+        "photo_id": "16907",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 16908,
+        "photo_id": "16908",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 16909,
+        "photo_id": "16909",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 16910,
+        "photo_id": "16910",
         "file": "5讲者1-卢雪琴1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "卢雪琴",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "卢雪琴"
       },
       {
-        "asset_id": 16911,
+        "photo_id": "16911",
         "file": "5讲者1-卢雪琴2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "卢雪琴",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "卢雪琴"
       },
       {
-        "asset_id": 16912,
+        "photo_id": "16912",
         "file": "6讲者2-王凤1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "王凤",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "王凤"
       },
       {
-        "asset_id": 16913,
+        "photo_id": "16913",
         "file": "6讲者2-王凤2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "王凤",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "王凤"
       },
       {
-        "asset_id": 16914,
+        "photo_id": "16914",
         "file": "7讲者3-王丽1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "王丽",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "王丽"
       },
       {
-        "asset_id": 16915,
+        "photo_id": "16915",
         "file": "7讲者3-王丽2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "王丽",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "王丽"
       },
       {
-        "asset_id": 16916,
+        "photo_id": "16916",
         "file": "8讲者4-唐明星1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "唐明星",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "唐明星"
       },
       {
-        "asset_id": 16917,
+        "photo_id": "16917",
         "file": "8讲者4-唐明星2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "唐明星",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "唐明星"
       },
       {
-        "asset_id": 16918,
+        "photo_id": "16918",
         "file": "9全景照片（63）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       }
     ]
   },
@@ -909,114 +860,106 @@
     "project_type": "LECTURE_HALL",
     "auditable": false,
     "label": "浏览 · 大讲堂 · 江苏大众 183（台卡两张）",
-    "session_no": "183",
+    "meeting_no": "183",
     "tags": [
       "browse",
       "naming-fixed"
     ],
     "note": "台卡已规范为 4台卡-1/2；待补 form",
     "photo_base": "/samples/hall/大讲堂已上传过的50场会议核销资料/183~2026-6-30~江苏大众医药连锁有限公司核销资料/",
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 18301,
+        "photo_id": "18301",
         "file": "10签到表1（35）.jpg",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 18302,
+        "photo_id": "18302",
         "file": "10签到表2（35）.png",
-        "declared_type": "SIGNIN"
+        "photo_type": "SignSheet"
       },
       {
-        "asset_id": 18303,
+        "photo_id": "18303",
         "file": "183.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 18304,
+        "photo_id": "18304",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 18305,
+        "photo_id": "18305",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 18306,
+        "photo_id": "18306",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 18307,
+        "photo_id": "18307",
         "file": "4台卡-1.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 18308,
+        "photo_id": "18308",
         "file": "4台卡-2.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 18309,
+        "photo_id": "18309",
         "file": "5讲者1-陈丽娟1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈丽娟",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "陈丽娟"
       },
       {
-        "asset_id": 18310,
+        "photo_id": "18310",
         "file": "5讲者1-陈丽娟2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈丽娟",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "陈丽娟"
       },
       {
-        "asset_id": 18311,
+        "photo_id": "18311",
         "file": "6讲者2-曹兰飞1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "曹兰飞",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "曹兰飞"
       },
       {
-        "asset_id": 18312,
+        "photo_id": "18312",
         "file": "6讲者2-曹兰飞2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "曹兰飞",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "曹兰飞"
       },
       {
-        "asset_id": 18313,
+        "photo_id": "18313",
         "file": "7讲者3-单丽丽1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "单丽丽",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "单丽丽"
       },
       {
-        "asset_id": 18314,
+        "photo_id": "18314",
         "file": "7讲者3-单丽丽2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "单丽丽",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "单丽丽"
       },
       {
-        "asset_id": 18315,
+        "photo_id": "18315",
         "file": "8讲者4-杨燕1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "杨燕",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "杨燕"
       },
       {
-        "asset_id": 18316,
+        "photo_id": "18316",
         "file": "8讲者4-杨燕2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "杨燕",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "杨燕"
       },
       {
-        "asset_id": 18317,
+        "photo_id": "18317",
         "file": "9全景照片（36）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       }
     ]
   },
@@ -1025,105 +968,97 @@
     "project_type": "LECTURE_HALL",
     "auditable": false,
     "label": "浏览 · 大讲堂 · 燕煌 218（已修展架/讲者序号）",
-    "session_no": "218",
+    "meeting_no": "218",
     "tags": [
       "browse",
       "naming-fixed"
     ],
     "note": "命名已修；待补 form",
     "photo_base": "/samples/hall/大讲堂已上传过的50场会议核销资料/218~2026-7-7~福建省燕煌医药连锁有限公司核销资料/",
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 21801,
+        "photo_id": "21801",
         "file": "0707.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 21802,
+        "photo_id": "21802",
         "file": "10签到表（36）.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       },
       {
-        "asset_id": 21803,
+        "photo_id": "21803",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 21804,
+        "photo_id": "21804",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 21805,
+        "photo_id": "21805",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 21806,
+        "photo_id": "21806",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 21807,
+        "photo_id": "21807",
         "file": "5讲者1-王玲玲1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "王玲玲",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "王玲玲"
       },
       {
-        "asset_id": 21808,
+        "photo_id": "21808",
         "file": "5讲者1-王玲玲2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "王玲玲",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "王玲玲"
       },
       {
-        "asset_id": 21809,
+        "photo_id": "21809",
         "file": "6讲者2-林瑞瑞1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "林瑞瑞",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "林瑞瑞"
       },
       {
-        "asset_id": 21810,
+        "photo_id": "21810",
         "file": "6讲者2-林瑞瑞2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "林瑞瑞",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "林瑞瑞"
       },
       {
-        "asset_id": 21811,
+        "photo_id": "21811",
         "file": "7讲者3-林剑毅1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "林剑毅",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "林剑毅"
       },
       {
-        "asset_id": 21812,
+        "photo_id": "21812",
         "file": "7讲者3-林剑毅2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "林剑毅",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "林剑毅"
       },
       {
-        "asset_id": 21813,
+        "photo_id": "21813",
         "file": "8讲者4-叶添益1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "叶添益",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "叶添益"
       },
       {
-        "asset_id": 21814,
+        "photo_id": "21814",
         "file": "8讲者4-叶添益2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "叶添益",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "叶添益"
       },
       {
-        "asset_id": 21815,
+        "photo_id": "21815",
         "file": "9全景照片（36）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       }
     ]
   },
@@ -1132,105 +1067,97 @@
     "project_type": "LECTURE_HALL",
     "auditable": false,
     "label": "浏览 · 大讲堂 · 百欣堂 225（已修陈玲1）",
-    "session_no": "225",
+    "meeting_no": "225",
     "tags": [
       "browse",
       "naming-fixed"
     ],
     "note": "命名已修；待补 form",
     "photo_base": "/samples/hall/大讲堂已上传过的50场会议核销资料/225~2026-7-9~四川省百欣堂药业连锁有限公司核销资料/",
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 22501,
+        "photo_id": "22501",
         "file": "0709.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 22502,
+        "photo_id": "22502",
         "file": "10签到表（35）.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       },
       {
-        "asset_id": 22503,
+        "photo_id": "22503",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 22504,
+        "photo_id": "22504",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 22505,
+        "photo_id": "22505",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 22506,
+        "photo_id": "22506",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 22507,
+        "photo_id": "22507",
         "file": "5讲者1-刘远琴1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "刘远琴",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "刘远琴"
       },
       {
-        "asset_id": 22508,
+        "photo_id": "22508",
         "file": "5讲者1-刘远琴2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "刘远琴",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "刘远琴"
       },
       {
-        "asset_id": 22509,
+        "photo_id": "22509",
         "file": "6讲者2-陈玲1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈玲",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "陈玲"
       },
       {
-        "asset_id": 22510,
+        "photo_id": "22510",
         "file": "6讲者2-陈玲2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "陈玲",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "陈玲"
       },
       {
-        "asset_id": 22511,
+        "photo_id": "22511",
         "file": "7讲者3-张泽芬1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "张泽芬",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "张泽芬"
       },
       {
-        "asset_id": 22512,
+        "photo_id": "22512",
         "file": "7讲者3-张泽芬2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "张泽芬",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "张泽芬"
       },
       {
-        "asset_id": 22513,
+        "photo_id": "22513",
         "file": "8讲者4-高晓文1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "高晓文",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "高晓文"
       },
       {
-        "asset_id": 22514,
+        "photo_id": "22514",
         "file": "8讲者4-高晓文2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "高晓文",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "高晓文"
       },
       {
-        "asset_id": 22515,
+        "photo_id": "22515",
         "file": "9全景照片（35）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       }
     ]
   },
@@ -1239,115 +1166,107 @@
     "project_type": "LECTURE_HALL",
     "auditable": false,
     "label": "浏览 · 大讲堂 · 健尔堂 231（已修签到前缀）",
-    "session_no": "231",
+    "meeting_no": "231",
     "tags": [
       "browse",
       "naming-fixed"
     ],
     "note": "命名已修；待补 form",
     "photo_base": "/samples/hall/大讲堂已上传过的50场会议核销资料/231~2026-7-13~成都健尔堂大药房连锁有限公司核销资料/",
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 23101,
+        "photo_id": "23101",
         "file": "0713.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 23102,
+        "photo_id": "23102",
         "file": "10签到表（55）.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       },
       {
-        "asset_id": 23103,
+        "photo_id": "23103",
         "file": "1手册.jpg",
-        "declared_type": "HANDBOOK"
+        "photo_type": "Manual"
       },
       {
-        "asset_id": 23104,
+        "photo_id": "23104",
         "file": "2权益-海报.jpg",
-        "declared_type": "POSTER"
+        "photo_type": "Poster"
       },
       {
-        "asset_id": 23105,
+        "photo_id": "23105",
         "file": "3权益-展架.jpg",
-        "declared_type": "STAND"
+        "photo_type": "Stand"
       },
       {
-        "asset_id": 23106,
+        "photo_id": "23106",
         "file": "4台卡.jpg",
-        "declared_type": "NAME_CARD"
+        "photo_type": "TableCard"
       },
       {
-        "asset_id": 23107,
+        "photo_id": "23107",
         "file": "5讲者1-帅小敏1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "帅小敏",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "帅小敏"
       },
       {
-        "asset_id": 23108,
+        "photo_id": "23108",
         "file": "5讲者1-帅小敏2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "帅小敏",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "帅小敏"
       },
       {
-        "asset_id": 23109,
+        "photo_id": "23109",
         "file": "6讲者2-林兴1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "林兴",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "林兴"
       },
       {
-        "asset_id": 23110,
+        "photo_id": "23110",
         "file": "6讲者2-林兴2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "林兴",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "林兴"
       },
       {
-        "asset_id": 23111,
+        "photo_id": "23111",
         "file": "7讲者3-张墨雅1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "张墨雅",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "张墨雅"
       },
       {
-        "asset_id": 23112,
+        "photo_id": "23112",
         "file": "7讲者3-张墨雅2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "张墨雅",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "张墨雅"
       },
       {
-        "asset_id": 23113,
+        "photo_id": "23113",
         "file": "8讲者4-曹仁支1.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "曹仁支",
-        "speaker_shot_kind": "TITLE_GROUP"
+        "photo_type": "SpeakerTitle",
+        "speaker_name": "曹仁支"
       },
       {
-        "asset_id": 23114,
+        "photo_id": "23114",
         "file": "8讲者4-曹仁支2.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_name": "曹仁支",
-        "speaker_shot_kind": "LECTURING"
+        "photo_type": "SpeakerLecture",
+        "speaker_name": "曹仁支"
       },
       {
-        "asset_id": 23115,
+        "photo_id": "23115",
         "file": "9全景照片（55）.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       }
     ]
   },
   "micro-000606": {
     "id": "micro-000606",
     "project_type": "MICRO",
-    "meeting_subtype": "SINGLE",
+    "meeting_type": "SINGLE",
     "auditable": true,
     "label": "合格 · 微型单讲 · 太极东大街 000606",
-    "session_no": "000606",
+    "meeting_no": "000606",
     "tags": [
       "golden",
       "pass",
@@ -1366,38 +1285,37 @@
         "PPT_PAGE_KIND": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 301,
+        "photo_id": "301",
         "file": "电子日程海报.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 302,
+        "photo_id": "302",
         "file": "项目介绍展示.jpeg",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
+        "photo_type": "ProjectIntro"
       },
       {
-        "asset_id": 303,
+        "photo_id": "303",
         "file": "电子日程海报展示.jpeg",
-        "declared_type": "E_POSTER_DISPLAY"
+        "photo_type": "EDMDisplay"
       },
       {
-        "asset_id": 304,
+        "photo_id": "304",
         "file": "标题合影.jpeg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
+        "photo_type": "SpeakerTitle",
         "speaker_name": "讲者"
       },
       {
-        "asset_id": 305,
+        "photo_id": "305",
         "file": "全景照片.jpeg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 306,
+        "photo_id": "306",
         "file": "签到表.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       }
     ]
@@ -1405,10 +1323,10 @@
   "micro-000670": {
     "id": "micro-000670",
     "project_type": "MICRO",
-    "meeting_subtype": "SINGLE",
+    "meeting_type": "SINGLE",
     "auditable": true,
     "label": "合格 · 微型单讲 · 张仲景关林路 000670",
-    "session_no": "000670",
+    "meeting_no": "000670",
     "tags": [
       "golden",
       "pass",
@@ -1427,38 +1345,37 @@
         "PPT_PAGE_KIND": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 6701,
+        "photo_id": "6701",
         "file": "电子日程海报.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 6702,
+        "photo_id": "6702",
         "file": "项目介绍展示.jpeg",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
+        "photo_type": "ProjectIntro"
       },
       {
-        "asset_id": 6703,
+        "photo_id": "6703",
         "file": "电子日程海报展示.jpeg",
-        "declared_type": "E_POSTER_DISPLAY"
+        "photo_type": "EDMDisplay"
       },
       {
-        "asset_id": 6704,
+        "photo_id": "6704",
         "file": "标题合影.png",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
+        "photo_type": "SpeakerTitle",
         "speaker_name": "讲者"
       },
       {
-        "asset_id": 6705,
+        "photo_id": "6705",
         "file": "全景照片.jpeg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 6706,
+        "photo_id": "6706",
         "file": "签到表.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       }
     ]
@@ -1466,10 +1383,10 @@
   "micro-000921": {
     "id": "micro-000921",
     "project_type": "MICRO",
-    "meeting_subtype": "DUAL",
+    "meeting_type": "DUAL",
     "auditable": true,
     "label": "合格 · 微型双讲 · 启扬泰兴东润 000921",
-    "session_no": "000921",
+    "meeting_no": "000921",
     "tags": [
       "golden",
       "pass",
@@ -1489,50 +1406,48 @@
         "SIGNIN_RATIO_AND_STORES": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 501,
+        "photo_id": "501",
         "file": "张吉根/电子日程海报.png",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 502,
+        "photo_id": "502",
         "file": "张吉根/项目介绍展示.jpg",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
+        "photo_type": "ProjectIntro"
       },
       {
-        "asset_id": 503,
+        "photo_id": "503",
         "file": "张吉根/电子日程海报展示.jpg",
-        "declared_type": "E_POSTER_DISPLAY"
+        "photo_type": "EDMDisplay"
       },
       {
-        "asset_id": 504,
+        "photo_id": "504",
         "file": "张吉根/标题合影.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
+        "photo_type": "SpeakerTitle",
         "speaker_name": "张吉根"
       },
       {
-        "asset_id": 505,
+        "photo_id": "505",
         "file": "郝万君/标题合影.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
+        "photo_type": "SpeakerTitle",
         "speaker_name": "郝万君"
       },
       {
-        "asset_id": 506,
+        "photo_id": "506",
         "file": "张吉根/全景照片.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 507,
+        "photo_id": "507",
         "file": "郝万君/全景照片.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 508,
+        "photo_id": "508",
         "file": "张吉根/签到表.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       }
     ]
@@ -1540,10 +1455,10 @@
   "micro-000938": {
     "id": "micro-000938",
     "project_type": "MICRO",
-    "meeting_subtype": "DUAL",
+    "meeting_type": "DUAL",
     "auditable": true,
     "label": "合格 · 微型双讲 · 德心堂红山二店 000938",
-    "session_no": "000938",
+    "meeting_no": "000938",
     "tags": [
       "golden",
       "pass",
@@ -1563,318 +1478,304 @@
         "SIGNIN_RATIO_AND_STORES": "PASS"
       }
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 93801,
+        "photo_id": "93801",
         "file": "李吉鹏/电子日程海报.jpg",
-        "declared_type": "E_POSTER"
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 93802,
+        "photo_id": "93802",
         "file": "李吉鹏/项目介绍展示.jpg",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
+        "photo_type": "ProjectIntro"
       },
       {
-        "asset_id": 93803,
+        "photo_id": "93803",
         "file": "李吉鹏/电子日程海报展示.jpg",
-        "declared_type": "E_POSTER_DISPLAY"
+        "photo_type": "EDMDisplay"
       },
       {
-        "asset_id": 93804,
+        "photo_id": "93804",
         "file": "李吉鹏/标题合影.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
+        "photo_type": "SpeakerTitle",
         "speaker_name": "李吉鹏"
       },
       {
-        "asset_id": 93805,
+        "photo_id": "93805",
         "file": "董灵娟/标题合影.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
+        "photo_type": "SpeakerTitle",
         "speaker_name": "董灵娟"
       },
       {
-        "asset_id": 93806,
+        "photo_id": "93806",
         "file": "李吉鹏/全景照片.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 93807,
+        "photo_id": "93807",
         "file": "董灵娟/全景照片.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 93808,
+        "photo_id": "93808",
         "file": "李吉鹏/签到表.pdf",
-        "declared_type": "SIGNIN",
+        "photo_type": "SignSheet",
         "is_pdf": true
       }
     ]
   },
-  "micro-000620": {
-    "id": "micro-000620",
+  "micro-000728": {
+    "id": "micro-000728",
     "project_type": "MICRO",
-    "meeting_subtype": "SINGLE",
     "auditable": true,
-    "label": "不合格 · 微型单讲 · 海王星辰海富花园 000620",
-    "session_no": "000620",
+    "label": "不合格 · 微型单讲 · 上海益丰益伟大药房有限公司 000728",
+    "meeting_no": "000728",
     "tags": [
       "negative",
-      "fail",
-      "single"
+      "fail"
     ],
-    "fixture": "/fixtures/micro-000620-fail.json",
-    "photo_base": "/samples/micro/不合格场次5场次/000620-2026-08-10-广州市海王星辰医药连锁有限公司海珠海富花园健康药房-微型药店健康服务赋能计划项目/",
+    "fixture": "/fixtures/micro-000728-fail.json",
+    "photo_base": "/samples/micro/微型药师20场不合格照片/（系统测试）-不合格场次20场10.30/000728-2026-08-20-上海市-上海益丰益伟大药房有限公司-微型药店健康服务赋能计划项目/",
     "expect": {
       "overall_status": "FAIL",
       "rules": {
-        "PPT_PAGE_KIND": "FAIL"
+        "PANORAMA_COUNT": "FAIL"
       },
       "fail_notes": [
-        "页类问题"
+        "全景人数不够（约5人）"
       ]
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 621,
-        "file": "电子日程海报.jpeg",
-        "declared_type": "E_POSTER"
+        "photo_id": "7281",
+        "file": "电子日程海报.png",
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 622,
+        "photo_id": "7282",
         "file": "项目介绍展示.jpeg",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
+        "photo_type": "ProjectIntro"
       },
       {
-        "asset_id": 623,
+        "photo_id": "7283",
         "file": "电子日程海报展示.jpeg",
-        "declared_type": "E_POSTER_DISPLAY"
+        "photo_type": "EDMDisplay"
       },
       {
-        "asset_id": 624,
+        "photo_id": "7284",
         "file": "标题合影.jpeg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
-        "speaker_name": "讲者"
+        "photo_type": "SpeakerLecture"
       },
       {
-        "asset_id": 625,
+        "photo_id": "7285",
         "file": "全景照片.jpeg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 626,
-        "file": "签到表.jpeg",
-        "declared_type": "SIGNIN"
-      }
-    ]
-  },
-  "micro-000823": {
-    "id": "micro-000823",
-    "project_type": "MICRO",
-    "meeting_subtype": "SINGLE",
-    "auditable": true,
-    "label": "不合格 · 微型单讲 · 润天省人医 000823",
-    "session_no": "000823",
-    "tags": [
-      "negative",
-      "fail",
-      "single"
-    ],
-    "fixture": "/fixtures/micro-000823-fail.json",
-    "photo_base": "/samples/micro/不合格场次5场次/000823-2026-08-28-南京市-江苏润天医药连锁药房有限公司省人医门诊药店-微型药店健康服务赋能计划项目/",
-    "expect": {
-      "overall_status": "FAIL",
-      "rules": {},
-      "fail_notes": [
-        "业务不合格场，实跑确认"
-      ]
-    },
-    "assets_meta": [
-      {
-        "asset_id": 824,
-        "file": "电子日程海报.jpg",
-        "declared_type": "E_POSTER"
-      },
-      {
-        "asset_id": 825,
-        "file": "项目介绍展示.jpg",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
-      },
-      {
-        "asset_id": 826,
-        "file": "电子日程海报展示.jpg",
-        "declared_type": "E_POSTER_DISPLAY"
-      },
-      {
-        "asset_id": 827,
-        "file": "标题合影.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
-        "speaker_name": "讲者"
-      },
-      {
-        "asset_id": 828,
-        "file": "全景照片.jpg",
-        "declared_type": "PANORAMA"
-      },
-      {
-        "asset_id": 829,
+        "photo_id": "7286",
         "file": "签到表.pdf",
-        "declared_type": "SIGNIN",
-        "is_pdf": true
+        "photo_type": "SignSheet"
       }
     ]
   },
-  "micro-001421": {
-    "id": "micro-001421",
+  "micro-001348": {
+    "id": "micro-001348",
     "project_type": "MICRO",
-    "meeting_subtype": "SINGLE",
     "auditable": true,
-    "label": "不合格 · 微型单讲 · 宏熙千金 001421",
-    "session_no": "001421",
+    "label": "不合格 · 微型单讲 · 瑞人堂医药集团股份有限公司台州路桥路 001348",
+    "meeting_no": "001348",
     "tags": [
       "negative",
-      "fail",
-      "single"
+      "fail"
     ],
-    "fixture": "/fixtures/micro-001421-fail.json",
-    "photo_base": "/samples/micro/不合格场次5场次/001421-2026-09-24-长沙市-长沙市天心区宏熙千金大药房-微型药店健康服务赋能计划项目/",
+    "fixture": "/fixtures/micro-001348-fail.json",
+    "photo_base": "/samples/micro/微型药师20场不合格照片/（系统测试）-不合格场次20场10.30/001348-2026-09-30-台州市-瑞人堂医药集团股份有限公司台州路桥路北药店-微型药店健康服务赋能计划项目/",
     "expect": {
       "overall_status": "FAIL",
-      "rules": {},
+      "rules": {
+        "ASSET_MISSING": "FAIL"
+      },
       "fail_notes": [
-        "缺标题合影"
+        "无电子日程海报"
       ]
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 1422,
-        "file": "电子日程海报.jpg",
-        "declared_type": "E_POSTER"
-      },
-      {
-        "asset_id": 1423,
+        "photo_id": "13482",
         "file": "项目介绍展示.jpg",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
+        "photo_type": "ProjectIntro"
       },
       {
-        "asset_id": 1424,
+        "photo_id": "13483",
         "file": "电子日程海报展示.jpg",
-        "declared_type": "E_POSTER_DISPLAY"
+        "photo_type": "EDMDisplay"
       },
       {
-        "asset_id": 1425,
-        "file": "全景照片.jpg",
-        "declared_type": "PANORAMA"
-      },
-      {
-        "asset_id": 1426,
-        "file": "签到表.png",
-        "declared_type": "SIGNIN"
-      }
-    ]
-  },
-  "micro-001499": {
-    "id": "micro-001499",
-    "project_type": "MICRO",
-    "meeting_subtype": "SINGLE",
-    "auditable": true,
-    "label": "不合格 · 微型单讲 · 老百姓仙人桥二店 001499",
-    "session_no": "001499",
-    "tags": [
-      "negative",
-      "fail",
-      "single"
-    ],
-    "fixture": "/fixtures/micro-001499-fail.json",
-    "photo_base": "/samples/micro/不合格场次5场次/001499-2026-10-14-娄底市-老百姓大药房连锁股份有限公司娄底益华康仙人桥二店-微型药店健康服务赋能计划项目/",
-    "expect": {
-      "overall_status": "FAIL",
-      "rules": {},
-      "fail_notes": [
-        "缺电子日程海报"
-      ]
-    },
-    "assets_meta": [
-      {
-        "asset_id": 1500,
-        "file": "项目介绍展示.png",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
-      },
-      {
-        "asset_id": 1501,
-        "file": "电子日程海报展示.png",
-        "declared_type": "E_POSTER_DISPLAY"
-      },
-      {
-        "asset_id": 1502,
+        "photo_id": "13484",
         "file": "标题合影.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
-        "speaker_name": "讲者"
+        "photo_type": "SpeakerLecture"
       },
       {
-        "asset_id": 1503,
+        "photo_id": "13485",
         "file": "全景照片.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 1504,
-        "file": "签到表.jpg",
-        "declared_type": "SIGNIN"
+        "photo_id": "13486",
+        "file": "签到表.pdf",
+        "photo_type": "SignSheet"
       }
     ]
   },
-  "micro-001541": {
-    "id": "micro-001541",
+  "micro-001358": {
+    "id": "micro-001358",
     "project_type": "MICRO",
-    "meeting_subtype": "SINGLE",
     "auditable": true,
-    "label": "不合格 · 微型单讲 · 海王星辰临平 001541",
-    "session_no": "001541",
+    "label": "不合格 · 微型单讲 · 国药控股国大药房沈阳连锁有限公司黄河 001358",
+    "meeting_no": "001358",
     "tags": [
       "negative",
-      "fail",
-      "single"
+      "fail"
     ],
-    "fixture": "/fixtures/micro-001541-fail.json",
-    "photo_base": "/samples/micro/不合格场次5场次/001541-2026-10-14-杭州市-杭州海王星辰健康药房有限公司临平店-微型药店健康服务赋能计划项目/",
+    "fixture": "/fixtures/micro-001358-fail.json",
+    "photo_base": "/samples/micro/微型药师20场不合格照片/（系统测试）-不合格场次20场10.30/001358-2026-9-30-沈阳市-国药控股国大药房沈阳连锁有限公司黄河大街店-微型药店健康服务赋能计划项目/",
     "expect": {
       "overall_status": "FAIL",
-      "rules": {},
+      "rules": {
+        "ASSET_MISSING": "FAIL"
+      },
       "fail_notes": [
-        "缺电子日程海报展示"
+        "无项目介绍展示"
       ]
     },
-    "assets_meta": [
+    "photos_meta": [
       {
-        "asset_id": 1542,
-        "file": "电子日程海报.jpg",
-        "declared_type": "E_POSTER"
+        "photo_id": "13581",
+        "file": "电子日程海报.png",
+        "photo_type": "EDM"
       },
       {
-        "asset_id": 1543,
-        "file": "项目介绍展示.jpg",
-        "declared_type": "PROJECT_INTRO_DISPLAY"
+        "photo_id": "13583",
+        "file": "电子日程海报展示.jpg",
+        "photo_type": "EDMDisplay"
       },
       {
-        "asset_id": 1544,
-        "file": "标题页.jpg",
-        "declared_type": "SPEAKER_PHOTO",
-        "speaker_shot_kind": "TITLE_GROUP",
-        "speaker_name": "讲者"
+        "photo_id": "13584",
+        "file": "标题合影.jpg",
+        "photo_type": "SpeakerLecture"
       },
       {
-        "asset_id": 1545,
+        "photo_id": "13585",
         "file": "全景照片.jpg",
-        "declared_type": "PANORAMA"
+        "photo_type": "Panorama"
       },
       {
-        "asset_id": 1546,
+        "photo_id": "13586",
         "file": "签到表.pdf",
-        "declared_type": "SIGNIN",
-        "is_pdf": true
+        "photo_type": "SignSheet"
+      }
+    ]
+  },
+  "micro-001453": {
+    "id": "micro-001453",
+    "project_type": "MICRO",
+    "auditable": true,
+    "label": "不合格 · 微型单讲 · 河南美锐大药房连锁有限公司平桥平西街 001453",
+    "meeting_no": "001453",
+    "tags": [
+      "negative",
+      "fail"
+    ],
+    "fixture": "/fixtures/micro-001453-fail.json",
+    "photo_base": "/samples/micro/微型药师20场不合格照片/（系统测试）-不合格场次20场10.30/001453-2026-09-30-信阳市-河南美锐大药房连锁有限公司平桥平西街分店-微型药店健康服务赋能计划项目/",
+    "expect": {
+      "overall_status": "FAIL",
+      "rules": {
+        "ASSET_MISSING": "FAIL"
+      },
+      "fail_notes": [
+        "无标题合影"
+      ]
+    },
+    "photos_meta": [
+      {
+        "photo_id": "14531",
+        "file": "电子日程海报.png",
+        "photo_type": "EDM"
+      },
+      {
+        "photo_id": "14532",
+        "file": "项目介绍展示.jpeg",
+        "photo_type": "ProjectIntro"
+      },
+      {
+        "photo_id": "14533",
+        "file": "电子日程海报展示.jpeg",
+        "photo_type": "EDMDisplay"
+      },
+      {
+        "photo_id": "14535",
+        "file": "全景照片.jpeg",
+        "photo_type": "Panorama"
+      },
+      {
+        "photo_id": "14536",
+        "file": "签到表.pdf",
+        "photo_type": "SignSheet"
+      }
+    ]
+  },
+  "micro-000664": {
+    "id": "micro-000664",
+    "project_type": "MICRO",
+    "auditable": true,
+    "label": "不合格 · 微型单讲 · 江苏万泽大药房连锁有限公司万达店 000664",
+    "meeting_no": "000664",
+    "tags": [
+      "negative",
+      "fail"
+    ],
+    "fixture": "/fixtures/micro-000664-fail.json",
+    "photo_base": "/samples/micro/微型药师20场不合格照片/（系统测试）-不合格场次20场10.30/000664-2026-08-11-常州市-江苏万泽大药房连锁有限公司万达店-微型药店健康服务赋能计划项目/",
+    "expect": {
+      "overall_status": "FAIL",
+      "rules": {
+        "KEY_FIELD_MATCH": "FAIL"
+      },
+      "fail_notes": [
+        "电子日程海报时间不对；展示缺单位"
+      ]
+    },
+    "photos_meta": [
+      {
+        "photo_id": "6641",
+        "file": "电子日程海报.png",
+        "photo_type": "EDM"
+      },
+      {
+        "photo_id": "6642",
+        "file": "项目介绍展示.jpeg",
+        "photo_type": "ProjectIntro"
+      },
+      {
+        "photo_id": "6643",
+        "file": "电子日程海报展示.jpeg",
+        "photo_type": "EDMDisplay"
+      },
+      {
+        "photo_id": "6644",
+        "file": "标题合影.jpeg",
+        "photo_type": "SpeakerLecture"
+      },
+      {
+        "photo_id": "6645",
+        "file": "全景照片.jpeg",
+        "photo_type": "Panorama"
+      },
+      {
+        "photo_id": "6646",
+        "file": "签到表.pdf",
+        "photo_type": "SignSheet"
       }
     ]
   }

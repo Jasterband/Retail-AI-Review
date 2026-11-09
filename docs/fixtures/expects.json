@@ -42,7 +42,11 @@
     "overall_status": "FAIL",
     "kind": "negative",
     "fail_notes": [
-      "模糊/信息不全/人数不够/手册重叠/特写"
+      "展架缺时间(146)",
+      "展架不完整(241)",
+      "全景人数不够(143)",
+      "讲者模糊(282)",
+      "讲者未拍到脸(243)"
     ],
     "rules": {
       "CLARITY": "FAIL",
@@ -70,47 +74,59 @@
     "overall_status": "PASS",
     "kind": "golden-dual"
   },
-  "micro-000620": {
-    "fixture": "micro-000620-fail.json",
+  "micro-000728": {
+    "fixture": "micro-000728-fail.json",
     "overall_status": "FAIL",
     "kind": "negative",
     "rules": {
-      "PPT_PAGE_KIND": "FAIL"
+      "PANORAMA_COUNT": "FAIL"
     },
     "fail_notes": [
-      "页类问题"
+      "全景人数不够（约5人）"
     ]
   },
-  "micro-000823": {
-    "fixture": "micro-000823-fail.json",
+  "micro-001348": {
+    "fixture": "micro-001348-fail.json",
     "overall_status": "FAIL",
     "kind": "negative",
+    "rules": {
+      "ASSET_MISSING": "FAIL"
+    },
     "fail_notes": [
-      "业务不合格场，实跑确认"
+      "无电子日程海报"
     ]
   },
-  "micro-001421": {
-    "fixture": "micro-001421-fail.json",
+  "micro-001358": {
+    "fixture": "micro-001358-fail.json",
     "overall_status": "FAIL",
     "kind": "negative",
+    "rules": {
+      "ASSET_MISSING": "FAIL"
+    },
     "fail_notes": [
-      "缺标题合影"
+      "无项目介绍展示"
     ]
   },
-  "micro-001499": {
-    "fixture": "micro-001499-fail.json",
+  "micro-001453": {
+    "fixture": "micro-001453-fail.json",
     "overall_status": "FAIL",
     "kind": "negative",
+    "rules": {
+      "ASSET_MISSING": "FAIL"
+    },
     "fail_notes": [
-      "缺电子日程海报"
+      "无标题合影"
     ]
   },
-  "micro-001541": {
-    "fixture": "micro-001541-fail.json",
+  "micro-000664": {
+    "fixture": "micro-000664-fail.json",
     "overall_status": "FAIL",
     "kind": "negative",
+    "rules": {
+      "KEY_FIELD_MATCH": "FAIL"
+    },
     "fail_notes": [
-      "缺电子日程海报展示"
+      "电子日程海报时间不对；展示缺单位"
     ]
   }
 }

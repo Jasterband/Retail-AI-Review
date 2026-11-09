@@ -1,26 +1,30 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pe.local/schemas/retail-meeting-check-response.schema.json",
-  "title": "RetailMeetingCheckResponse",
-  "description": "AI → PE：零售会议材料检查结果。response_mode=simple 给系统展示；full 给 AI debug。业务 FAIL 与系统 ERROR 分离。",
+  "title": "RetailMeetingCheckResponse (full)",
+  "description": "AI 侧 full 响应（排障 / 落库完整形态）。PE 线上默认 simple 最瘦形状见 docs/README-PE-simple对接.md 与 app/services/projection.py：仅 task_id、meeting_id、overall_status、photo_results[{photo_id,photo_status,fail_reasons[{reason_code}]}]、以及 ERROR 时的 error。本 schema 不要用来校验 PE simple 响应。业务 FAIL 与系统 ERROR 分离。",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "response_mode",
-    "request_id",
+    "task_id",
     "meeting_id",
     "overall_status",
-    "asset_results",
+    "photo_results",
     "rule_results"
   ],
   "properties": {
     "response_mode": {
       "type": "string",
       "enum": ["simple", "full"],
-      "description": "simple=PE展示；full=AI排障"
+      "description": "full=本 schema 目标；simple 投影已瘦身，勿用本 schema 校验"
     },
-    "request_id": { "type": "string" },
-    "meeting_id": { "type": "integer", "minimum": 1 },
+    "task_id": { "type": "string" },
+    "meeting_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 36
+    },
     "job_id": { "type": ["integer", "null"] },
     "attempt_no": { "type": ["integer", "null"], "minimum": 1 },
     "overall_status": {
@@ -65,7 +69,7 @@
         "retryable": { "type": "boolean", "default": false }
       }
     },
-    "asset_results": {
+    "photo_results": {
       "type": "array",
       "items": { "$ref": "#/$defs/AssetResult" }
     },
@@ -111,21 +115,24 @@
     "FailReason": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["reason_text"],
+      "required": ["reason_code"],
       "properties": {
-        "check": { "type": ["string", "null"] },
-        "reason_code": { "type": ["string", "null"] },
-        "reason_text": { "type": "string" }
+        "check": { "type": ["string", "null"], "description": "full：对应 checks 键；simple 不返回" },
+        "reason_code": { "type": "string", "description": "机器码；simple 仅此字段" },
+        "reason_text": { "type": ["string", "null"], "description": "full：中文说明；simple 不返回，由 PE 本地映射" }
       }
     },
     "AssetResult": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["asset_id", "declared_type", "asset_status", "fail_reasons"],
+      "required": ["photo_id", "photo_status", "fail_reasons"],
       "properties": {
-        "asset_id": { "type": "integer" },
-        "declared_type": { "type": "string" },
-        "asset_status": {
+        "photo_id": { "type": "string", "minLength": 1, "maxLength": 36 },
+        "photo_type": {
+          "type": "string",
+          "description": "full：声明类型；simple 不返回"
+        },
+        "photo_status": {
           "type": "string",
           "enum": ["PASS", "FAIL", "UNCERTAIN", "ERROR"],
           "description": "simple/full 均有；PE 展示用"
@@ -133,7 +140,7 @@
         "fail_reasons": {
           "type": "array",
           "items": { "$ref": "#/$defs/FailReason" },
-          "description": "不合格/待人工原因；通过时为空数组"
+          "description": "不合格/待人工原因；通过时为空数组。simple 仅含 reason_code"
         },
         "detected_type": {
           "type": ["string", "null"],
@@ -185,14 +192,14 @@
           "minimum": 0,
           "maximum": 1
         },
-        "image_dup_ref_meeting_id": { "type": ["integer", "null"] },
-        "image_dup_ref_session_no": { "type": ["string", "null"] },
+        "image_dup_ref_meeting_id": { "type": ["string", "null"] },
+        "image_dup_ref_meeting_no": { "type": ["string", "null"] },
         "topic_reuse_hit": {
           "type": "boolean",
           "default": false,
           "description": "讲者照OCR标题是否与历史主题重复"
         },
-        "topic_reuse_ref_session_no": { "type": ["string", "null"] },
+        "topic_reuse_ref_meeting_no": { "type": ["string", "null"] },
         "topic_text_ocr": { "type": ["string", "null"] },
         "fetch_error": {
           "type": ["object", "null"],
@@ -230,9 +237,9 @@
           "type": ["object", "null"],
           "description": "full：比对明细等"
         },
-        "related_asset_ids": {
+        "related_photo_ids": {
           "type": "array",
-          "items": { "type": "integer" }
+          "items": { "type": "string" }
         }
       }
     }

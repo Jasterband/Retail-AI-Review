@@ -15,6 +15,7 @@ from app.db import SessionLocal
 from app.models import AiArtifact, AiAssetResult, AiCheckJob, AiRuleResult, AiStepLog
 from app.services.callback import post_callback
 from app.services.history import persist_histories
+from app.services.field_roi_ocr import enrich_contexts_with_field_roi_ocr
 from app.services.pipeline.aggregate import build_full_response
 from app.services.pipeline.asset_context import AssetContext, build_contexts
 from app.services.rules.engine import run_all_rules
@@ -54,17 +55,17 @@ def _persist_results(
     job: AiCheckJob,
     full: dict,
 ) -> None:
-    for a in full.get("asset_results") or []:
+    for a in full.get("photo_results") or []:
         db.add(
             AiAssetResult(
                 job_id=job.id,
-                asset_id=a["asset_id"],
-                declared_type=a.get("declared_type"),
+                photo_id=a["photo_id"],
+                declared_type=a.get("photo_type") or a.get("declared_type"),
                 detected_type=a.get("detected_type"),
                 type_match=a.get("type_match"),
                 clarity_score=a.get("clarity_score"),
                 is_clear=a.get("is_clear"),
-                asset_status=a.get("asset_status"),
+                photo_status=a.get("photo_status"),
                 checks=a.get("checks"),
                 fail_reasons=a.get("fail_reasons"),
                 ocr_fields=a.get("ocr_fields"),
@@ -86,7 +87,7 @@ def _persist_results(
                 reason_code=r.get("reason_code"),
                 reason_text=r.get("reason_text"),
                 evidence=r.get("evidence"),
-                related_asset_ids=r.get("related_asset_ids"),
+                related_photo_ids=r.get("related_photo_ids"),
             )
         )
 
@@ -134,7 +135,7 @@ def run_check_sync(job_id: int) -> None:
         t0 = time.time()
         try:
             contexts = build_contexts(
-                snap.get("assets") or [],
+                snap.get("photos") or [],
                 snap["project_type"],
                 vision,
             )
@@ -168,7 +169,7 @@ def run_check_sync(job_id: int) -> None:
                 "step": "fetch_and_vision",
                 "ms": int((time.time() - t0) * 1000),
                 "ok": True,
-                "assets": len(contexts),
+                "photos": len(contexts),
             }
         )
 
@@ -185,6 +186,17 @@ def run_check_sync(job_id: int) -> None:
                 "ms": int((time.time() - t_tpl) * 1000),
                 "ok": True,
                 "pack": pack.as_dict(),
+            }
+        )
+
+        # 关键字段：字段区 crop 定位 → ROI OCR（覆盖/补全 ocr_fields）
+        t_roi = time.time()
+        enrich_contexts_with_field_roi_ocr(contexts, pack, vision)
+        pipeline_steps.append(
+            {
+                "step": "field_roi_ocr",
+                "ms": int((time.time() - t_roi) * 1000),
+                "ok": True,
             }
         )
 
@@ -220,7 +232,7 @@ def run_check_sync(job_id: int) -> None:
                     db.add(
                         AiArtifact(
                             job_id=job.id,
-                            asset_id=c.asset_id,
+                            photo_id=c.photo_id,
                             artifact_type="vision_raw",
                             payload_json=c.vision,
                         )
@@ -234,7 +246,7 @@ def run_check_sync(job_id: int) -> None:
                 db.add(
                     AiArtifact(
                         job_id=job.id,
-                        asset_id=c.asset_id,
+                        photo_id=c.photo_id,
                         artifact_type="vision_raw",
                         payload_json=c.vision,
                     )
@@ -243,7 +255,7 @@ def run_check_sync(job_id: int) -> None:
                 db.add(
                     AiArtifact(
                         job_id=job.id,
-                        asset_id=c.asset_id,
+                        photo_id=c.photo_id,
                         artifact_type="vision_error",
                         payload_json=c.vision_error,
                     )
@@ -277,7 +289,7 @@ def run_check_sync(job_id: int) -> None:
         job.final_response_json = full
         job.finished_at = _utcnow()
         db.commit()
-        logger.info("job %s done overall=%s", job.request_id, job.overall_status)
+        logger.info("job %s done overall=%s", job.task_id, job.overall_status)
         _maybe_callback(job, full)
 
     except Exception:
@@ -292,7 +304,7 @@ def run_check_sync(job_id: int) -> None:
             }
             full = {
                 "response_mode": "full",
-                "request_id": job.request_id,
+                "task_id": job.task_id,
                 "meeting_id": job.meeting_id,
                 "job_id": job.id,
                 "attempt_no": job.attempt_no,
@@ -301,7 +313,7 @@ def run_check_sync(job_id: int) -> None:
                 "summary_failed": [],
                 "need_human_reasons": [],
                 "error": err,
-                "asset_results": [],
+                "photo_results": [],
                 "rule_results": [],
                 "finished_at": _utcnow().isoformat(),
             }
@@ -323,7 +335,7 @@ def _maybe_callback(job: AiCheckJob, full: dict) -> None:
     mode = ((job.pe_snapshot or {}).get("options") or {}).get(
         "response_mode", "simple"
     )
-    post_callback(job.callback_url, job.request_id, full, mode)
+    post_callback(job.callback_url, job.task_id, full, mode)
 
 
 async def schedule_check(job_id: int) -> None:

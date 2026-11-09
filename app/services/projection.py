@@ -10,40 +10,33 @@ def project_response(
     full: Dict[str, Any],
     mode: Literal["simple", "full"],
 ) -> Dict[str, Any]:
-    out = deepcopy(full)
-    out["response_mode"] = mode
-
     if mode == "full":
+        out = deepcopy(full)
+        out["response_mode"] = "full"
         return out
 
-    out.pop("debug", None)
-    out.pop("overall_confidence", None)
-    out.pop("model_version", None)
-    out.pop("template_pack_version", None)
-
-    assets = []
-    for a in out.get("asset_results") or []:
-        assets.append(
+    # PE simple 最瘦：对齐 + 整场结论 + 按图 status/reason_code
+    photos = []
+    for a in full.get("photo_results") or []:
+        reasons = [
+            {"reason_code": fr.get("reason_code")}
+            for fr in (a.get("fail_reasons") or [])
+            if isinstance(fr, dict)
+        ]
+        photos.append(
             {
-                "asset_id": a["asset_id"],
-                "declared_type": a["declared_type"],
-                "asset_status": a["asset_status"],
-                "fail_reasons": a.get("fail_reasons") or [],
+                "photo_id": a["photo_id"],
+                "photo_status": a["photo_status"],
+                "fail_reasons": reasons,
             }
         )
-    out["asset_results"] = assets
 
-    rules = []
-    for r in out.get("rule_results") or []:
-        rules.append(
-            {
-                "rule_code": r["rule_code"],
-                "passed": r.get("passed"),
-                "status": r["status"],
-                "reason_code": r.get("reason_code"),
-                "reason_text": r.get("reason_text"),
-                "related_asset_ids": r.get("related_asset_ids") or [],
-            }
-        )
-    out["rule_results"] = rules
+    out: Dict[str, Any] = {
+        "task_id": full["task_id"],
+        "meeting_id": full["meeting_id"],
+        "overall_status": full["overall_status"],
+        "photo_results": photos,
+    }
+    if full.get("error") is not None:
+        out["error"] = full["error"]
     return out

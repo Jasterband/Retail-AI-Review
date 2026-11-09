@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./retail_meeting_check.db"
     api_tokens: str = "dev-token-change-me"
     callback_hmac_secret: str = ""
-    check_stub_delay_sec: float = 0.0
     model_version: str = "vision-0.1.0"
 
     openai_api_key: str = ""
@@ -34,7 +33,7 @@ class Settings(BaseSettings):
     local_asset_root: str = ""
     # 样例照片根（相对 asset_root）：药师大讲堂 / 微型药师
     sample_photos_dirname: str = "零售照片ai审核"
-    # s3_uri → 相对路径 JSON
+    # file_url → 相对路径 JSON
     s3_local_map_path: str = "docs/fixtures/s3_local_map.json"
     # 真 S3：开启后本地 map 未命中时走 boto3 GetObject
     use_real_s3: bool = False

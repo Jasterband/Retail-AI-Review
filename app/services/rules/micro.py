@@ -1,8 +1,8 @@
 """微型药师专用规则。
 
 权益模版检测约定（业务确认）：
-- 权益一 PROJECT_INTRO_DISPLAY：规定模版上是否有【彩色丝带/彩色波浪装饰】
-- 权益二 E_POSTER_DISPLAY：规定模版上是否有【日程表】
+- 权益一 ProjectIntro：规定模版上是否有【彩色丝带/彩色波浪装饰】
+- 权益二 EDMDisplay：规定模版上是否有【日程表】
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ def _flag_conf(
 
 def _equity_feature(ctx: AssetContext) -> Tuple[str, Optional[bool], float, str]:
     """返回 (检测点名, 是否命中, 置信度, 失败文案)。优先模版 pack crop。"""
-    if ctx.declared_type == "PROJECT_INTRO_DISPLAY":
+    if ctx.photo_type == "ProjectIntro":
         tm = (ctx.template_match or {}).get("colorful_ribbon")
         if tm:
             hit = tm.get("hit")
@@ -66,7 +66,7 @@ def _equity_feature(ctx: AssetContext) -> Tuple[str, Optional[bool], float, str]
             conf,
             "权益一（项目介绍）模版未检出彩色丝带/彩色波浪装饰",
         )
-    if ctx.declared_type == "E_POSTER_DISPLAY":
+    if ctx.photo_type == "EDMDisplay":
         tm = (ctx.template_match or {}).get("agenda_table")
         if tm:
             hit = tm.get("hit")
@@ -100,8 +100,8 @@ def rule_ppt_template_match(
 ) -> RuleOutcome:
     from app.services.thresholds import merge_thresholds
 
-    types = {"E_POSTER_DISPLAY", "PROJECT_INTRO_DISPLAY"}
-    targets = [c for c in contexts if c.declared_type in types and c.ok]
+    types = {"EDMDisplay", "ProjectIntro"}
+    targets = [c for c in contexts if c.photo_type in types and c.ok]
     if not targets:
         return skip("PPT_TEMPLATE_MATCH", "无权益一/权益二展示材料")
 
@@ -115,11 +115,11 @@ def rule_ppt_template_match(
     passes: List[dict] = []
 
     for c in targets:
-        related.append(c.asset_id)
+        related.append(c.photo_id)
         check_name, flag, conf, fail_text = _equity_feature(c)
         item = {
-            "asset_id": c.asset_id,
-            "declared_type": c.declared_type,
+            "photo_id": c.photo_id,
+            "photo_type": c.photo_type,
             "check": check_name,
             "flag": flag,
             "confidence": conf,
@@ -151,7 +151,7 @@ def rule_ppt_template_match(
             "TEMPLATE_MISMATCH",
             "；".join(texts),
             conf=min(f["confidence"] for f in fails),
-            related=[f["asset_id"] for f in fails],
+            related=[f["photo_id"] for f in fails],
             evidence=evidence,
         )
     if uncs and not passes:
@@ -159,7 +159,7 @@ def rule_ppt_template_match(
             "PPT_TEMPLATE_MATCH",
             "TEMPLATE_UNCERTAIN",
             "权益模版特征（彩色丝带/日程表）识别不清",
-            related=[u["asset_id"] for u in uncs],
+            related=[u["photo_id"] for u in uncs],
             evidence=evidence,
         )
     if uncs:
@@ -167,16 +167,16 @@ def rule_ppt_template_match(
             "PPT_TEMPLATE_MATCH",
             "TEMPLATE_UNCERTAIN",
             "部分权益页模版特征灰区",
-            related=[u["asset_id"] for u in uncs],
+            related=[u["photo_id"] for u in uncs],
             evidence=evidence,
         )
 
     # 文案按类型汇总
     bits = []
     for c in targets:
-        if c.declared_type == "PROJECT_INTRO_DISPLAY":
+        if c.photo_type == "ProjectIntro":
             bits.append("权益一检出彩色丝带")
-        elif c.declared_type == "E_POSTER_DISPLAY":
+        elif c.photo_type == "EDMDisplay":
             bits.append("权益二检出日程表")
     return pass_(
         "PPT_TEMPLATE_MATCH",
@@ -190,8 +190,8 @@ def rule_ppt_page_kind(
     contexts: List[AssetContext], options: dict
 ) -> RuleOutcome:
     """权益一=项目介绍（丝带页）；权益二=日程页（有日程表）。二者须互补。"""
-    types = {"E_POSTER_DISPLAY", "PROJECT_INTRO_DISPLAY"}
-    targets = [c for c in contexts if c.declared_type in types and c.ok]
+    types = {"EDMDisplay", "ProjectIntro"}
+    targets = [c for c in contexts if c.photo_type in types and c.ok]
     if len(targets) < 2:
         return skip("PPT_PAGE_KIND", "权益展示页不足两张")
 
@@ -200,7 +200,7 @@ def rule_ppt_page_kind(
     evidence_rows: List[dict] = []
 
     for c in targets:
-        related.append(c.asset_id)
+        related.append(c.photo_id)
         tm = c.template_match or {}
         ribbon_tm = tm.get("colorful_ribbon") or {}
         agenda_tm = tm.get("agenda_table") or {}
@@ -231,20 +231,20 @@ def rule_ppt_page_kind(
         # 业务特征优先：有日程表 → 日程页；否则有丝带且声明为介绍 → 介绍页
         if agenda is True:
             kind = "AGENDA"
-        elif c.declared_type == "PROJECT_INTRO_DISPLAY" and ribbon is True:
+        elif c.photo_type == "ProjectIntro" and ribbon is True:
             kind = "PROJECT_INTRO"
-        elif c.declared_type == "E_POSTER_DISPLAY" and agenda is False and ribbon is True:
+        elif c.photo_type == "EDMDisplay" and agenda is False and ribbon is True:
             # 只有丝带没有表，不像权益二
             kind = kind or "OTHER"
         elif not kind:
             # 不再仅凭声明类型直接 PASS；特征不足 → OTHER 进灰区
             kind = "OTHER"
 
-        kinds.append((c.asset_id, kind))
+        kinds.append((c.photo_id, kind))
         evidence_rows.append(
             {
-                "asset_id": c.asset_id,
-                "declared_type": c.declared_type,
+                "photo_id": c.photo_id,
+                "photo_type": c.photo_type,
                 "kind": kind,
                 "has_colorful_ribbon": ribbon,
                 "has_agenda_table": agenda,
@@ -295,14 +295,14 @@ def rule_signin_ratio_and_stores(
 ) -> RuleOutcome:
     from app.services.thresholds import merge_thresholds
 
-    signs = [c for c in contexts if c.declared_type == "SIGNIN" and c.ok]
+    signs = [c for c in contexts if c.photo_type == "SignSheet" and c.ok]
     if not signs:
         return skip("SIGNIN_RATIO_AND_STORES", "无签到")
     thr = merge_thresholds(options)
     n_speakers = len(form.get("speakers") or [])
     need_audience = n_speakers * int(thr.get("signin_audience_per_speaker", 6))
     min_stores = int(thr.get("signin_min_store_kinds", 2))
-    related = [c.asset_id for c in signs]
+    related = [c.photo_id for c in signs]
 
     audience = None
     stores = []

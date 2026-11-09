@@ -54,6 +54,21 @@ SAVE_PRESETS = [
         "path": "lecture_hall/poster_footer_wave_crop.jpg",
     },
     {
+        "id": "poster_key_fields",
+        "label": "大讲堂 · 字段区(时间地点日程)",
+        "path": "lecture_hall/poster_key_fields_crop.jpg",
+    },
+    {
+        "id": "edm_key_fields",
+        "label": "大讲堂 · 电子日程字段区",
+        "path": "lecture_hall/edm_key_fields_crop.jpg",
+    },
+    {
+        "id": "micro_edm_key_fields",
+        "label": "微型 · 电子日程字段区",
+        "path": "micro/edm_key_fields_crop.jpg",
+    },
+    {
         "id": "name_card_border",
         "label": "大讲堂 · 台卡装饰条",
         "path": "lecture_hall/name_card_border_crop.jpg",

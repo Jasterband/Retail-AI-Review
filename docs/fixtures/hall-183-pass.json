@@ -1,72 +1,196 @@
 {
-  "request_id": "req-hall-183-golden-001",
-  "meeting_id": 1183,
-  "session_no": "183",
+  "task_id": "req-hall-183-golden-001",
+  "meeting_id": "1183",
+  "meeting_no": "183",
   "project_type": "LECTURE_HALL",
-  "meeting_subtype": null,
-  "period_id": 1,
+  "meeting_type": null,
+  "project_id": "1",
   "form": {
     "meeting_name": "菁英药师大讲堂项目",
     "meeting_date": "2026-06-30",
     "start_time": "14:00",
     "end_time": "16:10",
     "chain_or_store_name": "江苏大众医药连锁有限公司",
-    "location": "江苏大众医药连锁有限公司",
+    "meeting_location": "江苏大众医药连锁有限公司",
     "total_attendees": 36,
     "speakers": [
       {
-        "speaker_id": 1,
+        "speaker_id": "1",
         "speaker_name": "陈丽娟",
         "topic": "合理用药与患者教育",
         "store_name": "江苏大众",
-        "service_minutes": 30
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       },
       {
-        "speaker_id": 2,
+        "speaker_id": "2",
         "speaker_name": "曹兰飞",
         "topic": "慢病管理实践分享",
         "store_name": "江苏大众",
-        "service_minutes": 30
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       },
       {
-        "speaker_id": 3,
+        "speaker_id": "3",
         "speaker_name": "单丽丽",
         "topic": "药学服务要点",
         "store_name": "江苏大众",
-        "service_minutes": 30
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       },
       {
-        "speaker_id": 4,
+        "speaker_id": "4",
         "speaker_name": "杨燕",
         "topic": "门店健康服务赋能",
         "store_name": "江苏大众",
-        "service_minutes": 40
+        "service_minutes": 40,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       }
     ]
   },
-  "assets": [
-    {"asset_id": 18301, "asset_type": "E_POSTER", "s3_uri": "s3://pe-meetings/hall/183/eposter.png", "content_type": "image/png"},
-    {"asset_id": 18302, "asset_type": "HANDBOOK", "s3_uri": "s3://pe-meetings/hall/183/handbook.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 18303, "asset_type": "POSTER", "s3_uri": "s3://pe-meetings/hall/183/poster.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 18304, "asset_type": "STAND", "s3_uri": "s3://pe-meetings/hall/183/stand.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 18305, "asset_type": "NAME_CARD", "s3_uri": "s3://pe-meetings/hall/183/name_card_1.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 18306, "asset_type": "NAME_CARD", "s3_uri": "s3://pe-meetings/hall/183/name_card_2.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 18307, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/hall/183/chenlijuan_1.jpg", "content_type": "image/jpeg", "speaker_id": 1, "speaker_shot_kind": "TITLE_GROUP"},
-    {"asset_id": 18308, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/hall/183/chenlijuan_2.jpg", "content_type": "image/jpeg", "speaker_id": 1, "speaker_shot_kind": "LECTURING"},
-    {"asset_id": 18309, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/hall/183/caolanfei_1.jpg", "content_type": "image/jpeg", "speaker_id": 2, "speaker_shot_kind": "TITLE_GROUP"},
-    {"asset_id": 18310, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/hall/183/caolanfei_2.jpg", "content_type": "image/jpeg", "speaker_id": 2, "speaker_shot_kind": "LECTURING"},
-    {"asset_id": 18311, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/hall/183/shanlili_1.jpg", "content_type": "image/jpeg", "speaker_id": 3, "speaker_shot_kind": "TITLE_GROUP"},
-    {"asset_id": 18312, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/hall/183/shanlili_2.jpg", "content_type": "image/jpeg", "speaker_id": 3, "speaker_shot_kind": "LECTURING"},
-    {"asset_id": 18313, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/hall/183/yangyan_1.jpg", "content_type": "image/jpeg", "speaker_id": 4, "speaker_shot_kind": "TITLE_GROUP"},
-    {"asset_id": 18314, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/hall/183/yangyan_2.jpg", "content_type": "image/jpeg", "speaker_id": 4, "speaker_shot_kind": "LECTURING"},
-    {"asset_id": 18315, "asset_type": "PANORAMA", "s3_uri": "s3://pe-meetings/hall/183/panorama.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 18316, "asset_type": "SIGNIN", "s3_uri": "s3://pe-meetings/hall/183/signin_1.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 18317, "asset_type": "SIGNIN", "s3_uri": "s3://pe-meetings/hall/183/signin_2.png", "content_type": "image/png"}
+  "photos": [
+    {
+      "photo_id": "18301",
+      "photo_type": "EDM",
+      "file_url": "s3://pe-meetings/hall/183/eposter.png",
+      "content_type": "image/png",
+      "sort": 1
+    },
+    {
+      "photo_id": "18302",
+      "photo_type": "Manual",
+      "file_url": "s3://pe-meetings/hall/183/handbook.jpg",
+      "content_type": "image/jpeg",
+      "sort": 2
+    },
+    {
+      "photo_id": "18303",
+      "photo_type": "Poster",
+      "file_url": "s3://pe-meetings/hall/183/poster.jpg",
+      "content_type": "image/jpeg",
+      "sort": 3
+    },
+    {
+      "photo_id": "18304",
+      "photo_type": "Stand",
+      "file_url": "s3://pe-meetings/hall/183/stand.jpg",
+      "content_type": "image/jpeg",
+      "sort": 4
+    },
+    {
+      "photo_id": "18305",
+      "photo_type": "TableCard",
+      "file_url": "s3://pe-meetings/hall/183/name_card_1.jpg",
+      "content_type": "image/jpeg",
+      "sort": 5
+    },
+    {
+      "photo_id": "18306",
+      "photo_type": "TableCard",
+      "file_url": "s3://pe-meetings/hall/183/name_card_2.jpg",
+      "content_type": "image/jpeg",
+      "sort": 6
+    },
+    {
+      "photo_id": "18307",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/183/chenlijuan_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "1",
+      "sort": 7
+    },
+    {
+      "photo_id": "18308",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/183/chenlijuan_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "1",
+      "sort": 8
+    },
+    {
+      "photo_id": "18309",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/183/caolanfei_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "2",
+      "sort": 9
+    },
+    {
+      "photo_id": "18310",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/183/caolanfei_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "2",
+      "sort": 10
+    },
+    {
+      "photo_id": "18311",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/183/shanlili_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "3",
+      "sort": 11
+    },
+    {
+      "photo_id": "18312",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/183/shanlili_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "3",
+      "sort": 12
+    },
+    {
+      "photo_id": "18313",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/183/yangyan_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "4",
+      "sort": 13
+    },
+    {
+      "photo_id": "18314",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/183/yangyan_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "4",
+      "sort": 14
+    },
+    {
+      "photo_id": "18315",
+      "photo_type": "Panorama",
+      "file_url": "s3://pe-meetings/hall/183/panorama.jpg",
+      "content_type": "image/jpeg",
+      "sort": 15
+    },
+    {
+      "photo_id": "18316",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/hall/183/signin_1.jpg",
+      "content_type": "image/jpeg",
+      "sort": 16
+    },
+    {
+      "photo_id": "18317",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/hall/183/signin_2.png",
+      "content_type": "image/png",
+      "sort": 17
+    }
   ],
   "refs": {
     "template_pack_version": "2026Q2",
     "topic_search_scope": "period",
     "image_dup_search_scope": "period"
   },
-  "options": {"response_mode": "full"}
+  "options": {
+    "response_mode": "full"
+  }
 }

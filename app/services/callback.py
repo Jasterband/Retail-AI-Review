@@ -22,7 +22,7 @@ def sign_body(body: bytes, secret: str) -> str:
 
 def post_callback(
     callback_url: str,
-    request_id: str,
+    task_id: str,
     full_response: Dict[str, Any],
     response_mode: str = "simple",
 ) -> None:
@@ -33,7 +33,7 @@ def post_callback(
     raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     headers = {
         "Content-Type": "application/json",
-        "X-Request-Id": request_id,
+        "X-Request-Id": task_id,
     }
     if settings.callback_hmac_secret:
         headers["X-Signature"] = sign_body(raw, settings.callback_hmac_secret)
@@ -45,10 +45,10 @@ def post_callback(
             logger.warning(
                 "callback non-2xx %s for %s: %s",
                 resp.status_code,
-                request_id,
+                task_id,
                 resp.text[:200],
             )
         else:
-            logger.info("callback ok for %s", request_id)
+            logger.info("callback ok for %s", task_id)
     except Exception:
-        logger.exception("callback failed for %s", request_id)
+        logger.exception("callback failed for %s", task_id)

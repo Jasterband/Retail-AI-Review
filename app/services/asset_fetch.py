@@ -1,4 +1,4 @@
-"""按 s3_uri 取材料：优先本地映射；可选真 S3；PDF 渲第一页为 JPEG。"""
+"""按 file_url 取材料：优先本地映射；可选真 S3；PDF 渲第一页为 JPEG。"""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class FetchedObject:
-    s3_uri: str
+    file_url: str
     content_type: str
     body: Optional[bytes] = None
     error_code: Optional[str] = None
@@ -24,13 +24,13 @@ class FetchedObject:
     local_path: Optional[str] = None
 
 
-def parse_s3_uri(s3_uri: str) -> Tuple[str, str]:
-    if not s3_uri.startswith("s3://"):
-        raise ValueError("invalid s3_uri: {0}".format(s3_uri))
-    rest = s3_uri[5:]
+def parse_file_url(file_url: str) -> Tuple[str, str]:
+    if not file_url.startswith("s3://"):
+        raise ValueError("invalid file_url: {0}".format(file_url))
+    rest = file_url[5:]
     bucket, _, key = rest.partition("/")
     if not bucket or not key:
-        raise ValueError("invalid s3_uri: {0}".format(s3_uri))
+        raise ValueError("invalid file_url: {0}".format(file_url))
     return bucket, key
 
 
@@ -63,20 +63,20 @@ def _pdf_first_page_jpeg(pdf_bytes: bytes) -> bytes:
     return buf.getvalue()
 
 
-def _fetch_real_s3(s3_uri: str, content_type: str) -> FetchedObject:
+def _fetch_real_s3(file_url: str, content_type: str) -> FetchedObject:
     settings = get_settings()
     try:
         import boto3
         from botocore.exceptions import ClientError
     except ImportError:
         return FetchedObject(
-            s3_uri=s3_uri,
+            file_url=file_url,
             content_type=content_type,
             error_code="S3_NOT_FOUND",
             error_message="boto3 未安装，无法真读 S3（pip install boto3）",
         )
 
-    bucket, key = parse_s3_uri(s3_uri)
+    bucket, key = parse_file_url(file_url)
     kwargs = {"region_name": settings.aws_region or None}
     if settings.aws_access_key_id and settings.aws_secret_access_key:
         kwargs["aws_access_key_id"] = settings.aws_access_key_id
@@ -92,13 +92,13 @@ def _fetch_real_s3(s3_uri: str, content_type: str) -> FetchedObject:
             out_type = "image/jpeg"
         if not body:
             return FetchedObject(
-                s3_uri=s3_uri,
+                file_url=file_url,
                 content_type=content_type,
                 error_code="S3_CORRUPT",
                 error_message="empty S3 object",
             )
         return FetchedObject(
-            s3_uri=s3_uri,
+            file_url=file_url,
             content_type=out_type,
             body=body,
         )
@@ -106,48 +106,48 @@ def _fetch_real_s3(s3_uri: str, content_type: str) -> FetchedObject:
         code = (e.response or {}).get("Error", {}).get("Code", "")
         if code in {"404", "NoSuchKey", "NotFound"}:
             return FetchedObject(
-                s3_uri=s3_uri,
+                file_url=file_url,
                 content_type=content_type,
                 error_code="S3_NOT_FOUND",
                 error_message=str(e),
             )
         return FetchedObject(
-            s3_uri=s3_uri,
+            file_url=file_url,
             content_type=content_type,
             error_code="S3_CORRUPT",
             error_message=str(e),
         )
     except Exception as e:
-        logger.exception("real s3 fetch failed %s", s3_uri)
+        logger.exception("real s3 fetch failed %s", file_url)
         return FetchedObject(
-            s3_uri=s3_uri,
+            file_url=file_url,
             content_type=content_type,
             error_code="S3_CORRUPT",
             error_message=str(e),
         )
 
 
-def fetch_object(s3_uri: str, content_type: str) -> FetchedObject:
+def fetch_object(file_url: str, content_type: str) -> FetchedObject:
     settings = get_settings()
     try:
-        parse_s3_uri(s3_uri)
+        parse_file_url(file_url)
     except ValueError as e:
         return FetchedObject(
-            s3_uri=s3_uri,
+            file_url=file_url,
             content_type=content_type,
             error_code="ASSET_MISSING",
             error_message=str(e),
         )
 
     mapping = _load_map()
-    rel = mapping.get(s3_uri)
+    rel = mapping.get(file_url)
     if rel:
         path = Path(rel)
         if not path.is_absolute():
             path = settings.asset_root / path
         if not path.exists():
             return FetchedObject(
-                s3_uri=s3_uri,
+                file_url=file_url,
                 content_type=content_type,
                 error_code="S3_NOT_FOUND",
                 error_message="local file missing: {0}".format(path),
@@ -157,7 +157,7 @@ def fetch_object(s3_uri: str, content_type: str) -> FetchedObject:
             raw = path.read_bytes()
             if not raw:
                 return FetchedObject(
-                    s3_uri=s3_uri,
+                    file_url=file_url,
                     content_type=content_type,
                     error_code="S3_CORRUPT",
                     error_message="empty file",
@@ -169,15 +169,15 @@ def fetch_object(s3_uri: str, content_type: str) -> FetchedObject:
                 body = _pdf_first_page_jpeg(raw)
                 out_type = "image/jpeg"
             return FetchedObject(
-                s3_uri=s3_uri,
+                file_url=file_url,
                 content_type=out_type,
                 body=body,
                 local_path=str(path),
             )
         except Exception as e:
-            logger.exception("fetch failed %s", s3_uri)
+            logger.exception("fetch failed %s", file_url)
             return FetchedObject(
-                s3_uri=s3_uri,
+                file_url=file_url,
                 content_type=content_type,
                 error_code="S3_CORRUPT",
                 error_message=str(e),
@@ -185,11 +185,11 @@ def fetch_object(s3_uri: str, content_type: str) -> FetchedObject:
             )
 
     if settings.use_real_s3:
-        return _fetch_real_s3(s3_uri, content_type)
+        return _fetch_real_s3(file_url, content_type)
 
     return FetchedObject(
-        s3_uri=s3_uri,
+        file_url=file_url,
         content_type=content_type,
         error_code="S3_NOT_FOUND",
-        error_message="no local mapping for {0}".format(s3_uri),
+        error_message="no local mapping for {0}".format(file_url),
     )

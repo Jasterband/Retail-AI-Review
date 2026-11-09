@@ -1,4 +1,5 @@
 .venv/
+.pydeps/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -7,7 +8,9 @@ __pycache__/
 *.db
 .DS_Store
 .ruff_cache/
+~$*
 
 # Large local datasets / runtime outputs (not for GitHub)
 零售照片ai审核/
+验收对照样本-*/
 runs/

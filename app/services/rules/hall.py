@@ -15,7 +15,7 @@ from app.services.text_norm import name_set_equal, normalize_topic
 def rule_name_card_speaker(
     contexts: List[AssetContext], form: dict, options: dict
 ) -> RuleOutcome:
-    cards = [c for c in contexts if c.declared_type == "NAME_CARD" and c.ok]
+    cards = [c for c in contexts if c.photo_type == "TableCard" and c.ok]
     if not cards:
         return skip("NAME_CARD_SPEAKER_MATCH", "无台卡")
     mode = (options or {}).get("name_match_mode", "fuzzy")
@@ -24,7 +24,7 @@ def rule_name_card_speaker(
     ocr_names = []
     related = []
     for c in cards:
-        related.append(c.asset_id)
+        related.append(c.photo_id)
         if _is_blurry(c, options):
             return uncertain(
                 "NAME_CARD_SPEAKER_MATCH",
@@ -73,13 +73,13 @@ def rule_name_card_template(
 ) -> RuleOutcome:
     from app.services.thresholds import merge_thresholds
 
-    cards = [c for c in contexts if c.declared_type == "NAME_CARD" and c.ok]
+    cards = [c for c in contexts if c.photo_type == "TableCard" and c.ok]
     if not cards:
         return skip("NAME_CARD_TEMPLATE", "无台卡")
     thr = merge_thresholds(options)
     thr_pass = float(thr.get("template_similarity_pass", 0.85))
     thr_fail = float(thr.get("template_similarity_fail", 0.65))
-    related = [c.asset_id for c in cards]
+    related = [c.photo_id for c in cards]
     scores = []
     evidence = []
     for c in cards:
@@ -93,7 +93,7 @@ def rule_name_card_template(
             else:
                 conf_f = min(conf_f, thr_fail - 0.01)
             scores.append(conf_f)
-            evidence.append({"asset_id": c.asset_id, "template_match": tm})
+            evidence.append({"photo_id": c.photo_id, "template_match": tm})
             continue
         flag = c.vision.get("is_standard_name_card_style")
         conf = c.vision.get("name_card_style_confidence")
@@ -106,7 +106,7 @@ def rule_name_card_template(
         if flag is True:
             conf_f = max(conf_f, 0.8)
         scores.append(conf_f)
-        evidence.append({"asset_id": c.asset_id, "vision_only": True, "score": conf_f})
+        evidence.append({"photo_id": c.photo_id, "vision_only": True, "score": conf_f})
     score = min(scores) if scores else 0.0
     if score >= thr_pass:
         return pass_(
@@ -136,7 +136,7 @@ def rule_name_card_template(
 
 
 def rule_handbook_detect(contexts: List[AssetContext]) -> RuleOutcome:
-    books = [c for c in contexts if c.declared_type == "HANDBOOK"]
+    books = [c for c in contexts if c.photo_type == "Manual"]
     if not books:
         return fail(
             "HANDBOOK_DETECT",
@@ -150,19 +150,17 @@ def rule_handbook_detect(contexts: List[AssetContext]) -> RuleOutcome:
             "HANDBOOK_DETECT",
             "HANDBOOK_NOT_FOUND",
             "手册材料不可读",
-            related=[c.asset_id for c in books],
+            related=[c.photo_id for c in books],
         )
     evidence = []
     for c in ok_books:
         tm = (c.template_match or {}).get("handbook_current") or {}
-        det = c.detected_type()
-        hit = bool(tm.get("hit")) or det == "HANDBOOK" or bool(
-            c.vision.get("handbook_ok")
-        )
+        # 类型已由 PE 声明为 Manual；是否像手册封面看 handbook_ok / 模版命中
+        hit = bool(tm.get("hit")) or bool(c.vision.get("handbook_ok"))
         evidence.append(
             {
-                "asset_id": c.asset_id,
-                "detected_type": det,
+                "photo_id": c.photo_id,
+                "photo_type": c.photo_type,
                 "template_match": tm or None,
                 "handbook_ok": c.vision.get("handbook_ok"),
                 "hit": hit,
@@ -172,14 +170,14 @@ def rule_handbook_detect(contexts: List[AssetContext]) -> RuleOutcome:
             return pass_(
                 "HANDBOOK_DETECT",
                 "识别到当期宣传手册",
-                related=[c.asset_id],
+                related=[c.photo_id],
                 evidence={"rows": evidence},
             )
     return fail(
         "HANDBOOK_DETECT",
         "HANDBOOK_NOT_FOUND",
         "未识别为宣传手册封面",
-        related=[c.asset_id for c in ok_books],
+        related=[c.photo_id for c in ok_books],
         evidence={"rows": evidence},
     )
 
@@ -211,7 +209,7 @@ def _extract_handbook_year(c: AssetContext) -> Optional[int]:
 
 def rule_handbook_not_stale(contexts: List[AssetContext]) -> RuleOutcome:
     """无旧版负样本时：封面年份须为当期年（默认 2026）。"""
-    books = [c for c in contexts if c.declared_type == "HANDBOOK"]
+    books = [c for c in contexts if c.photo_type == "Manual"]
     if not books:
         return fail(
             "HANDBOOK_NOT_STALE",
@@ -225,11 +223,11 @@ def rule_handbook_not_stale(contexts: List[AssetContext]) -> RuleOutcome:
             "HANDBOOK_NOT_STALE",
             "HANDBOOK_NOT_FOUND",
             "手册材料不可读",
-            related=[c.asset_id for c in books],
+            related=[c.photo_id for c in books],
         )
 
     need_year = int(get_settings().handbook_current_year)
-    related = [c.asset_id for c in ok_books]
+    related = [c.photo_id for c in ok_books]
     evidence = []
     stale = []
     ok_ids = []
@@ -239,7 +237,7 @@ def rule_handbook_not_stale(contexts: List[AssetContext]) -> RuleOutcome:
         year = _extract_handbook_year(c)
         stale_tm = (c.template_match or {}).get("handbook_stale") or {}
         row = {
-            "asset_id": c.asset_id,
+            "photo_id": c.photo_id,
             "handbook_year": year,
             "need_year": need_year,
             "handbook_stale": stale_tm or None,
@@ -248,19 +246,19 @@ def rule_handbook_not_stale(contexts: List[AssetContext]) -> RuleOutcome:
 
         # 若有旧版负样本且命中更强 → 直接旧版
         if stale_tm.get("hit"):
-            stale.append(c.asset_id)
+            stale.append(c.photo_id)
             continue
 
         if year is None:
             if _is_blurry(c, {}):
-                uncs.append(c.asset_id)
+                uncs.append(c.photo_id)
             else:
-                uncs.append(c.asset_id)
+                uncs.append(c.photo_id)
             continue
         if year == need_year:
-            ok_ids.append(c.asset_id)
+            ok_ids.append(c.photo_id)
         else:
-            stale.append(c.asset_id)
+            stale.append(c.photo_id)
 
     if stale:
         return fail(
@@ -293,9 +291,7 @@ def rule_speaker_topic_ocr(
     photos = [
         c
         for c in contexts
-        if c.declared_type == "SPEAKER_PHOTO"
-        and c.ok
-        and (not c.speaker_shot_kind or c.speaker_shot_kind == "TITLE_GROUP")
+        if c.photo_type == "SpeakerTitle" and c.ok
     ]
     if not photos:
         return skip("SPEAKER_TOPIC_OCR", "无标题合影")
@@ -304,7 +300,7 @@ def rule_speaker_topic_ocr(
     uncs = []
     related = []
     for c in photos:
-        related.append(c.asset_id)
+        related.append(c.photo_id)
         sp = speakers.get(c.speaker_id)
         if not sp:
             continue
@@ -313,16 +309,16 @@ def rule_speaker_topic_ocr(
         got = normalize_topic(of.get("topic_title") or "")
         if not got:
             if _is_blurry(c, options):
-                uncs.append(c.asset_id)
+                uncs.append(c.photo_id)
             else:
-                uncs.append(c.asset_id)
+                uncs.append(c.photo_id)
             continue
         if expected and got != expected:
             # allow containment
             if expected not in got and got not in expected:
                 fails.append(
                     {
-                        "asset_id": c.asset_id,
+                        "photo_id": c.photo_id,
                         "expected": sp.get("topic"),
                         "got": of.get("topic_title"),
                     }
@@ -332,7 +328,7 @@ def rule_speaker_topic_ocr(
             "SPEAKER_TOPIC_OCR",
             "TOPIC_MISMATCH",
             "课件标题与表单主题不一致",
-            related=[f["asset_id"] for f in fails],
+            related=[f["photo_id"] for f in fails],
             evidence={"fails": fails},
         )
     if uncs and not fails:
@@ -355,17 +351,17 @@ def rule_speaker_shot_pair(
     speakers = form.get("speakers") or []
     if not speakers:
         return skip("SPEAKER_SHOT_PAIR", "无讲者")
-    photos = [c for c in contexts if c.declared_type == "SPEAKER_PHOTO"]
+    photos = [c for c in contexts if c.photo_type in ("SpeakerTitle", "SpeakerLecture")]
     missing = []
-    related = [c.asset_id for c in photos]
+    related = [c.photo_id for c in photos]
     for sp in speakers:
         sid = sp["speaker_id"]
         kinds = {
-            c.speaker_shot_kind
+            c.photo_type
             for c in photos
             if c.speaker_id == sid and c.ok
         }
-        need = {"TITLE_GROUP", "LECTURING"}
+        need = {"SpeakerTitle", "SpeakerLecture"}
         if not need.issubset(kinds):
             missing.append(
                 {

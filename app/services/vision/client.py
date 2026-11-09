@@ -11,7 +11,13 @@ from typing import Any, Dict, List, Optional
 import httpx
 
 from app.config import Settings, get_settings
-from app.services.vision.prompts import SYSTEM, user_prompt
+from app.services.vision.prompts import (
+    KEY_FIELDS_ROI_PROMPT,
+    NAME_CARD_LOCATE_PROMPT,
+    NAME_CARD_ROI_PROMPT,
+    SYSTEM,
+    user_prompt,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -53,18 +59,18 @@ def _data_url(image_bytes: bytes, content_type: str) -> str:
 
 # 偏 OCR / 字段抽取的材料类型
 _OCR_TYPES = {
-    "POSTER",
-    "STAND",
-    "E_POSTER",
-    "E_POSTER_DISPLAY",
-    "PROJECT_INTRO_DISPLAY",
-    "NAME_CARD",
-    "HANDBOOK",
-    "SPEAKER_PHOTO",
-    "SIGNIN",
+    "Poster",
+    "Stand",
+    "EDM",
+    "EDMDisplay",
+    "ProjectIntro",
+    "TableCard",
+    "Manual",
+    "SpeakerTitle",
+    "SignSheet",
 }
 # 偏数人的材料类型
-_COUNT_TYPES = {"PANORAMA"}
+_COUNT_TYPES = {"Panorama"}
 
 
 class VisionClient:
@@ -74,14 +80,14 @@ class VisionClient:
     def available(self) -> bool:
         return bool(self.settings.openai_api_key)
 
-    def model_for(self, declared_type: str) -> str:
+    def model_for(self, photo_type: str) -> str:
         """双模型分流：全景用 count 模型，其余优先 OCR 模型。"""
         base = self.settings.vision_model
         ocr = (self.settings.vision_ocr_model or "").strip() or base
         count = (self.settings.vision_count_model or "").strip() or base
-        if declared_type in _COUNT_TYPES:
+        if photo_type in _COUNT_TYPES:
             return count
-        if declared_type in _OCR_TYPES:
+        if photo_type in _OCR_TYPES:
             return ocr
         return base
 
@@ -160,15 +166,15 @@ class VisionClient:
         self,
         image_bytes: bytes,
         content_type: str,
-        declared_type: str,
+        photo_type: str,
         project_type: str,
     ) -> Dict[str, Any]:
-        model = self.model_for(declared_type)
+        model = self.model_for(photo_type)
         data = self._chat(
             [
                 {
                     "type": "text",
-                    "text": user_prompt(declared_type, project_type),
+                    "text": user_prompt(photo_type, project_type),
                 },
                 {
                     "type": "image_url",
@@ -181,6 +187,69 @@ class VisionClient:
         if isinstance(data, dict):
             data.setdefault("_vision_model", model)
         return data
+
+    def ocr_key_fields_roi(
+        self,
+        image_bytes: bytes,
+        content_type: str = "image/jpeg",
+    ) -> Dict[str, Any]:
+        """对已裁好的字段区 ROI 做关键字段 OCR（日期/时间/地点/讲者）。"""
+        model = self.model_for("Poster")
+        data = self._chat(
+            [
+                {"type": "text", "text": KEY_FIELDS_ROI_PROMPT},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": _data_url(image_bytes, content_type)},
+                },
+            ],
+            model=model,
+        )
+        return data if isinstance(data, dict) else {}
+
+    def ocr_name_card_roi(
+        self,
+        image_bytes: bytes,
+        content_type: str = "image/jpeg",
+    ) -> Dict[str, Any]:
+        """对已裁好的单张台卡 ROI 抽取姓名。"""
+        model = self.model_for("TableCard")
+        data = self._chat(
+            [
+                {"type": "text", "text": NAME_CARD_ROI_PROMPT},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": _data_url(image_bytes, content_type)},
+                },
+            ],
+            model=model,
+        )
+        return data if isinstance(data, dict) else {}
+
+    def locate_name_cards(
+        self,
+        scene_bytes: bytes,
+        ref_bytes: bytes,
+        scene_type: str = "image/jpeg",
+        ref_type: str = "image/jpeg",
+    ) -> Dict[str, Any]:
+        """对照单卡参考 crop，在现场图中定位各台卡框。"""
+        model = self.model_for("TableCard")
+        data = self._chat(
+            [
+                {"type": "text", "text": NAME_CARD_LOCATE_PROMPT},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": _data_url(ref_bytes, ref_type)},
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {"url": _data_url(scene_bytes, scene_type)},
+                },
+            ],
+            model=model,
+        )
+        return data if isinstance(data, dict) else {}
 
     def compare_reference(
         self,

@@ -1,161 +1,181 @@
 {
-  "request_id": "req-hall-208-golden-001",
-  "meeting_id": 1208,
-  "session_no": "208",
+  "task_id": "req-hall-208-golden-001",
+  "meeting_id": "1208",
+  "meeting_no": "208",
   "project_type": "LECTURE_HALL",
-  "meeting_subtype": null,
-  "period_id": 1,
+  "meeting_type": null,
+  "project_id": "1",
   "form": {
     "meeting_name": "菁英药师大讲堂项目",
     "meeting_date": "2026-07-10",
     "start_time": "14:00",
     "end_time": "16:10",
     "chain_or_store_name": "康佰家医药集团股份有限公司",
-    "location": "康佰家医药集团股份有限公司",
+    "meeting_location": "康佰家医药集团股份有限公司",
     "total_attendees": 36,
     "speakers": [
       {
-        "speaker_id": 1,
+        "speaker_id": "1",
         "speaker_name": "彭艳梅",
         "topic": "合理用药与患者教育",
         "store_name": "康佰家医药集团股",
-        "service_minutes": 30
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       },
       {
-        "speaker_id": 2,
+        "speaker_id": "2",
         "speaker_name": "蔡诗晴",
         "topic": "慢病管理实践分享",
         "store_name": "康佰家医药集团股",
-        "service_minutes": 30
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       },
       {
-        "speaker_id": 3,
+        "speaker_id": "3",
         "speaker_name": "郭雅惠",
         "topic": "药学服务要点",
         "store_name": "康佰家医药集团股",
-        "service_minutes": 30
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       },
       {
-        "speaker_id": 4,
+        "speaker_id": "4",
         "speaker_name": "蔡黎宁",
         "topic": "门店健康服务赋能",
         "store_name": "康佰家医药集团股",
-        "service_minutes": 40
+        "service_minutes": 40,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       }
     ]
   },
-  "assets": [
+  "photos": [
     {
-      "asset_id": 20801,
-      "asset_type": "E_POSTER",
-      "s3_uri": "s3://pe-meetings/hall/208/eposter.png",
-      "content_type": "image/png"
+      "photo_id": "20801",
+      "photo_type": "EDM",
+      "file_url": "s3://pe-meetings/hall/208/eposter.png",
+      "content_type": "image/png",
+      "sort": 1
     },
     {
-      "asset_id": 20811,
-      "asset_type": "HANDBOOK",
-      "s3_uri": "s3://pe-meetings/hall/208/handbook.jpg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 20812,
-      "asset_type": "POSTER",
-      "s3_uri": "s3://pe-meetings/hall/208/poster.jpg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 20813,
-      "asset_type": "STAND",
-      "s3_uri": "s3://pe-meetings/hall/208/stand.jpg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 20814,
-      "asset_type": "NAME_CARD",
-      "s3_uri": "s3://pe-meetings/hall/208/name_card.jpg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 20853,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/208/speaker1_1.jpg",
+      "photo_id": "20811",
+      "photo_type": "Manual",
+      "file_url": "s3://pe-meetings/hall/208/handbook.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 1,
-      "speaker_shot_kind": "TITLE_GROUP"
+      "sort": 2
     },
     {
-      "asset_id": 20854,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/208/speaker1_2.jpg",
+      "photo_id": "20812",
+      "photo_type": "Poster",
+      "file_url": "s3://pe-meetings/hall/208/poster.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 1,
-      "speaker_shot_kind": "LECTURING"
+      "sort": 3
     },
     {
-      "asset_id": 20855,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/208/speaker2_1.jpg",
+      "photo_id": "20813",
+      "photo_type": "Stand",
+      "file_url": "s3://pe-meetings/hall/208/stand.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 2,
-      "speaker_shot_kind": "TITLE_GROUP"
+      "sort": 4
     },
     {
-      "asset_id": 20856,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/208/speaker2_2.jpg",
+      "photo_id": "20814",
+      "photo_type": "TableCard",
+      "file_url": "s3://pe-meetings/hall/208/name_card.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 2,
-      "speaker_shot_kind": "LECTURING"
+      "sort": 5
     },
     {
-      "asset_id": 20857,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/208/speaker3_1.jpg",
+      "photo_id": "20853",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/208/speaker1_1.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 3,
-      "speaker_shot_kind": "TITLE_GROUP"
+      "speaker_id": "1",
+      "sort": 6
     },
     {
-      "asset_id": 20858,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/208/speaker3_2.jpg",
+      "photo_id": "20854",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/208/speaker1_2.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 3,
-      "speaker_shot_kind": "LECTURING"
+      "speaker_id": "1",
+      "sort": 7
     },
     {
-      "asset_id": 20859,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/208/speaker4_1.jpg",
+      "photo_id": "20855",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/208/speaker2_1.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 4,
-      "speaker_shot_kind": "TITLE_GROUP"
+      "speaker_id": "2",
+      "sort": 8
     },
     {
-      "asset_id": 20860,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/208/speaker4_2.jpg",
+      "photo_id": "20856",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/208/speaker2_2.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 4,
-      "speaker_shot_kind": "LECTURING"
+      "speaker_id": "2",
+      "sort": 9
     },
     {
-      "asset_id": 20880,
-      "asset_type": "PANORAMA",
-      "s3_uri": "s3://pe-meetings/hall/208/panorama.jpg",
-      "content_type": "image/jpeg"
+      "photo_id": "20857",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/208/speaker3_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "3",
+      "sort": 10
     },
     {
-      "asset_id": 20891,
-      "asset_type": "SIGNIN",
-      "s3_uri": "s3://pe-meetings/hall/208/signin_1.jpg",
-      "content_type": "image/jpeg"
+      "photo_id": "20858",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/208/speaker3_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "3",
+      "sort": 11
     },
     {
-      "asset_id": 20892,
-      "asset_type": "SIGNIN",
-      "s3_uri": "s3://pe-meetings/hall/208/signin_2.jpg",
-      "content_type": "image/jpeg"
+      "photo_id": "20859",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/208/speaker4_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "4",
+      "sort": 12
+    },
+    {
+      "photo_id": "20860",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/208/speaker4_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "4",
+      "sort": 13
+    },
+    {
+      "photo_id": "20880",
+      "photo_type": "Panorama",
+      "file_url": "s3://pe-meetings/hall/208/panorama.jpg",
+      "content_type": "image/jpeg",
+      "sort": 14
+    },
+    {
+      "photo_id": "20891",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/hall/208/signin_1.jpg",
+      "content_type": "image/jpeg",
+      "sort": 15
+    },
+    {
+      "photo_id": "20892",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/hall/208/signin_2.jpg",
+      "content_type": "image/jpeg",
+      "sort": 16
     }
   ],
   "refs": {

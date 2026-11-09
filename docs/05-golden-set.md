@@ -1,10 +1,33 @@
 # 黄金集与负样本清单
 
-现有本地样例均为**合格**参考。黄金集用于回归：给定构造的 `RetailMeetingCheckRequest`（表单与路径对齐），期望 `overall_status=PASS` 且关键规则 `PASS`。
+黄金集用于回归：给定构造的 `RetailMeetingCheckRequest`（表单与路径对齐），期望 `overall_status=PASS` 且关键规则 `PASS`。本地目录同时含合格与不合格样本（见下方「本地样本库」）。
 
 路径均相对仓库根：`/Users/ruining.yu/project/零售/`。
 
 **B 项进展（2026-11-02）：** 命名修复、5 场大讲堂黄金夹具、微型 5 场不合格夹具、双讲对照等已落地。机器可读期望见 [`docs/fixtures/expects.json`](fixtures/expects.json)；整理说明见 [`docs/fixtures/README-B样例整理.md`](fixtures/README-B样例整理.md)。
+
+### 本地样本库（照片目录）
+
+#### 药师大讲堂
+
+| 目录 | 场次 | 说明 |
+|------|------|------|
+| `零售照片ai审核/药师大讲堂/大讲堂已上传过的50场会议核销资料/` | 50 | **整改后的合格版**（含下述 20 场换图后的版本 + 另外 30 场） |
+| `零售照片ai审核/药师大讲堂/20场有不合格照片场次&对应执行报告/` | 20 | **换图前的不合格版**；场次 ID 与上表 50 场中的 20 个**重复** |
+
+**重要：** 这 20 场不合格与 50 场里同 ID 的会议**不是同一套图**。不合格包是问题材料尚在时的版本；50 场包里同 ID 目录是业务换图（或补图）之后的合格版。两侧多数其它材料 MD5 相同，但错误明细点名的那张（展架/讲者/海报/全景等）内容不同；场次 340 为保留原全景并新增第二张全景。  
+并排对比页：[`零售照片ai审核/药师大讲堂/换图对比-不合格20vs合格50.html`](../零售照片ai审核/药师大讲堂/换图对比-不合格20vs合格50.html)。  
+执行报告：仅不合格 20 场有 `不合格照片场次会议执行报告.xlsx`；另 30 场合格无对应执行表。
+
+去重口径：大讲堂唯一会议 **50** = 合格 **30** + 不合格 **20**（不合格 20 ⊆ 原 50 场 ID，但是换图前副本）。
+
+#### 微型药师
+
+| 目录 | 场次 | 说明 |
+|------|------|------|
+| `零售照片ai审核/微型药师/合格场次45场次/` | 45 | 合格；与不合格无 ID 交集 |
+| `零售照片ai审核/微型药师/微型药师20场不合格照片/` | 20 | **新提供**的不合格包 |
+| `会议执行报告-11.01.xlsx` | ~70 | 覆盖合格 45 + 不合格 20 + 另 5 场仅有表无图 |
 
 ### 当前可跑黄金 / 负样本夹具
 
@@ -15,7 +38,7 @@
 | 大讲堂负样本图包 | `hall-negative-samples-fail.json` | FAIL |
 | 微型 000606 / 000670 | `micro-000090-pass.json` / `micro-000670-pass.json` | PASS |
 | 微型双讲 000921 / 000938 | `micro-000125-pass.json` / `micro-000938-dual-pass.json` | PASS |
-| 微型不合格 000620 / 000823 / 001421 / 001499 / 001541 | `micro-*-fail.json` | FAIL |
+| 微型不合格 000728 / 001348 / 001358 / 001453 / 000664 | `micro-*-fail.json` | FAIL |
 
 ---
 
@@ -33,31 +56,31 @@
 | meeting_date | 2026-04-17 |
 | start_time / end_time | 14:00 / 16:10 |
 | chain_or_store_name | 河南美锐大药房连锁有限公司 |
-| location | 信阳市六合春宴酒店（信阳师范大学店）（以海报为准） |
+| meeting_location | 信阳市六合春宴酒店（信阳师范大学店）（以海报为准） |
 | total_attendees | 35 |
 | speakers | 高芳、袁芳、刘亭、余艳红（注意：文件夹有「徐艳红」笔误，黄金集姓名以台卡/结算「余艳红」为准） |
 
-**资产映射：**
+**照片映射：**
 
-| asset_type | 文件 | speaker / shot |
-|------------|------|----------------|
-| POSTER | `1权益-海报.jpg` | |
-| STAND | `2权益-展架.jpg` | |
-| NAME_CARD | `3台卡.jpg` | |
-| HANDBOOK | **缺失** — 见缺口 | |
-| SPEAKER_PHOTO | `4讲者-高芳1.jpg` | 高芳 / TITLE_GROUP |
-| SPEAKER_PHOTO | `4讲者-高芳2.jpg` | 高芳 / LECTURING |
-| SPEAKER_PHOTO | `5讲者-袁芳1.jpg` | 袁芳 / TITLE_GROUP |
-| SPEAKER_PHOTO | `5讲者-袁芳2.jpg` | 袁芳 / LECTURING |
-| SPEAKER_PHOTO | `6讲者-刘亭1.jpg` | 刘亭 / TITLE_GROUP |
-| SPEAKER_PHOTO | `6讲者-刘亭2.jpg` | 刘亭 / LECTURING |
-| SPEAKER_PHOTO | `7讲者4-徐艳红1.jpg` | 余艳红 / TITLE_GROUP |
-| SPEAKER_PHOTO | `7讲者4-徐艳红2.jpg` | 余艳红 / LECTURING |
-| PANORAMA | `8全景照片-35.jpg` | |
-| SIGNIN | `9签到表-35（1）.jpg`, `9签到表-35（2）.jpg` | |
-| E_POSTER | 本包未单独提供 | 若产品必传需补图或用海报电子版 |
+| photo_type | 文件 | speaker |
+|------------|------|---------|
+| Poster | `1权益-海报.jpg` | |
+| Stand | `2权益-展架.jpg` | |
+| TableCard | `3台卡.jpg` | |
+| Manual | **缺失** — 见缺口 | |
+| SpeakerTitle | `4讲者-高芳1.jpg` | 高芳 |
+| SpeakerLecture | `4讲者-高芳2.jpg` | 高芳 |
+| SpeakerTitle | `5讲者-袁芳1.jpg` | 袁芳 |
+| SpeakerLecture | `5讲者-袁芳2.jpg` | 袁芳 |
+| SpeakerTitle | `6讲者-刘亭1.jpg` | 刘亭 |
+| SpeakerLecture | `6讲者-刘亭2.jpg` | 刘亭 |
+| SpeakerTitle | `7讲者4-徐艳红1.jpg` | 余艳红 |
+| SpeakerLecture | `7讲者4-徐艳红2.jpg` | 余艳红 |
+| Panorama | `8全景照片-35.jpg` | |
+| SignSheet | `9签到表-35（1）.jpg`, `9签到表-35（2）.jpg` | |
+| EDM | 本包未单独提供 | 若产品必传需补图或用海报电子版 |
 
-**期望 overall：** `PASS`（拍板：大讲堂 `E_POSTER` / `HANDBOOK` 等为**必审**；请求缺类型 → `ASSET_MISSING` FAIL。夹具见 `docs/fixtures/hall-meirui-pass.json`）
+**期望 overall：** `PASS`（拍板：大讲堂 `EDM` / `Manual` 等为**必审**；请求缺类型 → `ASSET_MISSING` FAIL。夹具见 `docs/fixtures/hall-meirui-pass.json`）
 
 **期望规则：**
 
@@ -93,15 +116,15 @@
 | meeting_subtype | SINGLE |
 | meeting_date | 2026-05-27 |
 | chain_or_store_name | 老百姓大药房连锁（安徽）有限公司 |
-| location | 水印/门店：淠河路店（表单应对齐） |
+| meeting_location | 水印/门店：淠河路店（表单应对齐） |
 
-| asset_type | 文件 |
+| photo_type | 文件 |
 |------------|------|
-| E_POSTER | `会议日程.png` |
-| E_POSTER_DISPLAY / PROJECT_INTRO_DISPLAY | `权益照片1.jpg`, `权益照片2.jpg`（按页类标注） |
-| SPEAKER_PHOTO | `讲者标题页.jpg` |
-| PANORAMA | `参会人员.jpg` |
-| SIGNIN | `会议签到表.pdf` |
+| EDM | `会议日程.png` |
+| EDMDisplay / ProjectIntro | `权益照片1.jpg`, `权益照片2.jpg`（按页类标注） |
+| SpeakerTitle | `讲者标题页.jpg` |
+| Panorama | `参会人员.jpg` |
+| SignSheet | `会议签到表.pdf` |
 
 **期望规则：** `PPT_TEMPLATE_MATCH` PASS、`PPT_PAGE_KIND` PASS、`BAYER_LOGO` PASS、`PANORAMA_COUNT` PASS（≥6）、`WATERMARK_CONSISTENCY` PASS（权益照含水印）、`SIGNIN_DURATION` PASS（>30）、`SIGNIN_RATIO_AND_STORES` PASS、`TOPIC_REUSE` PASS（若有标题合影）。
 
@@ -124,13 +147,13 @@
 | speakers | 张辉、张彦文 |
 | total_attendees | 14 |
 
-| asset_type | 文件 |
+| photo_type | 文件 |
 |------------|------|
-| E_POSTER | `会议日程.jpg` |
-| 展示类 | `权益照片-1.jpg`, `权益照片-2.jpg` |
-| SPEAKER_PHOTO | `讲者标题页-1.jpg`, `讲者标题页-2.jpg` |
-| PANORAMA | `参会人员-1.jpg`, `参会人员-2.jpg`（人数合计 ≥12） |
-| SIGNIN | `会议签到表.pdf` |
+| EDM | `会议日程.jpg` |
+| EDMDisplay / ProjectIntro | `权益照片-1.jpg`, `权益照片-2.jpg` |
+| SpeakerTitle | `讲者标题页-1.jpg`, `讲者标题页-2.jpg` |
+| Panorama | `参会人员-1.jpg`, `参会人员-2.jpg`（人数合计 ≥12） |
+| SignSheet | `会议签到表.pdf` |
 
 **期望：** `PANORAMA_COUNT` PASS（双讲者 ≥12）、`SIGNIN_DURATION` PASS（>60）、其余微型规则 PASS。
 
@@ -140,8 +163,8 @@
 
 | 缺口 | 影响规则 | 处理 |
 |------|----------|------|
-| 大讲堂无独立「手册」照片 | HANDBOOK_* | **已实现：无 HANDBOOK 资产 → SKIP**；补封面后可跑真规则 |
-| 大讲堂无独立「电子日程海报」 | E_POSTER | 补图或产品确认是否可用日程海报电子档 |
+| 大讲堂无独立「手册」照片 | HANDBOOK_* | **已实现：无 Manual 资产 → SKIP**；补封面后可跑真规则 |
+| 大讲堂无独立「电子日程海报」 | EDM | 补图或产品确认是否可用日程海报电子档 |
 | 仅合格样本 | 阈值/召回 | 必须补负样本（见下） |
 | 姓名文件名「徐艳红」vs 台卡「余艳红」 | 姓名匹配评测 | 黄金集以 OCR/台卡为准；表单勿用错字 |
 
@@ -154,10 +177,10 @@
 | ID | 类型 | 构造方式 | 期望 overall | 期望触发 rule |
 |----|------|----------|--------------|---------------|
 | N01 | 模糊图 | 高斯模糊合格海报 | NEED_HUMAN | CLARITY + KEY_FIELD_MATCH UNCERTAIN |
-| N02 | 错模版 | 非拜耳波浪/旧 VI 海报 | FAIL | PPT_TEMPLATE_MATCH / POSTER 模版 |
+| N02 | 错模版 | 非拜耳波浪/旧 VI 海报 | FAIL | PPT_TEMPLATE_MATCH / Poster 模版 |
 | N03 | 无 Logo | 遮挡或裁掉 Logo | FAIL | BAYER_LOGO |
 | N04 | 旧手册封面 | 往期手册标题/版式 | FAIL | HANDBOOK_NOT_STALE |
-| N05 | 非手册 | 普通笔记本特写当 HANDBOOK | FAIL | HANDBOOK_DETECT |
+| N05 | 非手册 | 普通笔记本特写当 Manual | FAIL | HANDBOOK_DETECT |
 | N06 | 台卡缺人 | 仅 3 个台卡入镜 | FAIL | NAME_CARD_SPEAKER_MATCH |
 | N07 | 台卡错名 | 姓名与表单不符 | FAIL | NAME_CARD_SPEAKER_MATCH |
 | N08 | 人数不足 | 全景明显 <35 / 微型 <6 | FAIL | PANORAMA_COUNT |
@@ -168,9 +191,9 @@
 | N11 | 签到时长不足 | 伪造短时长表头 | FAIL | SIGNIN_DURATION |
 | N12 | 签到门店单一 | 微型听众均同一门店 | FAIL | SIGNIN_RATIO_AND_STORES |
 | N13 | 水印日期错误 | 水印改到其他日 | FAIL | WATERMARK_CONSISTENCY |
-| N14 | 类别错挂 | 全景图声明为 POSTER | FAIL | ASSET_TYPE_CHECK |
-| N15 | S3 404 | 错误 uri | ERROR | S3_NOT_FOUND |
-| N16 | 讲者缺过程照 | 大讲堂仅 TITLE_GROUP | FAIL | SPEAKER_SHOT_PAIR |
+| N14 | 类别错挂 | 全景图声明为 Poster | FAIL | ASSET_TYPE_CHECK |
+| N15 | S3 404 | 错误 file_url | ERROR | S3_NOT_FOUND |
+| N16 | 讲者缺过程照 | 大讲堂仅 SpeakerTitle | FAIL | SPEAKER_SHOT_PAIR |
 | N17 | 主题不一致 | 标题合影课件≠表单 topic | FAIL | SPEAKER_TOPIC_OCR |
 | N18 | 两张同为项目介绍 | 微型缺日程页 | FAIL | PPT_PAGE_KIND |
 
@@ -178,7 +201,7 @@
 
 ## E. 回归执行建议
 
-1. 将本地文件上传到测试桶，生成真实 `s3_uri` 的 Request JSON（可放 `docs/fixtures/` 后续补充）
+1. 将本地文件上传到测试桶，生成真实 `file_url` 的 Request JSON（可放 `docs/fixtures/` 后续补充）
 2. 跑 AI 流水线，断言：
    - `overall_status`
    - 关键 `rule_code` 的 `status`

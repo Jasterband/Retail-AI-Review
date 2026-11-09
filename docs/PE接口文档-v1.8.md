@@ -1,25 +1,31 @@
 # 药师会零售会议材料检查 · PE 接口文档 v1.8
 
+> **状态：历史全文 / full 排障参考，不再作为 PE simple 对接权威。**  
+> PE 系统开发请读 **[README-PE-simple对接.md](README-PE-simple对接.md)**（提交 / 轮询 / 回调 / 最瘦响应 / `reason_code`）。  
+> 本文与对接文档冲突时，**以对接文档为准**。下文中「simple」若仍含 `reason_text` / `rule_results` / `response_mode` 等，视为旧稿。
+
 | 项 | 内容 |
 |----|------|
-| 文档版本 | v1.8 |
+| 文档版本 | v1.9（历史） |
 | API 版本 | v1 |
-| 更新日期 | 2026-10-23 |
-| 适用对象 | PE 系统开发 / 测试；AI 排障可用 `full` |
-| OpenAPI | [openapi/pe-retail-meeting-check.v1.yaml](openapi/pe-retail-meeting-check.v1.yaml) |
-| JSON Schema | [schemas/retail-meeting-check-request.schema.json](schemas/retail-meeting-check-request.schema.json) · [schemas/retail-meeting-check-response.schema.json](schemas/retail-meeting-check-response.schema.json) |
+| 更新日期 | 2026-11-05 |
+| 适用对象 | AI 排障 / 规则与阈值补充；**PE 对接改看 simple 文档** |
+| PE simple 权威 | [README-PE-simple对接.md](README-PE-simple对接.md) |
+| OpenAPI | [openapi/pe-retail-meeting-check.v1.yaml](openapi/pe-retail-meeting-check.v1.yaml)（可能滞后） |
+| JSON Schema | [schemas/retail-meeting-check-request.schema.json](schemas/retail-meeting-check-request.schema.json) · [schemas/retail-meeting-check-response.schema.json](schemas/retail-meeting-check-response.schema.json)（**full**） |
 
 **变更记录**
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| v1.9 | 2026-11-05 | 字段名/`photo_type` 对齐 CRM；去掉 `speaker_shot_kind`；讲者照用 `SpeakerTitle`/`SpeakerLecture` |
 | v1.8 | 2026-10-23 | 两类查重定稿：主题=OCR文字；照片盗用= pHash/embedding **仅跨会议**（不查会内相似） |
 | v1.7 | 2026-10-23 | 拆开两类查重：图片查重 vs 主题不重复（仅讲者照） |
 | v1.6 | 2026-10-23 | 响应分 **`simple` / `full` 两种模式**：simple 给 PE 展示（哪张不合格+原因）；full 给 AI debug（字段尽量全） |
 | v1.5 | 2026-10-23 | （已 superseded）曾将主题 OCR 扩到全部照片；现改回仅讲者照，图片一致另立规则 |
 | v1.4 | 2026-10-23 | 主路径改为 `/v1/retail_meeting_checks`；类型名改为 `RetailMeetingCheckRequest/Response` |
 | v1.3 | 2026-10-23 | 跨会议查重定义为**主题/标题重复**（非图像盗用） |
-| v1.2 | 2026-10-23 | `asset_results.checks` 布尔检测点清单；`rule_results.passed`；查重说明 |
+| v1.2 | 2026-10-23 | `photo_results.checks` 布尔检测点清单；`rule_results.passed`；查重说明 |
 | v1.1 | 2026-10-22 | 改为以接口清单为主体；删除一页纸摘要 |
 | v1.0 | 2026-10-22 | 首版 |
 
@@ -32,16 +38,16 @@ PE 与 AI **零售会议材料检查**相关的接口如下。材料**只传 S3 
 | 序号 | 方向 | 方法 | 路径 | 说明 | 成功码 |
 |------|------|------|------|------|--------|
 | 1 | PE → AI | `POST` | `/v1/retail_meeting_checks` | 提交一场会议的材料检查 | `202` |
-| 2 | PE → AI | `GET` | `/v1/retail_meeting_checks/{request_id}` | 查询检查进度/结果 | `200` |
+| 2 | PE → AI | `GET` | `/v1/retail_meeting_checks/{task_id}` | 查询检查进度/结果 | `200` |
 | 3 | AI → PE | `POST` | `{X-Callback-URL}` | 检查完成回调（可选；由 PE 提供 URL） | `2xx` |
 | 4 | PE → AI | `GET` | `/health` | 健康检查（连通性） | `200` |
 
 **调用关系：**
 
 ```text
-PE 提交 POST /v1/retail_meeting_checks ──202──► 拿到 request_id / job_id
+PE 提交 POST /v1/retail_meeting_checks ──202──► 拿到 task_id / job_id
         │
-        ├─ 轮询 GET /v1/retail_meeting_checks/{request_id} 直到终态
+        ├─ 轮询 GET /v1/retail_meeting_checks/{task_id} 直到终态
         │
         └─ 或等待 AI 回调 POST {callback_url}（若提交时带了 X-Callback-URL）
 ```
@@ -72,8 +78,8 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 | 项 | 约定 |
 |----|------|
 | 协议 | HTTPS，`Content-Type: application/json`，UTF-8 |
-| 幂等 | 相同 `request_id` 不重复计次，返回首次结果 |
-| 重提 | 用户改材料后再审 → **换新** `request_id` |
+| 幂等 | 相同 `task_id` 不重复计次，返回首次结果 |
+| 重提 | 用户改材料后再审 → **换新** `task_id` |
 | S3 | `s3://{bucket}/{key}`；AI 需有只读权限 |
 | 轮询建议 | 首次 3s，之后每 5s，最长约 10 分钟 |
 | 限流 | 默认 60 次/分钟/Token，超限 `429` |
@@ -95,7 +101,7 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 | 方法 / 路径 | `POST /v1/retail_meeting_checks` |
 | 说明 | 提交一场会议材料检查任务（异步） |
 | 成功 | `202 Accepted` |
-| 幂等键 | Body.`request_id` |
+| 幂等键 | Body.`task_id` |
 
 ### 3.1 请求头
 
@@ -104,7 +110,7 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 | Authorization | 是 | `Bearer <token>` |
 | Content-Type | 是 | `application/json` |
 | X-Callback-URL | 否 | 完成后回调的 HTTPS 地址；不传则只靠轮询 |
-| Idempotency-Key | 否 | 若传须与 `request_id` 一致 |
+| Idempotency-Key | 否 | 若传须与 `task_id` 一致 |
 
 ### 3.2 请求体字段
 
@@ -112,14 +118,14 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| request_id | string | 是 | 请求唯一 ID，8~64 字符 |
-| meeting_id | integer | 是 | PE 会议主键 |
-| session_no | string | 是 | 场次编号，≤20 |
+| task_id | string | 是 | 请求唯一 ID，8~50 字符（对齐 CRM TaskID） |
+| meeting_id | string | 是 | PE 会议主键 |
+| meeting_no | string | 是 | 场次编号，≤20 |
 | project_type | string | 是 | `LECTURE_HALL` \| `MICRO` |
-| meeting_subtype | string/null | 条件 | 微型：`SINGLE`\|`DUAL`；大讲堂：`null` |
-| period_id | integer | 是 | 项目期数 ID |
+| meeting_type | string/null | 条件 | 微型：`SINGLE`\|`DUAL`；大讲堂：`null` |
+| project_id | string | 是 | 项目期数 ID |
 | form | object | 是 | 会议表单 |
-| assets | array | 是 | 材料列表，≥1 |
+| photos | array | 是 | 材料列表，≥1 |
 | refs | object | 否 | 模版包/主题查重范围 |
 | options | object | 否 | 阈值等 |
 
@@ -132,7 +138,7 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 | start_time | string | 是 | `HH:mm` |
 | end_time | string | 是 | `HH:mm` |
 | chain_or_store_name | string | 是 | 大讲堂=连锁名；微型=药店名 |
-| location | string | 是 | 会议地点（与海报/水印比对） |
+| meeting_location | string | 是 | 会议地点（与海报/水印比对） |
 | remark | string | 否 | 备注 |
 | total_attendees | integer | 是 | 总参会人数 |
 | speakers | array | 是 | 讲者列表，≥1 |
@@ -141,49 +147,50 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| speaker_id | integer | 是 | 讲者 ID |
+| speaker_id | string | 是 | 讲者 ID |
 | speaker_name | string | 是 | 姓名 |
 | topic | string | 是 | 讲题 |
 | store_name | string | 是 | 所属门店 |
 | service_minutes | integer | 是 | 服务时长（分钟） |
-| role_title | string | 否 | 身份 |
-| fee / tax | number | 否 | 讲课费 / 税金 |
+| identity_name | string | 是 | 身份（≤10；CRM NotNull） |
+| lecture_fee | number | 是 | 讲课费（CRM NotNull） |
+| tax | number | 是 | 税金（CRM NotNull） |
 
-**assets[]**
+**photos[]**
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| asset_id | integer | 是 | 材料 ID |
-| asset_type | string | 是 | 见下表枚举 |
-| s3_uri | string | 是 | `s3://bucket/key` |
+| photo_id | string | 是 | 材料 ID |
+| photo_type | string | 是 | 见下表枚举 |
+| file_url | string | 是 | `s3://bucket/key` |
 | content_type | string | 是 | `image/jpeg` \| `image/png` \| `application/pdf` |
-| sort_no | integer | 否 | 同类型多张顺序 |
-| speaker_id | integer | 条件 | 讲者照必填 |
-| speaker_shot_kind | string | 条件 | `TITLE_GROUP` \| `LECTURING` |
+| sort | integer | 是 | 同类型多张顺序，≥1（CRM NotNull） |
+| speaker_id | string | 条件 | `SpeakerTitle`/`SpeakerLecture` 必填 |
 
-**asset_type（大讲堂）**
-
-| 码 | 含义 | 数量 |
-|----|------|------|
-| E_POSTER | 电子日程海报 | ≥1 |
-| POSTER | 日程海报 | ≥1 |
-| STAND | 日程展架 | ≥1 |
-| NAME_CARD | 台卡 | ≥1 |
-| HANDBOOK | 手册 | ≥1 |
-| SPEAKER_PHOTO | 讲者照 | 每讲者 2 张 |
-| PANORAMA | 全景 | ≥1 |
-| SIGNIN | 签到表 | ≥1 |
-
-**asset_type（微型）**
+**photo_type（大讲堂）** — 与 CRM `PhotoType` 同值
 
 | 码 | 含义 | 数量 |
 |----|------|------|
-| E_POSTER | 电子日程海报 | ≥1 |
-| E_POSTER_DISPLAY | 电子日程海报展示 | ≥1 |
-| PROJECT_INTRO_DISPLAY | 项目介绍展示 | ≥1 |
-| SPEAKER_PHOTO | 讲者标题合影 | 单 1 / 双 2 |
-| PANORAMA | 全景 | ≥1 |
-| SIGNIN | 签到表 | ≥1 |
+| EDM | 电子日程海报 | ≥1 |
+| Poster | 日程海报 | ≥1 |
+| Stand | 日程展架 | ≥1 |
+| TableCard | 台卡 | ≥1 |
+| Manual | 手册 | ≥1 |
+| SpeakerTitle | 讲者标题合影 | 每讲者 ≥1（须 `speaker_id`） |
+| SpeakerLecture | 讲者讲课照 | 每讲者 ≥1（须 `speaker_id`） |
+| Panorama | 全景 | ≥1 |
+| SignSheet | 签到表 | ≥1 |
+
+**photo_type（微型）** — 与 CRM `PhotoType` 同值
+
+| 码 | 含义 | 数量 |
+|----|------|------|
+| EDM | 电子日程海报 | ≥1 |
+| EDMDisplay | 电子日程海报展示 | ≥1 |
+| ProjectIntro | 项目介绍展示 | ≥1 |
+| SpeakerTitle | 讲者标题合影 | 单 1 / 双 2（须 `speaker_id`） |
+| Panorama | 全景 | ≥1 |
+| SignSheet | 签到表 | ≥1 |
 
 **refs / options（可选）**
 
@@ -209,43 +216,46 @@ curl -X POST 'https://retail-meeting-check-test.example.com/v1/retail_meeting_ch
   -H 'Content-Type: application/json' \
   -d @- <<'EOF'
 {
-  "request_id": "req-micro-000090-001",
-  "meeting_id": 1090,
-  "session_no": "000090",
+  "task_id": "req-micro-000090-001",
+  "meeting_id": "1090",
+  "meeting_no": "000090",
   "project_type": "MICRO",
-  "meeting_subtype": "SINGLE",
-  "period_id": 2,
+  "meeting_type": "SINGLE",
+  "project_id": "2",
   "form": {
     "meeting_name": "单讲师",
     "meeting_date": "2026-05-27",
     "start_time": "14:00",
     "end_time": "14:35",
     "chain_or_store_name": "老百姓大药房连锁（安徽）有限公司",
-    "location": "合肥市老百姓大药房连锁（安徽）有限公司淠河路店",
+    "meeting_location": "合肥市老百姓大药房连锁（安徽）有限公司淠河路店",
     "total_attendees": 7,
     "speakers": [
       {
-        "speaker_id": 1,
+        "speaker_id": "1",
         "speaker_name": "示例讲者",
         "topic": "慢病管理",
         "store_name": "淠河路店",
-        "service_minutes": 30
+        "service_minutes": 30,
+          "identity_name": "药师",
+          "lecture_fee": 0,
+          "tax": 0
       }
     ]
   },
-  "assets": [
-    {"asset_id": 301, "asset_type": "E_POSTER", "s3_uri": "s3://pe-meetings/micro/000090/agenda.png", "content_type": "image/png"},
-    {"asset_id": 302, "asset_type": "E_POSTER_DISPLAY", "s3_uri": "s3://pe-meetings/micro/000090/display1.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 303, "asset_type": "PROJECT_INTRO_DISPLAY", "s3_uri": "s3://pe-meetings/micro/000090/intro.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 304, "asset_type": "SPEAKER_PHOTO", "s3_uri": "s3://pe-meetings/micro/000090/speaker.jpg", "content_type": "image/jpeg", "speaker_id": 1, "speaker_shot_kind": "TITLE_GROUP"},
-    {"asset_id": 305, "asset_type": "PANORAMA", "s3_uri": "s3://pe-meetings/micro/000090/panorama.jpg", "content_type": "image/jpeg"},
-    {"asset_id": 306, "asset_type": "SIGNIN", "s3_uri": "s3://pe-meetings/micro/000090/signin.pdf", "content_type": "application/pdf"}
+  "photos": [
+    {"photo_id": "301", "photo_type": "EDM", "file_url": "s3://pe-meetings/micro/000090/agenda.png", "content_type": "image/png", "sort": 1},
+    {"photo_id": "302", "photo_type": "EDMDisplay", "file_url": "s3://pe-meetings/micro/000090/display1.jpg", "content_type": "image/jpeg", "sort": 2},
+    {"photo_id": "303", "photo_type": "ProjectIntro", "file_url": "s3://pe-meetings/micro/000090/intro.jpg", "content_type": "image/jpeg", "sort": 3},
+    {"photo_id": "304", "photo_type": "SpeakerTitle", "file_url": "s3://pe-meetings/micro/000090/speaker.jpg", "content_type": "image/jpeg", "sort": 4, "speaker_id": "1"},
+    {"photo_id": "305", "photo_type": "Panorama", "file_url": "s3://pe-meetings/micro/000090/panorama.jpg", "content_type": "image/jpeg", "sort": 5},
+    {"photo_id": "306", "photo_type": "SignSheet", "file_url": "s3://pe-meetings/micro/000090/signin.pdf", "content_type": "application/pdf", "sort": 6}
   ]
 }
 EOF
 ```
 
-大讲堂完整请求示例见 [02-api-io-contract.md](02-api-io-contract.md)。
+大讲堂完整请求示例见 [README-PE-simple对接.md](README-PE-simple对接.md) §3.3；字段映射见 [CRM与AI-API字段对照.md](CRM与AI-API字段对照.md)。
 
 ### 3.4 响应
 
@@ -253,7 +263,7 @@ EOF
 
 ```json
 {
-  "request_id": "req-micro-000090-001",
+  "task_id": "req-micro-000090-001",
   "job_id": 9001,
   "status": "ACCEPTED"
 }
@@ -265,7 +275,7 @@ EOF
 {
   "error": {
     "code": "SCHEMA_INVALID",
-    "message": "meeting_subtype 在 project_type=MICRO 时必填",
+    "message": "meeting_type 在 project_type=MICRO 时必填",
     "retryable": false
   }
 }
@@ -277,7 +287,7 @@ EOF
 
 | 项 | 内容 |
 |----|------|
-| 方法 / 路径 | `GET /v1/retail_meeting_checks/{request_id}` |
+| 方法 / 路径 | `GET /v1/retail_meeting_checks/{task_id}` |
 | 说明 | 查询进度或终态结果 |
 | 成功 | `200 OK` |
 
@@ -285,7 +295,7 @@ EOF
 
 | 参数 | 位置 | 类型 | 说明 |
 |------|------|------|------|
-| request_id | path | string | 提交时的 request_id |
+| task_id | path | string | 提交时的 task_id |
 | mode | query | string | 响应模式：`simple`（**默认**）\| `full`。覆盖提交时 `options.response_mode` |
 
 ### 4.2 响应模式：`simple` vs `full`
@@ -302,7 +312,7 @@ EOF
 1. 服务端始终算完整结果并落库；`mode` 只影响**本次返回裁剪**，不改变判定。  
 2. 回调默认 `simple`（除非提交时 `options.response_mode=full`）。  
 3. 响应顶层带 `response_mode`，便于调用方确认。  
-4. 检测点全表、主题查重见 [检测点清单与asset_results.md](检测点清单与asset_results.md)。
+4. 检测点全表、主题查重见 [检测点清单与photo_results.md](检测点清单与photo_results.md)。
 
 ### 4.3 请求示例
 
@@ -321,13 +331,13 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 ```json
 {
   "response_mode": "simple",
-  "request_id": "req-micro-000090-001",
-  "meeting_id": 1090,
+  "task_id": "req-micro-000090-001",
+  "meeting_id": "1090",
   "job_id": 9001,
   "overall_status": null,
   "processing_status": "RUNNING",
   "message": "检查进行中",
-  "asset_results": [],
+  "photo_results": [],
   "rule_results": []
 }
 ```
@@ -339,8 +349,8 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | response_mode | string | `simple` \| `full` |
-| request_id | string | 请求 ID |
-| meeting_id | integer | 会议 ID |
+| task_id | string | 请求 ID |
+| meeting_id | string | 会议 ID |
 | job_id | integer | 任务 ID |
 | attempt_no | integer | 本场第几次检查 |
 | overall_status | string | `PASS` \| `FAIL` \| `NEED_HUMAN` \| `ERROR` |
@@ -348,7 +358,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | summary_failed | string[] | 整场不通过原因（展示用） |
 | need_human_reasons | string[] | 待人工原因 |
 | error | object/null | 仅 ERROR：`code` / `message` / `retryable` |
-| asset_results | array | 每张材料一条（字段随 mode 增减） |
+| photo_results | array | 每张材料一条（字段随 mode 增减） |
 | rule_results | array | 场级规则（字段随 mode 增减） |
 | finished_at | string | ISO-8601 |
 
@@ -357,7 +367,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | overall_status | PE 会议状态 |
 |----------------|-------------|
 | PASS | 通过 |
-| FAIL | 不通过（可改材料后换新 request_id 重提） |
+| FAIL | 不通过（可改材料后换新 task_id 重提） |
 | NEED_HUMAN | 待人工（不要当成 FAIL） |
 | ERROR | 保持待校验并告警重试（不要记业务不合格） |
 
@@ -365,13 +375,13 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 
 核心问题：**哪张照片不合格？不合格原因是什么？**
 
-**asset_results[]（simple）**
+**photo_results[]（simple）**
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| asset_id | int | 材料 ID |
-| declared_type | string | PE 声明类型 |
-| asset_status | string | `PASS` \| `FAIL` \| `UNCERTAIN` \| `ERROR` |
+| photo_id | string | 材料 ID |
+| photo_type | string | PE 声明类型 |
+| photo_status | string | `PASS` \| `FAIL` \| `UNCERTAIN` \| `ERROR` |
 | fail_reasons | array | **不合格/待人工原因列表**；通过时为 `[]` |
 
 **fail_reasons[]**
@@ -390,7 +400,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | passed | bool/null |
 | status | `PASS` \| `FAIL` \| `SKIP` \| `UNCERTAIN` |
 | reason_code / reason_text | 原因 |
-| related_asset_ids | 关联材料（方便点到具体照片） |
+| related_photo_ids | 关联材料（方便点到具体照片） |
 
 > simple **不返回**：完整 `checks` 字典、OCR 原文、检测框、`evidence`、清晰度分数、`debug` 等。
 
@@ -399,25 +409,25 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 ```json
 {
   "response_mode": "simple",
-  "request_id": "req-hall-x-002",
-  "meeting_id": 1009,
+  "task_id": "req-hall-x-002",
+  "meeting_id": "1009",
   "job_id": 9002,
   "overall_status": "FAIL",
   "summary_matched": ["拜耳Logo检出"],
   "summary_failed": ["台卡缺少讲者「刘亭」", "全景合计人数28<35"],
   "need_human_reasons": [],
   "error": null,
-  "asset_results": [
+  "photo_results": [
     {
-      "asset_id": 201,
-      "declared_type": "POSTER",
-      "asset_status": "PASS",
+      "photo_id": "201",
+      "photo_type": "Poster",
+      "photo_status": "PASS",
       "fail_reasons": []
     },
     {
-      "asset_id": 203,
-      "declared_type": "NAME_CARD",
-      "asset_status": "FAIL",
+      "photo_id": "203",
+      "photo_type": "TableCard",
+      "photo_status": "FAIL",
       "fail_reasons": [
         {
           "check": "name_set_matches_speakers",
@@ -427,9 +437,9 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
       ]
     },
     {
-      "asset_id": 210,
-      "declared_type": "PANORAMA",
-      "asset_status": "FAIL",
+      "photo_id": "210",
+      "photo_type": "Panorama",
+      "photo_status": "FAIL",
       "fail_reasons": [
         {
           "check": "people_count_recorded",
@@ -446,7 +456,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
       "status": "FAIL",
       "reason_code": "NAME_SET_MISMATCH",
       "reason_text": "台卡姓名集合与系统讲者不一致：缺少刘亭",
-      "related_asset_ids": [203]
+      "related_photo_ids": [203]
     },
     {
       "rule_code": "PANORAMA_COUNT",
@@ -454,7 +464,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
       "status": "FAIL",
       "reason_code": "BELOW_THRESHOLD",
       "reason_text": "全景合计人数28<35",
-      "related_asset_ids": [210]
+      "related_photo_ids": [210]
     }
   ],
   "finished_at": "2026-04-18T11:00:00+08:00"
@@ -466,17 +476,17 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 ```json
 {
   "response_mode": "simple",
-  "request_id": "req-hall-2-20260417-001",
-  "meeting_id": 1002,
+  "task_id": "req-hall-2-20260417-001",
+  "meeting_id": "1002",
   "job_id": 9001,
   "overall_status": "PASS",
   "summary_matched": ["日程海报与表单一致", "台卡四名一致", "拜耳Logo检出"],
   "summary_failed": [],
   "need_human_reasons": [],
   "error": null,
-  "asset_results": [
-    { "asset_id": 201, "declared_type": "POSTER", "asset_status": "PASS", "fail_reasons": [] },
-    { "asset_id": 203, "declared_type": "NAME_CARD", "asset_status": "PASS", "fail_reasons": [] }
+  "photo_results": [
+    { "photo_id": "201", "photo_type": "Poster", "photo_status": "PASS", "fail_reasons": [] },
+    { "photo_id": "203", "photo_type": "TableCard", "photo_status": "PASS", "fail_reasons": [] }
   ],
   "rule_results": [
     {
@@ -484,7 +494,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
       "passed": true,
       "status": "PASS",
       "reason_text": "台卡姓名与系统讲者一致",
-      "related_asset_ids": [203]
+      "related_photo_ids": [203]
     }
   ],
   "finished_at": "2026-04-18T10:00:00+08:00"
@@ -493,7 +503,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 
 ### 4.7 `full` 模式（AI debug，字段尽量全）
 
-在 **simple 全部字段**之上，再返回（或补全）以下内容；`asset_results` / `rule_results` 用完整结构。
+在 **simple 全部字段**之上，再返回（或补全）以下内容；`photo_results` / `rule_results` 用完整结构。
 
 **额外顶层**
 
@@ -511,11 +521,11 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | artifact_refs | 可继续查库/S3 的中间产物引用（`ai_step_log` / `ai_artifact`） |
 | notes | 任意补充说明 |
 
-**asset_results[]（full = simple + 下列）**
+**photo_results[]（full = simple + 下列）**
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| （含 simple 的 asset_status / fail_reasons） | | 方便同一套解析 |
+| （含 simple 的 photo_status / fail_reasons） | | 方便同一套解析 |
 | detected_type / type_match | | 类型识别 |
 | clarity_score / is_clear | | 清晰度 |
 | checks | object | **全部检测点** true/false/null |
@@ -526,9 +536,9 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | image_dup_hit | bool | 本张是否与**其他会议**照片重复（跨会议混用） |
 | image_dup_kind | string/null | `exact` \| `similar` |
 | image_dup_score | float/null | 近似相似度 |
-| image_dup_ref_session_no / image_dup_ref_meeting_id | | 撞到的历史场次/会议 |
+| image_dup_ref_meeting_no / image_dup_ref_meeting_id | | 撞到的历史场次/会议 |
 | topic_reuse_hit | bool | **讲者照**标题是否撞历史 |
-| topic_reuse_ref_session_no | string/null | 撞到的历史场次 |
+| topic_reuse_ref_meeting_no | string/null | 撞到的历史场次 |
 | topic_text_ocr | string/null | 讲者照 OCR 标题 |
 | model_scores | object/null | 各子模型分数 |
 | fetch_error | object/null | 下载失败详情 |
@@ -547,8 +557,8 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 ```json
 {
   "response_mode": "full",
-  "request_id": "req-hall-x-002",
-  "meeting_id": 1009,
+  "task_id": "req-hall-x-002",
+  "meeting_id": "1009",
   "job_id": 9002,
   "overall_status": "FAIL",
   "overall_confidence": 0.88,
@@ -558,11 +568,11 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
   "summary_failed": ["台卡缺少讲者「刘亭」"],
   "need_human_reasons": [],
   "error": null,
-  "asset_results": [
+  "photo_results": [
     {
-      "asset_id": 203,
-      "declared_type": "NAME_CARD",
-      "asset_status": "FAIL",
+      "photo_id": "203",
+      "photo_type": "TableCard",
+      "photo_status": "FAIL",
       "fail_reasons": [
         {
           "check": "name_set_matches_speakers",
@@ -570,7 +580,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
           "reason_text": "台卡缺少讲者「刘亭」"
         }
       ],
-      "detected_type": "NAME_CARD",
+      "detected_type": "TableCard",
       "type_match": true,
       "clarity_score": 0.86,
       "is_clear": true,
@@ -606,7 +616,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
         "missing": ["刘亭"],
         "extra": []
       },
-      "related_asset_ids": [203]
+      "related_photo_ids": [203]
     }
   ],
   "debug": {
@@ -628,19 +638,19 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 ```json
 {
   "response_mode": "simple",
-  "request_id": "req-micro-y-003",
-  "meeting_id": 1100,
+  "task_id": "req-micro-y-003",
+  "meeting_id": "1100",
   "job_id": 9003,
   "overall_status": "NEED_HUMAN",
   "summary_matched": [],
   "summary_failed": [],
   "need_human_reasons": ["签到表模糊，无法可靠读取起止时间"],
   "error": null,
-  "asset_results": [
+  "photo_results": [
     {
-      "asset_id": 401,
-      "declared_type": "SIGNIN",
-      "asset_status": "UNCERTAIN",
+      "photo_id": "401",
+      "photo_type": "SignSheet",
+      "photo_status": "UNCERTAIN",
       "fail_reasons": [
         {
           "check": "duration_readable",
@@ -657,7 +667,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
       "status": "UNCERTAIN",
       "reason_code": "BLURRY",
       "reason_text": "签到表模糊，无法可靠读取起止时间",
-      "related_asset_ids": [401]
+      "related_photo_ids": [401]
     }
   ],
   "finished_at": "2026-05-28T09:00:00+08:00"
@@ -669,8 +679,8 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 ```json
 {
   "response_mode": "simple",
-  "request_id": "req-micro-z-004",
-  "meeting_id": 1101,
+  "task_id": "req-micro-z-004",
+  "meeting_id": "1101",
   "job_id": 9004,
   "overall_status": "ERROR",
   "summary_matched": [],
@@ -681,11 +691,11 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
     "message": "对象不存在: s3://pe-meetings/micro/1101/poster.jpg",
     "retryable": false
   },
-  "asset_results": [
+  "photo_results": [
     {
-      "asset_id": 501,
-      "declared_type": "E_POSTER",
-      "asset_status": "ERROR",
+      "photo_id": "501",
+      "photo_type": "EDM",
+      "photo_status": "ERROR",
       "fail_reasons": [
         {
           "check": null,
@@ -706,7 +716,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 {
   "error": {
     "code": "NOT_FOUND",
-    "message": "request_id 不存在",
+    "message": "task_id 不存在",
     "retryable": false
   }
 }
@@ -728,7 +738,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | Header | 说明 |
 |--------|------|
 | Content-Type | `application/json` |
-| X-Request-Id | 对应 `request_id` |
+| X-Request-Id | 对应 `task_id` |
 | X-Signature | `sha256=` + HMAC-SHA256(原始 Body，双方约定密钥) 的小写 hex |
 
 ### 5.2 请求体
@@ -737,10 +747,10 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 
 ### 5.3 PE 侧要求
 
-- 同一 `request_id` 可能收到重复回调 → **幂等处理**
+- 同一 `task_id` 可能收到重复回调 → **幂等处理**
 - 非 2xx 时 AI 最多重试 3 次（指数退避）
 - 未配置回调时，仅用接口 2 轮询
-- PE 展示页按 **simple** 解析即可：看 `asset_results[].asset_status` + `fail_reasons`
+- PE 展示页按 **simple** 解析即可：看 `photo_results[].photo_status` + `fail_reasons`
 
 ---
 
@@ -776,7 +786,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/health' \
 | 400 | 参数非法 |
 | 401 | 未鉴权 |
 | 403 | 无权限 |
-| 404 | request_id 不存在 |
+| 404 | task_id 不存在 |
 | 429 | 限流 |
 | 500 | 内部错误 |
 | 503 | 依赖不可用 |
@@ -788,7 +798,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/health' \
 | UNAUTHORIZED | N | 鉴权失败 |
 | FORBIDDEN | N | 无权限 |
 | SCHEMA_INVALID | N | 字段不合规 |
-| NOT_FOUND | N | 无此 request_id |
+| NOT_FOUND | N | 无此 task_id |
 | S3_NOT_FOUND | N | 对象不存在 |
 | S3_ACCESS_DENIED | N | 无读权限 |
 | S3_TIMEOUT | Y | 拉取超时 |
@@ -825,8 +835,8 @@ curl -X GET 'https://retail-meeting-check-test.example.com/health' \
 ## 8. 附录：对接检查清单
 
 - [ ] 测试/生产 Base URL、Token 已配置  
-- [ ] S3 可读；`s3_uri` 正确  
+- [ ] S3 可读；`file_url` 正确  
 - [ ] 接口 1 提交 + 接口 2 轮询（和/或接口 3 回调）已联调  
-- [ ] `asset_type` 与实际上传一致；必传材料已齐  
+- [ ] `photo_type` 与实际上传一致；必传材料已齐  
 - [ ] 四种 `overall_status` 已映射；`ERROR` ≠ `FAIL`  
-- [ ] 重提使用新 `request_id`  
+- [ ] 重提使用新 `task_id`  

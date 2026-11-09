@@ -4,7 +4,7 @@
 
 | 参数 | 默认 | 用途 |
 |------|------|------|
-| `clarity_threshold` | 0.60 | 清晰度；低于则相关 OCR/模版规则偏 UNCERTAIN |
+| `clarity_threshold` | 0.60 | 本地 Laplacian 清晰度；低于则相关 OCR/模版规则偏 UNCERTAIN |
 | `human_confidence_threshold` | 0.75 | 类型等置信度灰区门槛 |
 | `watermark_time_skew_minutes` | 120 | 水印/图上时间相对会议时段容差 |
 | `name_match_mode` | fuzzy | 讲者/台卡姓名比对 |

@@ -1,0 +1,187 @@
+{
+  "task_id": "req-hall-143-accept-001",
+  "meeting_id": "1143",
+  "meeting_no": "143",
+  "project_type": "LECTURE_HALL",
+  "meeting_type": null,
+  "project_id": "1",
+  "form": {
+    "meeting_name": "菁英药师大讲堂",
+    "meeting_date": "2026-06-23",
+    "start_time": "14:00",
+    "end_time": "16:10",
+    "chain_or_store_name": "广州东兴堂大药房连锁有限公司",
+    "meeting_location": "广州东兴堂大药房连锁有限公司培训中心",
+    "total_attendees": 35,
+    "speakers": [
+      {
+        "speaker_id": "1",
+        "speaker_name": "任池",
+        "topic": "从血压波动到24小时平稳达标 ——高血压药事服务要点培训",
+        "store_name": "广州东兴堂大药房连锁有限公司下沙分店",
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      },
+      {
+        "speaker_id": "2",
+        "speaker_name": "谢爱华",
+        "topic": "长期抗凝，精准用药更安心——抗凝患者门店管理",
+        "store_name": "广州东兴堂大药房连锁有限公司文冲分店",
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      },
+      {
+        "speaker_id": "3",
+        "speaker_name": "陈秋英",
+        "topic": "规范抗栓治疗，为心脑血管患者带来长期获益",
+        "store_name": "广州东兴堂大药房连锁有限公司普晖分店",
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      },
+      {
+        "speaker_id": "4",
+        "speaker_name": "邓永莉",
+        "topic": "慢病用药管理中的原研药历程",
+        "store_name": "广州东兴堂大药房连锁有限公司南岗分店",
+        "service_minutes": 40,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      }
+    ]
+  },
+  "photos": [
+    {
+      "photo_id": "199",
+      "photo_type": "EDM",
+      "file_url": "s3://pe-meetings/hall/143/eposter.png",
+      "content_type": "image/png",
+      "sort": 1
+    },
+    {
+      "photo_id": "200",
+      "photo_type": "Manual",
+      "file_url": "s3://pe-meetings/hall/143/handbook.jpg",
+      "content_type": "image/jpeg",
+      "sort": 2
+    },
+    {
+      "photo_id": "201",
+      "photo_type": "Poster",
+      "file_url": "s3://pe-meetings/hall/143/poster.jpg",
+      "content_type": "image/jpeg",
+      "sort": 3
+    },
+    {
+      "photo_id": "202",
+      "photo_type": "Stand",
+      "file_url": "s3://pe-meetings/hall/143/stand.jpg",
+      "content_type": "image/jpeg",
+      "sort": 4
+    },
+    {
+      "photo_id": "203",
+      "photo_type": "TableCard",
+      "file_url": "s3://pe-meetings/hall/143/name_card.jpg",
+      "content_type": "image/jpeg",
+      "sort": 5
+    },
+    {
+      "photo_id": "210",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/143/renchi_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "1",
+      "sort": 6
+    },
+    {
+      "photo_id": "211",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/143/renchi_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "1",
+      "sort": 7
+    },
+    {
+      "photo_id": "212",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/143/xieaihua_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "2",
+      "sort": 8
+    },
+    {
+      "photo_id": "213",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/143/xieaihua_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "2",
+      "sort": 9
+    },
+    {
+      "photo_id": "214",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/143/chenqiuying_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "3",
+      "sort": 10
+    },
+    {
+      "photo_id": "215",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/143/chenqiuying_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "3",
+      "sort": 11
+    },
+    {
+      "photo_id": "216",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/143/dengyongli_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "4",
+      "sort": 12
+    },
+    {
+      "photo_id": "217",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/143/dengyongli_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "4",
+      "sort": 13
+    },
+    {
+      "photo_id": "220",
+      "photo_type": "Panorama",
+      "file_url": "s3://pe-meetings/hall/143/panorama.jpg",
+      "content_type": "image/jpeg",
+      "sort": 14
+    },
+    {
+      "photo_id": "230",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/hall/143/signin_1.jpg",
+      "content_type": "image/jpeg",
+      "sort": 15
+    },
+    {
+      "photo_id": "231",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/hall/143/signin_2.jpg",
+      "content_type": "image/jpeg",
+      "sort": 16
+    }
+  ],
+  "refs": {
+    "template_pack_version": "2026Q2"
+  },
+  "options": {
+    "response_mode": "full"
+  }
+}

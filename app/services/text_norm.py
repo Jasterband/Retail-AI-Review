@@ -15,11 +15,25 @@ def normalize_topic(text: str) -> str:
     return t
 
 
-def normalize_name(name: str) -> str:
-    return re.sub(r"[\s\u3000]+", "", (name or "").strip())
+def _as_name_text(name: object) -> str:
+    if name is None:
+        return ""
+    if isinstance(name, str):
+        return name
+    if isinstance(name, dict):
+        for key in ("name", "speaker_name", "text", "value"):
+            val = name.get(key)
+            if isinstance(val, str) and val.strip():
+                return val
+        return ""
+    return str(name)
 
 
-def names_match(a: str, b: str, mode: str = "fuzzy") -> bool:
+def normalize_name(name: object) -> str:
+    return re.sub(r"[\s\u3000]+", "", _as_name_text(name).strip())
+
+
+def names_match(a: object, b: object, mode: str = "fuzzy") -> bool:
     na, nb = normalize_name(a), normalize_name(b)
     if not na or not nb:
         return False
@@ -32,7 +46,7 @@ def names_match(a: str, b: str, mode: str = "fuzzy") -> bool:
     return False
 
 
-def name_set_equal(ocr_names: Iterable[str], form_names: Iterable[str], mode: str) -> dict:
+def name_set_equal(ocr_names: Iterable[object], form_names: Iterable[object], mode: str) -> dict:
     ocr = [normalize_name(x) for x in ocr_names if normalize_name(x)]
     form = [normalize_name(x) for x in form_names if normalize_name(x)]
     matched_form: Set[str] = set()
@@ -65,10 +79,16 @@ def fuzzy_contains(haystack: str, needle: str) -> bool:
 
 
 def date_equal(a: Optional[str], b: Optional[str]) -> bool:
-    def digits(x: str) -> str:
-        return re.sub(r"\D", "", x or "")
+    def ymd(x: str) -> str:
+        m = re.search(r"(\d{4})\D*?(\d{1,2})\D*?(\d{1,2})", x or "")
+        if m:
+            return "{0}{1:02d}{2:02d}".format(
+                m.group(1), int(m.group(2)), int(m.group(3))
+            )
+        digits = re.sub(r"\D", "", x or "")
+        return digits[:8] if len(digits) >= 8 else digits
 
-    da, db = digits(a or ""), digits(b or "")
+    da, db = ymd(a or ""), ymd(b or "")
     if len(da) >= 8 and len(db) >= 8:
         return da[:8] == db[:8]
     return bool(da) and bool(db) and da == db
@@ -77,12 +97,47 @@ def date_equal(a: Optional[str], b: Optional[str]) -> bool:
 def time_to_minutes(t: Optional[str]) -> Optional[int]:
     if not t:
         return None
-    m = re.search(r"(\d{1,2})\s*[:：点]\s*(\d{2})?", t)
+    m = re.search(r"(\d{1,2})\s*[:：点]\s*(\d{2})?", str(t))
     if m:
         return int(m.group(1)) * 60 + int(m.group(2) or 0)
-    digits = re.sub(r"\D", "", t)
+    digits = re.sub(r"\D", "", str(t))
     if len(digits) >= 3:
         if len(digits) == 3:
             return int(digits[0]) * 60 + int(digits[1:])
         return int(digits[:2]) * 60 + int(digits[2:4])
     return None
+
+
+def parse_time_pair(
+    start: Optional[str], end: Optional[str] = None
+) -> tuple[Optional[int], Optional[int]]:
+    """解析起止时间；支持单字段「14:00-16:10」或「14:00至16:10」。"""
+    st = time_to_minutes(start)
+    et = time_to_minutes(end)
+    if et is None and start:
+        m = re.search(
+            r"(\d{1,2}\s*[:：点]\s*\d{0,2}).{0,6}?(\d{1,2}\s*[:：点]\s*\d{0,2})",
+            str(start),
+        )
+        if m:
+            st = time_to_minutes(m.group(1))
+            et = time_to_minutes(m.group(2))
+    return st, et
+
+
+def duration_minutes_from_times(
+    start: Optional[str],
+    end: Optional[str] = None,
+    duration: Optional[object] = None,
+) -> Optional[int]:
+    if duration is not None:
+        try:
+            return int(duration)
+        except (TypeError, ValueError):
+            pass
+    st, et = parse_time_pair(start, end)
+    if st is None or et is None:
+        return None
+    if et >= st:
+        return et - st
+    return et + 24 * 60 - st

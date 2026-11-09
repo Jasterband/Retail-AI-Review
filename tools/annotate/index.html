@@ -263,7 +263,20 @@
       return null;
     }
 
-    const $ = (id) => document.getElementById(id);
+    
+      function photosBag(ann) {
+        return (ann && (ann.photos || ann.assets)) || {};
+      }
+      function metaPhotos(meta) {
+        return (meta && (meta.photos || meta.assets)) || [];
+      }
+      function photoType(a) {
+        return (a && (a.photo_type || a.declared_type)) || "";
+      }
+      function isPanorama(t) {
+        return t === "Panorama" || t === "PANORAMA";
+      }
+const $ = (id) => document.getElementById(id);
     const img = $("img");
     const canvas = $("overlay");
     const ctx = canvas.getContext("2d");
@@ -276,7 +289,7 @@
 
     function curAssetAnn() {
       if (!state.ann || !state.file) return null;
-      return state.ann.assets[state.file];
+      return photosBag(state.ann)[state.file];
     }
 
     function syncFieldsFromAnn() {
@@ -314,7 +327,7 @@
       if (year) a.fields.handbook_year = Number(year) || year;
       else delete a.fields.handbook_year;
       if (people !== "") a.fields.people_count = Number(people);
-      else if (a.declared_type === "PANORAMA") a.fields.people_count = (a.points || []).length;
+      else if (isPanorama(photoType(a))) a.fields.people_count = (a.points || []).length;
       else delete a.fields.people_count;
       if (topic) a.fields.topic_title = topic; else delete a.fields.topic_title;
       if (names) a.fields.speaker_names = split(names); else delete a.fields.speaker_names;
@@ -336,13 +349,13 @@
     function renderAssets() {
       const ul = $("assetList");
       if (!state.meta) return;
-      ul.innerHTML = state.meta.assets.map((a) => {
-        const done = state.ann?.assets?.[a.file]?.done;
+      ul.innerHTML = metaPhotos(state.meta).map((a) => {
+        const done = photosBag(state.ann)?.[a.file]?.done;
         const sel = state.file === a.file ? "sel" : "";
         const dn = done ? "done" : "";
         return `<li class="${sel} ${dn}" data-file="${a.file}">
           <div>${a.file}</div>
-          <span class="type-tag">${a.declared_type}${a.speaker_shot_kind ? " · " + a.speaker_shot_kind : ""}</span>
+          <span class="type-tag">${photoType(a)}</span>
         </li>`;
       }).join("");
       ul.querySelectorAll("li").forEach((li) => {
@@ -366,12 +379,12 @@
       if (boxLabels.length) setLabel(boxLabels[0].id);
       else {
         state.label = null;
-        $("labelHint").textContent = a?.declared_type === "PANORAMA"
+        $("labelHint").textContent = isPanorama(photoType(a))
           ? "全景请用「点人头」工具"
           : "无预设框标签";
       }
       // auto tool
-      if (a?.declared_type === "PANORAMA") setTool("point");
+      if (isPanorama(photoType(a))) setTool("point");
       else setTool("box");
     }
 
@@ -403,7 +416,7 @@
         ? ` · 定点 ${state.quadDraft.length}/4`
         : "";
       $("countStat").textContent = `框 ${nBox} · 点 ${nPt}${draft}` +
-        (a.declared_type === "PANORAMA" ? ` · 人数 ${a.fields?.people_count ?? nPt}` : "");
+        (isPanorama(photoType(a)) ? ` · 人数 ${a.fields?.people_count ?? nPt}` : "");
     }
 
     function renderBoxList() {
@@ -560,10 +573,11 @@
       state.sessionId = id;
       state.meta = await fetch(`/v1/annotate/sessions/${id}`).then((r) => r.json());
       state.ann = await fetch(`/v1/annotate/sessions/${id}/annotations`).then((r) => r.json());
+      if (state.ann && !state.ann.photos && state.ann.assets) state.ann.photos = state.ann.assets;
       $("sessionHint").textContent =
         `${state.meta.project_type} · 保存至 ${state.meta.annotation_path}`;
       renderAssets();
-      const first = state.meta.assets.find((a) => a.exists)?.file || state.meta.assets[0]?.file;
+      const first = metaPhotos(state.meta).find((a) => a.exists)?.file || metaPhotos(state.meta)[0]?.file;
       if (first) await selectAsset(first);
       setDirty(false);
     }
@@ -571,7 +585,7 @@
     async function selectAsset(file) {
       writeFieldsToAnn();
       state.file = file;
-      state.asset = state.meta.assets.find((a) => a.file === file);
+      state.asset = metaPhotos(state.meta).find((a) => a.file === file);
       state.selectedBox = -1;
       state.quadDraft = [];
       state.dragCorner = null;
@@ -591,8 +605,8 @@
     async function saveAll() {
       writeFieldsToAnn();
       // panorama people_count sync
-      Object.values(state.ann.assets).forEach((a) => {
-        if (a.declared_type === "PANORAMA") {
+      Object.values(photosBag(state.ann)).forEach((a) => {
+        if (isPanorama(photoType(a))) {
           a.fields = a.fields || {};
           if (a.fields.people_count == null) a.fields.people_count = (a.points || []).length;
         }
@@ -600,7 +614,7 @@
       const res = await fetch(`/v1/annotate/sessions/${state.sessionId}/annotations`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assets: state.ann.assets, notes: state.ann.session_notes || "" }),
+        body: JSON.stringify({ photos: photosBag(state.ann), notes: state.ann.meeting_notes || state.ann.session_notes || "" }),
       }).then((r) => r.json());
       setDirty(false);
       $("saveStatus").textContent = `已保存 ${res.done_count}/${res.total} · ${res.path}`;
@@ -631,7 +645,7 @@
       const a = curAssetAnn();
       if (!a) return;
       a.done = true;
-      if (a.declared_type === "PANORAMA") a.fields.people_count = (a.points || []).length;
+      if (isPanorama(photoType(a))) a.fields.people_count = (a.points || []).length;
       setDirty(true);
       renderAssets();
     };
@@ -659,7 +673,7 @@
       const a = curAssetAnn();
       if (!a) return;
       a.points = [];
-      if (a.declared_type === "PANORAMA") a.fields.people_count = 0;
+      if (isPanorama(photoType(a))) a.fields.people_count = 0;
       $("fPeople").value = "0";
       setDirty(true); draw(); updateCountStat();
     };
@@ -674,7 +688,7 @@
         a.boxes.pop();
         state.selectedBox = -1;
       }
-      if (a.declared_type === "PANORAMA") {
+      if (isPanorama(photoType(a))) {
         a.fields.people_count = a.points.length;
         $("fPeople").value = String(a.points.length);
       }

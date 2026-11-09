@@ -6,6 +6,7 @@ pydantic-settings>=2.6.0
 python-multipart>=0.0.12
 httpx>=0.27.0
 Pillow>=10.0.0
+numpy>=1.26.0
 pypdfium2>=4.30.0
 # 可选：真 S3（USE_REAL_S3=true）
 boto3>=1.35.0

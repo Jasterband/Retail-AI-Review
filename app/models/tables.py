@@ -24,14 +24,14 @@ from app.db import Base
 class AiCheckJob(Base):
     __tablename__ = "ai_check_job"
     __table_args__ = (
-        UniqueConstraint("request_id", name="uq_ai_request_id"),
+        UniqueConstraint("task_id", name="uq_ai_task_id"),
         UniqueConstraint("meeting_id", "attempt_no", name="uq_ai_meeting_attempt"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    meeting_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    meeting_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
     attempt_no: Mapped[int] = mapped_column(Integer, nullable=False)
-    request_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    task_id: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     pe_snapshot: Mapped[dict] = mapped_column(JSON, nullable=False)
     processing_status: Mapped[str] = mapped_column(
         String(16), nullable=False, default="RUNNING"
@@ -49,7 +49,7 @@ class AiCheckJob(Base):
     error_code: Mapped[Optional[str]] = mapped_column(String(64))
     error_message: Mapped[Optional[str]] = mapped_column(Text)
 
-    asset_results: Mapped[List["AiAssetResult"]] = relationship(
+    photo_results: Mapped[List["AiAssetResult"]] = relationship(
         back_populates="job", cascade="all, delete-orphan"
     )
     rule_results: Mapped[List["AiRuleResult"]] = relationship(
@@ -70,13 +70,13 @@ class AiAssetResult(Base):
     job_id: Mapped[int] = mapped_column(
         ForeignKey("ai_check_job.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    asset_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    photo_id: Mapped[str] = mapped_column(String(36), nullable=False)
     declared_type: Mapped[Optional[str]] = mapped_column(String(32))
     detected_type: Mapped[Optional[str]] = mapped_column(String(32))
     type_match: Mapped[Optional[bool]] = mapped_column(Boolean)
     clarity_score: Mapped[Optional[float]] = mapped_column(Float)
     is_clear: Mapped[Optional[bool]] = mapped_column(Boolean)
-    asset_status: Mapped[Optional[str]] = mapped_column(String(16))
+    photo_status: Mapped[Optional[str]] = mapped_column(String(16))
     checks: Mapped[Optional[dict]] = mapped_column(JSON)
     fail_reasons: Mapped[Optional[list]] = mapped_column(JSON)
     ocr_fields: Mapped[Optional[dict]] = mapped_column(JSON)
@@ -85,7 +85,7 @@ class AiAssetResult(Base):
     topic_reuse_hit: Mapped[bool] = mapped_column(Boolean, default=False)
     topic_text_ocr: Mapped[Optional[str]] = mapped_column(Text)
 
-    job: Mapped["AiCheckJob"] = relationship(back_populates="asset_results")
+    job: Mapped["AiCheckJob"] = relationship(back_populates="photo_results")
 
 
 class AiRuleResult(Base):
@@ -103,7 +103,7 @@ class AiRuleResult(Base):
     reason_code: Mapped[Optional[str]] = mapped_column(String(64))
     reason_text: Mapped[Optional[str]] = mapped_column(Text)
     evidence: Mapped[Optional[dict]] = mapped_column(JSON)
-    related_asset_ids: Mapped[Optional[list]] = mapped_column(JSON)
+    related_photo_ids: Mapped[Optional[list]] = mapped_column(JSON)
 
     job: Mapped["AiCheckJob"] = relationship(back_populates="rule_results")
 
@@ -134,10 +134,10 @@ class AiArtifact(Base):
     job_id: Mapped[int] = mapped_column(
         ForeignKey("ai_check_job.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    asset_id: Mapped[Optional[int]] = mapped_column(Integer)
+    photo_id: Mapped[Optional[str]] = mapped_column(String(36))
     artifact_type: Mapped[str] = mapped_column(String(64), nullable=False)
     payload_json: Mapped[Optional[dict]] = mapped_column(JSON)
-    s3_uri: Mapped[Optional[str]] = mapped_column(String(512))
+    file_url: Mapped[Optional[str]] = mapped_column(String(512))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -149,11 +149,11 @@ class ImageDupHistory(Base):
     __tablename__ = "image_dup_history"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    meeting_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    session_no: Mapped[Optional[str]] = mapped_column(String(20))
-    period_id: Mapped[Optional[int]] = mapped_column(Integer, index=True)
-    asset_id: Mapped[Optional[int]] = mapped_column(Integer)
-    asset_type: Mapped[Optional[str]] = mapped_column(String(32))
+    meeting_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    meeting_no: Mapped[Optional[str]] = mapped_column(String(20))
+    project_id: Mapped[Optional[str]] = mapped_column(String(36), index=True)
+    photo_id: Mapped[Optional[str]] = mapped_column(String(36))
+    photo_type: Mapped[Optional[str]] = mapped_column(String(32))
     phash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     embedding: Mapped[Optional[bytes]] = mapped_column(LargeBinary)
     created_at: Mapped[datetime] = mapped_column(
@@ -165,10 +165,10 @@ class TopicHistory(Base):
     __tablename__ = "topic_history"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    meeting_id: Mapped[Optional[int]] = mapped_column(Integer, index=True)
-    session_no: Mapped[Optional[str]] = mapped_column(String(20))
-    period_id: Mapped[Optional[int]] = mapped_column(Integer, index=True)
-    asset_id: Mapped[Optional[int]] = mapped_column(Integer)
+    meeting_id: Mapped[Optional[str]] = mapped_column(String(36), index=True)
+    meeting_no: Mapped[Optional[str]] = mapped_column(String(20))
+    project_id: Mapped[Optional[str]] = mapped_column(String(36), index=True)
+    photo_id: Mapped[Optional[str]] = mapped_column(String(36))
     speaker_name: Mapped[str] = mapped_column(String(20), nullable=False)
     topic_raw: Mapped[str] = mapped_column(String(200), nullable=False)
     topic_normalized: Mapped[str] = mapped_column(String(200), nullable=False, index=True)

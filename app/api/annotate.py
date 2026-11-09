@@ -25,142 +25,141 @@ SESSIONS: Dict[str, Dict[str, Any]] = {
         "id": "hall-183",
         "label": "大讲堂 · 江苏大众 183",
         "project_type": "LECTURE_HALL",
-        "session_no": "183",
+        "meeting_no": "183",
         "rel_dir": "药师大讲堂/大讲堂已上传过的50场会议核销资料/183~2026-6-30~江苏大众医药连锁有限公司核销资料",
-        "assets": [
-            {"file": "1手册.jpg", "declared_type": "HANDBOOK"},
-            {"file": "183.png", "declared_type": "E_POSTER"},
-            {"file": "2权益-海报.jpg", "declared_type": "POSTER"},
-            {"file": "3权益-展架.jpg", "declared_type": "STAND"},
-            {"file": "4台卡-1.jpg", "declared_type": "NAME_CARD"},
-            {"file": "4台卡-2.jpg", "declared_type": "NAME_CARD"},
+        "photos": [
+            {"file": "1手册.jpg", "photo_type": "Manual"},
+            {"file": "183.png", "photo_type": "EDM"},
+            {"file": "2权益-海报.jpg", "photo_type": "Poster"},
+            {"file": "3权益-展架.jpg", "photo_type": "Stand"},
+            {"file": "4台卡-1.jpg", "photo_type": "TableCard"},
+            {"file": "4台卡-2.jpg", "photo_type": "TableCard"},
             {
                 "file": "5讲者1-陈丽娟1.jpg",
-                "declared_type": "SPEAKER_PHOTO",
+                "photo_type": "SpeakerTitle",
                 "speaker_name": "陈丽娟",
-                "speaker_shot_kind": "TITLE_GROUP",
             },
             {
                 "file": "5讲者1-陈丽娟2.jpg",
-                "declared_type": "SPEAKER_PHOTO",
+                "photo_type": "SpeakerLecture",
                 "speaker_name": "陈丽娟",
-                "speaker_shot_kind": "LECTURING",
             },
             {
                 "file": "6讲者2-曹兰飞1.jpg",
-                "declared_type": "SPEAKER_PHOTO",
+                "photo_type": "SpeakerTitle",
                 "speaker_name": "曹兰飞",
-                "speaker_shot_kind": "TITLE_GROUP",
             },
             {
                 "file": "6讲者2-曹兰飞2.jpg",
-                "declared_type": "SPEAKER_PHOTO",
+                "photo_type": "SpeakerLecture",
                 "speaker_name": "曹兰飞",
-                "speaker_shot_kind": "LECTURING",
             },
             {
                 "file": "7讲者3-单丽丽1.jpg",
-                "declared_type": "SPEAKER_PHOTO",
+                "photo_type": "SpeakerTitle",
                 "speaker_name": "单丽丽",
-                "speaker_shot_kind": "TITLE_GROUP",
             },
             {
                 "file": "7讲者3-单丽丽2.jpg",
-                "declared_type": "SPEAKER_PHOTO",
+                "photo_type": "SpeakerLecture",
                 "speaker_name": "单丽丽",
-                "speaker_shot_kind": "LECTURING",
             },
             {
                 "file": "8讲者4-杨燕1.jpg",
-                "declared_type": "SPEAKER_PHOTO",
+                "photo_type": "SpeakerTitle",
                 "speaker_name": "杨燕",
-                "speaker_shot_kind": "TITLE_GROUP",
             },
             {
                 "file": "8讲者4-杨燕2.jpg",
-                "declared_type": "SPEAKER_PHOTO",
+                "photo_type": "SpeakerLecture",
                 "speaker_name": "杨燕",
-                "speaker_shot_kind": "LECTURING",
             },
-            {"file": "9全景照片（36）.jpg", "declared_type": "PANORAMA"},
-            {"file": "10签到表1（35）.jpg", "declared_type": "SIGNIN"},
-            {"file": "10签到表2（35）.png", "declared_type": "SIGNIN"},
+            {"file": "9全景照片（36）.jpg", "photo_type": "Panorama"},
+            {"file": "10签到表1（35）.jpg", "photo_type": "SignSheet"},
+            {"file": "10签到表2（35）.png", "photo_type": "SignSheet"},
         ],
     },
     "micro-000606": {
         "id": "micro-000606",
         "label": "微型 · 太极东大街 000606",
         "project_type": "MICRO",
-        "meeting_subtype": "SINGLE",
-        "session_no": "000606",
+        "meeting_type": "SINGLE",
+        "meeting_no": "000606",
         "rel_dir": "微型药师/合格场次45场次/000606-2026-8-11-成都市-四川太极大药房连锁有限公司锦江区东大街药店-微型药店健康服务赋能计划项目",
-        "assets": [
-            {"file": "电子日程海报.png", "declared_type": "E_POSTER"},
-            {"file": "项目介绍展示.jpeg", "declared_type": "PROJECT_INTRO_DISPLAY"},
-            {"file": "电子日程海报展示.jpeg", "declared_type": "E_POSTER_DISPLAY"},
+        "photos": [
+            {"file": "电子日程海报.png", "photo_type": "EDM"},
+            {"file": "项目介绍展示.jpeg", "photo_type": "ProjectIntro"},
+            {"file": "电子日程海报展示.jpeg", "photo_type": "EDMDisplay"},
             {
                 "file": "标题合影.jpeg",
-                "declared_type": "SPEAKER_PHOTO",
-                "speaker_shot_kind": "TITLE_GROUP",
+                "photo_type": "SpeakerTitle",
             },
-            {"file": "全景照片.jpeg", "declared_type": "PANORAMA"},
-            {"file": "签到表.pdf", "declared_type": "SIGNIN", "is_pdf": True},
+            {"file": "全景照片.jpeg", "photo_type": "Panorama"},
+            {"file": "签到表.pdf", "photo_type": "SignSheet", "is_pdf": True},
         ],
     },
 }
 
 # 按材料类型推荐的框标签
 LABELS_BY_TYPE: Dict[str, List[Dict[str, str]]] = {
-    "HANDBOOK": [
+    "Manual": [
         {"id": "handbook_cover", "mode": "box", "hint": "手册封面整体"},
         {"id": "handbook_year", "mode": "box", "hint": "年份数字（如 2026）"},
     ],
-    "NAME_CARD": [
+    "TableCard": [
         {"id": "name_card", "mode": "box", "hint": "单张台卡"},
         {"id": "name_text", "mode": "box", "hint": "姓名文字区"},
     ],
-    "POSTER": [
+    "Poster": [
+        {"id": "poster_panel", "mode": "box", "hint": "先框：海报整体（含背景外的材料本体）"},
         {"id": "bayer_logo", "mode": "box", "hint": "拜耳 Logo"},
         {"id": "date", "mode": "box", "hint": "日期"},
         {"id": "time", "mode": "box", "hint": "时间"},
         {"id": "location", "mode": "box", "hint": "地点"},
         {"id": "speakers", "mode": "box", "hint": "讲者名区域"},
     ],
-    "STAND": [
+    "Stand": [
+        {"id": "stand_panel", "mode": "box", "hint": "先框：展架整体（材料本体）"},
         {"id": "bayer_logo", "mode": "box", "hint": "拜耳 Logo"},
         {"id": "date", "mode": "box", "hint": "日期"},
         {"id": "time", "mode": "box", "hint": "时间"},
         {"id": "location", "mode": "box", "hint": "地点"},
         {"id": "speakers", "mode": "box", "hint": "讲者名区域"},
     ],
-    "E_POSTER": [
+    "EDM": [
+        {"id": "edm_panel", "mode": "box", "hint": "先框：电子海报整体"},
         {"id": "bayer_logo", "mode": "box", "hint": "拜耳 Logo"},
         {"id": "date", "mode": "box", "hint": "日期"},
         {"id": "time", "mode": "box", "hint": "时间"},
         {"id": "location", "mode": "box", "hint": "地点"},
         {"id": "speakers", "mode": "box", "hint": "讲者名区域"},
     ],
-    "SPEAKER_PHOTO": [
+    "SpeakerTitle": [
         {"id": "speaker", "mode": "box", "hint": "讲者本人（人物）"},
         {"id": "ppt_region", "mode": "box", "hint": "投影/PPT 区域"},
         {"id": "topic_title", "mode": "box", "hint": "讲题标题文字"},
         {"id": "watermark", "mode": "box", "hint": "水印（若有）"},
     ],
-    "PANORAMA": [
+    "SpeakerLecture": [
+        {"id": "speaker", "mode": "box", "hint": "讲者本人（人物）"},
+        {"id": "ppt_region", "mode": "box", "hint": "投影/PPT 区域"},
+        {"id": "watermark", "mode": "box", "hint": "水印（若有）"},
+    ],
+    "Panorama": [
         {"id": "person", "mode": "point", "hint": "点击人头"},
     ],
-    "SIGNIN": [
+    "SignSheet": [
         {"id": "start_time", "mode": "box", "hint": "开始时间"},
         {"id": "end_time", "mode": "box", "hint": "结束时间"},
         {"id": "audience_block", "mode": "box", "hint": "听众区（可选）"},
         {"id": "store_names", "mode": "box", "hint": "门店名列（微型）"},
     ],
-    "PROJECT_INTRO_DISPLAY": [
+    "ProjectIntro": [
         {"id": "colorful_ribbon", "mode": "box", "hint": "彩色丝带"},
         {"id": "bayer_logo", "mode": "box", "hint": "拜耳 Logo"},
         {"id": "watermark", "mode": "box", "hint": "水印（若有）"},
     ],
-    "E_POSTER_DISPLAY": [
+    "EDMDisplay": [
         {"id": "agenda_table", "mode": "box", "hint": "日程表"},
         {"id": "bayer_logo", "mode": "box", "hint": "拜耳 Logo"},
         {"id": "watermark", "mode": "box", "hint": "水印（若有）"},
@@ -184,12 +183,11 @@ def _ann_path(session_id: str) -> Path:
 
 def _empty_annotation(session_id: str) -> dict:
     meta = SESSIONS[session_id]
-    assets = {}
-    for a in meta["assets"]:
-        assets[a["file"]] = {
-            "declared_type": a["declared_type"],
+    photos = {}
+    for a in meta["photos"]:
+        photos[a["file"]] = {
+            "photo_type": a["photo_type"],
             "speaker_name": a.get("speaker_name"),
-            "speaker_shot_kind": a.get("speaker_shot_kind"),
             "boxes": [],
             "points": [],
             "fields": {},
@@ -199,11 +197,22 @@ def _empty_annotation(session_id: str) -> dict:
     return {
         "session_id": session_id,
         "project_type": meta["project_type"],
-        "session_no": meta["session_no"],
+        "meeting_no": meta["meeting_no"],
         "label": meta["label"],
         "updated_at": None,
-        "assets": assets,
+        "photos": photos,
     }
+
+
+def _normalize_annotation(data: dict) -> dict:
+    """兼容旧标注文件：assets→photos，session_no→meeting_no。"""
+    if "photos" not in data and "assets" in data:
+        data["photos"] = data.pop("assets")
+    if "meeting_no" not in data and data.get("session_no"):
+        data["meeting_no"] = data.pop("session_no")
+    if "meeting_notes" not in data and "session_notes" in data:
+        data["meeting_notes"] = data.get("session_notes")
+    return data
 
 
 def _pdf_first_jpeg(pdf_bytes: bytes) -> bytes:
@@ -227,10 +236,10 @@ def list_sessions() -> dict:
     for sid, meta in SESSIONS.items():
         path = _ann_path(sid)
         done_n = 0
-        total = len(meta["assets"])
+        total = len(meta["photos"])
         if path.exists():
             data = json.loads(path.read_text(encoding="utf-8"))
-            for a in (data.get("assets") or {}).values():
+            for a in (data.get("photos") or data.get("assets") or {}).values():
                 if a.get("done"):
                     done_n += 1
         rows.append(
@@ -238,7 +247,7 @@ def list_sessions() -> dict:
                 "id": sid,
                 "label": meta["label"],
                 "project_type": meta["project_type"],
-                "session_no": meta["session_no"],
+                "meeting_no": meta["meeting_no"],
                 "asset_count": total,
                 "done_count": done_n,
                 "has_file": path.exists(),
@@ -253,22 +262,22 @@ def get_session(session_id: str) -> dict:
     if not meta:
         raise HTTPException(404, "unknown session")
     folder = _session_dir(session_id)
-    assets = []
-    for a in meta["assets"]:
+    photos = []
+    for a in meta["photos"]:
         p = folder / a["file"]
-        assets.append(
+        photos.append(
             {
                 **a,
                 "exists": p.exists(),
-                "labels": LABELS_BY_TYPE.get(a["declared_type"], []),
+                "labels": LABELS_BY_TYPE.get(a["photo_type"], []),
             }
         )
     return {
         "id": session_id,
         "label": meta["label"],
         "project_type": meta["project_type"],
-        "session_no": meta["session_no"],
-        "assets": assets,
+        "meeting_no": meta["meeting_no"],
+        "photos": photos,
         "annotation_path": str(_ann_path(session_id).relative_to(ROOT)),
     }
 
@@ -310,11 +319,11 @@ def get_annotations(session_id: str) -> dict:
             json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         return data
-    return json.loads(path.read_text(encoding="utf-8"))
+    return _normalize_annotation(json.loads(path.read_text(encoding="utf-8")))
 
 
 class AnnotationSave(BaseModel):
-    assets: Dict[str, Any] = Field(default_factory=dict)
+    photos: Dict[str, Any] = Field(default_factory=dict)
     notes: Optional[str] = None
 
 
@@ -326,24 +335,23 @@ def save_annotations(session_id: str, body: AnnotationSave) -> dict:
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = _empty_annotation(session_id)
     if path.exists():
-        existing = json.loads(path.read_text(encoding="utf-8"))
-    # merge asset by asset
-    for fname, payload in (body.assets or {}).items():
-        if fname not in existing["assets"]:
-            existing["assets"][fname] = payload
+        existing = _normalize_annotation(json.loads(path.read_text(encoding="utf-8")))
+    for fname, payload in (body.photos or {}).items():
+        if fname not in existing["photos"]:
+            existing["photos"][fname] = payload
         else:
-            existing["assets"][fname].update(payload)
+            existing["photos"][fname].update(payload)
     if body.notes is not None:
-        existing["session_notes"] = body.notes
+        existing["meeting_notes"] = body.notes
     existing["updated_at"] = datetime.now(timezone.utc).isoformat()
     path.write_text(
         json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    done = sum(1 for a in existing["assets"].values() if a.get("done"))
+    done = sum(1 for a in existing["photos"].values() if a.get("done"))
     return {
         "ok": True,
         "path": str(path.relative_to(ROOT)),
         "updated_at": existing["updated_at"],
         "done_count": done,
-        "total": len(existing["assets"]),
+        "total": len(existing["photos"]),
     }

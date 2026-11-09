@@ -14,7 +14,7 @@ class RuleOutcome:
     reason_code: Optional[str] = None
     reason_text: Optional[str] = None
     evidence: Optional[Dict[str, Any]] = None
-    related_asset_ids: List[int] = field(default_factory=list)
+    related_photo_ids: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -26,17 +26,17 @@ class RuleOutcome:
             "reason_code": self.reason_code,
             "reason_text": self.reason_text,
             "evidence": self.evidence or {},
-            "related_asset_ids": self.related_asset_ids,
+            "related_photo_ids": self.related_photo_ids,
         }
 
 
-def skip(code: str, text: str = "不适用或材料缺失", related: Optional[List[int]] = None) -> RuleOutcome:
+def skip(code: str, text: str = "不适用或材料缺失", related: Optional[List[str]] = None) -> RuleOutcome:
     return RuleOutcome(
         rule_code=code,
         status="SKIP",
         passed=None,
         reason_text=text,
-        related_asset_ids=related or [],
+        related_photo_ids=related or [],
     )
 
 
@@ -44,7 +44,7 @@ def pass_(
     code: str,
     text: str,
     conf: float = 0.9,
-    related: Optional[List[int]] = None,
+    related: Optional[List[str]] = None,
     evidence: Optional[dict] = None,
 ) -> RuleOutcome:
     return RuleOutcome(
@@ -53,7 +53,7 @@ def pass_(
         passed=True,
         confidence=conf,
         reason_text=text,
-        related_asset_ids=related or [],
+        related_photo_ids=related or [],
         evidence=evidence,
     )
 
@@ -63,7 +63,7 @@ def fail(
     reason_code: str,
     text: str,
     conf: float = 0.9,
-    related: Optional[List[int]] = None,
+    related: Optional[List[str]] = None,
     evidence: Optional[dict] = None,
 ) -> RuleOutcome:
     return RuleOutcome(
@@ -73,7 +73,7 @@ def fail(
         confidence=conf,
         reason_code=reason_code,
         reason_text=text,
-        related_asset_ids=related or [],
+        related_photo_ids=related or [],
         evidence=evidence,
     )
 
@@ -83,7 +83,7 @@ def uncertain(
     reason_code: str,
     text: str,
     conf: float = 0.5,
-    related: Optional[List[int]] = None,
+    related: Optional[List[str]] = None,
     evidence: Optional[dict] = None,
 ) -> RuleOutcome:
     return RuleOutcome(
@@ -94,6 +94,6 @@ def uncertain(
         trigger_human=True,
         reason_code=reason_code,
         reason_text=text,
-        related_asset_ids=related or [],
+        related_photo_ids=related or [],
         evidence=evidence,
     )

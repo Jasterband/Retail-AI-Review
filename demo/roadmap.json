@@ -8,7 +8,7 @@
           "id": "a-eposter",
           "label": "大讲堂电子日程：第 7 页必填 vs 第 12 页不审",
           "status": "done",
-          "note": "拍板：E_POSTER 必审；缺类型 ASSET_MISSING FAIL"
+          "note": "拍板：EDM 必审；缺类型 ASSET_MISSING FAIL"
         },
         {
           "id": "a-panorama-model",
@@ -71,7 +71,7 @@
       "title": "C · 核心能力打磨",
       "items": [
         { "id": "c-panorama", "label": "全景人数：换模型 + 加强 prompt + 标点图回归", "status": "done", "note": "prompt 加强；阈值进配置；标点图回归仍建议抽测" },
-        { "id": "c-asset-type", "label": "ASSET_TYPE_CHECK 真实图抽测", "status": "done", "note": "规则已接线；抽测用黄金集批量跑" },
+        { "id": "c-asset-type", "label": "ASSET_TYPE_CHECK（信任 PE 声明）", "status": "done", "note": "不做视觉分类；以 photos[].photo_type 为准" },
         { "id": "c-key-fields", "label": "关键字段比对（海报/展架/电子日程 vs form）", "status": "done", "note": "场级 KEY_FIELD_MATCH + 资产 checks 回填 date/time/location/speakers_matches_form" },
         { "id": "c-logo", "label": "拜耳 Logo", "status": "done", "note": "应检材料均需检出；模版对照+vision" },
         { "id": "c-duration", "label": "签到时长阈值", "status": "done", "note": "阈值进 options/thresholds" },
@@ -87,7 +87,7 @@
         { "id": "d-namecard", "label": "台卡四人姓名 vs form.speakers", "status": "done", "note": "" },
         { "id": "d-template", "label": "台卡模版（crop 进 pack）", "status": "done", "note": "name_card_one + border crop" },
         { "id": "d-handbook", "label": "手册封面 + 非旧版", "status": "done", "note": "无负样本：封面年份须=HANDBOOK_CURRENT_YEAR(2026)" },
-        { "id": "d-pair", "label": "讲者成对 TITLE_GROUP + LECTURING", "status": "done", "note": "" },
+        { "id": "d-pair", "label": "讲者成对 SpeakerTitle + SpeakerLecture", "status": "done", "note": "" },
         { "id": "d-topic", "label": "讲者主题 OCR vs form.topic", "status": "done", "note": "" }
       ]
     },

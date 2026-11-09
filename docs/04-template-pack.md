@@ -43,20 +43,20 @@ s3://pe-templates/2026Q2/
 
 | template_kind | 源文件 | Crop 目标 | crop_meta 建议 | 用途 |
 |---------------|--------|-----------|----------------|------|
-| POSTER | `1权益-海报.jpg` | 整图归档 | source=full | 版式比对基线 |
-| POSTER | 同上 | 顶部标题区（含「菁英药师大讲堂」字标） | 约上 20% | OCR 标题 + 版式 |
-| POSTER | 同上 | 底部青粉波浪装饰条 | 约下 15% | 模版特征匹配 |
-| POSTER | 同上 | 主办/赞助红字区 | 底部文字带 | 辅助确认官方物料 |
-| STAND | `2权益-展架.jpg` | 整图 + 与海报同款 footer/header crops | — | 展架版式与 Logo |
-| NAME_CARD | `3台卡.jpg` | 单张台卡 ROI（4 张分别 crop） | 每卡一张 | OCR 姓名训练/评测 |
-| NAME_CARD | 同上 | 台卡底部蓝绿装饰条 | 单卡下缘 | `NAME_CARD_TEMPLATE` |
-| HANDBOOK | **缺失独立文件** | 需从 Teams/补拍：手册封面正面 | full cover | `HANDBOOK_DETECT` |
-| HANDBOOK | 台卡图桌面手册仅作弱参考 | 不建议作主 ref | — | 正式以封面照为准 |
+| Poster | `1权益-海报.jpg` | 整图归档 | source=full | 版式比对基线 |
+| Poster | 同上 | 顶部标题区（含「菁英药师大讲堂」字标） | 约上 20% | OCR 标题 + 版式 |
+| Poster | 同上 | 底部青粉波浪装饰条 | 约下 15% | 模版特征匹配 |
+| Poster | 同上 | 主办/赞助红字区 | 底部文字带 | 辅助确认官方物料 |
+| Stand | `2权益-展架.jpg` | 整图 + 与海报同款 footer/header crops | — | 展架版式与 Logo |
+| TableCard | `3台卡.jpg` | 单张台卡 ROI（4 张分别 crop） | 每卡一张 | OCR 姓名训练/评测 |
+| TableCard | 同上 | 台卡底部蓝绿装饰条 | 单卡下缘 | `NAME_CARD_TEMPLATE` |
+| Manual | **缺失独立文件** | 需从 Teams/补拍：手册封面正面 | full cover | `HANDBOOK_DETECT` |
+| Manual | 台卡图桌面手册仅作弱参考 | 不建议作主 ref | — | 正式以封面照为准 |
 | LOGO_BAYER | 海报/展架角标 | Logo 外接矩形 | 紧裁 | `BAYER_LOGO` |
-| SIGNIN | `9签到表-35（1）.jpg` 等 | 表头模版区（会议时间/时长栏） | 上半表头 | 模版一致性（可选） |
-| SPEAKER_TITLE | `4讲者-高芳1.jpg` 等 `*1` | 课件标题条区域 | 投影/屏幕 ROI | `SPEAKER_TOPIC_OCR` 评测 |
+| SignSheet | `9签到表-35（1）.jpg` 等 | 表头模版区（会议时间/时长栏） | 上半表头 | 模版一致性（可选） |
+| SpeakerTitle | `4讲者-高芳1.jpg` 等 `*1` | 课件标题条区域 | 投影/屏幕 ROI | `SPEAKER_TOPIC_OCR` 评测 |
 
-台卡图中可见桌面白色手册叠放：仅证明「现场有手册物」，**不能替代** `HANDBOOK` 类型必传封面照。
+台卡图中可见桌面白色手册叠放：仅证明「现场有手册物」，**不能替代** `Manual` 类型必传封面照。
 
 ---
 
@@ -75,8 +75,8 @@ s3://pe-templates/2026Q2/
 | PPT_INTRO | 同上 | 底部彩色波浪装饰 | 模版特征 |
 | PPT_INTRO | 同上 | 右上角圆形 Logo | `BAYER_LOGO` |
 | PPT_AGENDA | `权益照片2` / 日程展示类 | 「电子日程/会议日程」投影页 | 第二页种类 |
-| E_POSTER | `会议日程.png` / `.jpg` | 电子日程海报整图 | 关键字段 OCR 基线 |
-| SIGNIN | `会议签到表.pdf` 首页渲染 | 表头标准栏位 | 模版/字段位置 |
+| EDM | `会议日程.png` / `.jpg` | 电子日程海报整图 | 关键字段 OCR 基线 |
+| SignSheet | `会议签到表.pdf` 首页渲染 | 表头标准栏位 | 模版/字段位置 |
 | LOGO_BAYER | 投影页角标 | Logo crop | Logo 检测 |
 
 透视说明：现场展示图常有倾角（如 000090 权益照片1）。入库 crop 应先做 **投影区域检测 → 透视矫正 → 再裁模版特征**，匹配时对查询图走同一流水线。

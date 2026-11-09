@@ -4,6 +4,8 @@
 
 业务库（PE）与 AI 审核结果库逻辑分离：会议主数据在 PE；每次审核快照与逐条规则结果落 AI 侧表，便于追溯与重跑。
 
+AI API 字段对齐 CRM：`photos[]` / `photo_id` / `photo_type` / `file_url` / `lecture_fee`；讲者照用 `SpeakerTitle` / `SpeakerLecture`（无 `speaker_shot_kind`）。详见 [CRM与AI-API字段对照.md](CRM与AI-API字段对照.md)。
+
 ## ER 图
 
 ```mermaid
@@ -36,7 +38,7 @@ erDiagram
     time start_time
     time end_time
     string chain_or_store_name
-    string location
+    string meeting_location
     int total_attendees
     string status
     int status_version
@@ -54,26 +56,25 @@ erDiagram
     string speaker_name
     string topic
     int service_minutes
-    decimal fee
+    decimal lecture_fee
     decimal tax
   }
 
   meeting_asset {
     bigint id PK
     bigint meeting_id FK
-    string asset_type
+    string photo_type
     int sort_no
-    string s3_uri
+    string file_url
     string content_type
     bigint speaker_id FK
-    string speaker_shot_kind
   }
 
   ai_check_job {
     bigint id PK
-    bigint meeting_id FK
+    string meeting_id
     int attempt_no
-    string request_id UK
+    string task_id UK
     jsonb pe_snapshot
     string overall_status
     float overall_confidence
@@ -87,15 +88,16 @@ erDiagram
   ai_asset_result {
     bigint id PK
     bigint job_id FK
-    bigint asset_id FK
+    string photo_id
+    string photo_type
     string detected_type
     bool type_match
     float clarity_score
     bool is_blurry
     jsonb ocr_fields
     jsonb detections
-    bool duplicate_hit
-    string duplicate_ref_session_no
+    bool topic_reuse_hit
+    string topic_reuse_ref_session_no
   }
 
   ai_rule_result {
@@ -121,8 +123,8 @@ erDiagram
 
   photo_embedding {
     bigint id PK
-    bigint meeting_id FK
-    bigint asset_id FK
+    string meeting_id
+    string photo_id
     string phash
     bytea embedding
     datetime created_at
@@ -157,7 +159,7 @@ erDiagram
 | start_time | TIME | Y | 开始时间 |
 | end_time | TIME | Y | 结束时间 |
 | chain_or_store_name | VARCHAR(50) | Y | 大讲堂=连锁名称；微型=药店名称 |
-| location | VARCHAR(200) | Y | 会议地点（与海报 OCR 地点比对） |
+| meeting_location | VARCHAR(200) | Y | 会议地点（与海报 OCR 地点比对；API `form.meeting_location`） |
 | remark | VARCHAR(200) | N | 备注 |
 | total_attendees | INT | Y | 总参会人数 |
 | other_fee | DECIMAL(12,2) | N | 其他费用 |
@@ -181,33 +183,34 @@ erDiagram
 | speaker_name | VARCHAR(20) | Y | 姓名 |
 | topic | VARCHAR(50) | Y | 讲者主题 |
 | service_minutes | INT | Y | 服务时长（分钟） |
-| fee | DECIMAL(12,2) | Y | 讲课费 |
+| lecture_fee | DECIMAL(12,2) | Y | 讲课费（API `lecture_fee`） |
 | tax | DECIMAL(12,2) | N | 税金，最多 2 位小数 |
 
-### meeting_asset（会议材料）
+### meeting_asset（会议材料 / 对齐 CRM Photo）
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| id | BIGINT PK | Y | |
+| id | BIGINT PK | Y | 业务侧主键；对外 API 用字符串 `photo_id` |
 | meeting_id | BIGINT FK | Y | |
-| asset_type | VARCHAR(32) | Y | 见 `asset_type` 枚举 |
+| photo_type | VARCHAR(32) | Y | 见 `photo_type` 枚举（与 CRM `PhotoType` 同值） |
 | sort_no | INT | Y | 同类型多张时的顺序 |
-| s3_uri | VARCHAR(512) | Y | 如 `s3://bucket/key` |
+| file_url | VARCHAR(512) | Y | 如 `s3://bucket/key`（API `file_url`） |
 | content_type | VARCHAR(64) | Y | `image/jpeg` / `image/png` / `application/pdf` |
 | file_size_bytes | BIGINT | N | 可选 |
-| speaker_id | BIGINT FK | N | 讲者照片关联讲者 |
-| speaker_shot_kind | VARCHAR(16) | N | `TITLE_GROUP` \| `LECTURING` |
+| speaker_id | BIGINT FK | N | `SpeakerTitle` / `SpeakerLecture` 必填 |
 | created_at | TIMESTAMPTZ | Y | |
+
+> 讲者合影与讲课照用不同 `photo_type`（`SpeakerTitle` / `SpeakerLecture`），不再使用 `speaker_shot_kind`。
 
 ### ai_check_job（一次材料检查任务）
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | id | BIGINT PK | Y | |
-| meeting_id | BIGINT FK | Y | |
+| meeting_id | VARCHAR(36) | Y | 对齐 CRM MeetingID / API string |
 | attempt_no | INT | Y | 本场第几次审核（与 pe 的 ai_check_count 对齐） |
-| request_id | VARCHAR(64) UK | Y | 幂等键；重复请求不重复计次 |
-| pe_snapshot | JSONB | Y | 调用时表单+资产快照 |
+| task_id | VARCHAR(50) UK | Y | 幂等键；对齐 CRM TaskID / API `task_id`；重复请求不重复计次 |
+| pe_snapshot | JSONB | Y | 调用时表单+照片快照 |
 | overall_status | VARCHAR(16) | N | `PASS`/`FAIL`/`NEED_HUMAN`/`ERROR` |
 | overall_confidence | REAL | N | 0~1 |
 | model_version | VARCHAR(64) | N | 模型/流水线版本 |
@@ -217,22 +220,23 @@ erDiagram
 | error_code | VARCHAR(64) | N | 系统错误码（非业务 FAIL） |
 | error_message | TEXT | N | |
 
-### ai_asset_result（单张材料分析结果）
+### ai_asset_result（单张材料分析结果；API 响应字段为 `photo_results[]`）
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | id | BIGINT PK | Y | |
 | job_id | BIGINT FK | Y | |
-| asset_id | BIGINT FK | Y | |
-| detected_type | VARCHAR(32) | N | 模型判定的类别 |
-| type_match | BOOLEAN | N | 是否与声明 asset_type 一致 |
+| photo_id | VARCHAR(36) | Y | 对齐 CRM PhotoID / 请求 `photos[].photo_id` |
+| photo_type | VARCHAR(32) | N | PE 声明类型（响应 `photo_type`） |
+| detected_type | VARCHAR(32) | N | 模型判定的类别（full） |
+| type_match | BOOLEAN | N | 是否与声明 `photo_type` 一致 |
 | clarity_score | REAL | N | 0~1 |
 | is_blurry | BOOLEAN | N | clarity < 阈值 |
 | ocr_fields | JSONB | N | 抽取字段，见下方结构 |
 | detections | JSONB | N | 检测框/物体（台卡 ROI、Logo、人数等） |
-| duplicate_hit | BOOLEAN | N | 是否命中他场照片 |
-| duplicate_ref_session_no | VARCHAR(20) | N | 命中的历史场次编号 |
-| duplicate_score | REAL | N | 相似度 |
+| topic_reuse_hit | BOOLEAN | N | 讲者照标题是否命中历史 |
+| topic_reuse_ref_session_no | VARCHAR(20) | N | 命中的历史场次编号 |
+| topic_text_ocr | TEXT | N | 讲者照 OCR 标题 |
 
 **ocr_fields 建议结构：**
 
@@ -265,7 +269,7 @@ erDiagram
 | reason_code | VARCHAR(64) | N | 机器可读原因码 |
 | reason_text | TEXT | N | 中文说明 |
 | evidence | JSONB | N | crop、期望值、OCR 原文等 |
-| related_asset_ids | BIGINT[] | N | 可选 |
+| related_photo_ids | VARCHAR(36)[] | N | 可选；对齐响应 `related_photo_ids` |
 
 ### template_ref（模版参考图）
 
@@ -275,19 +279,20 @@ erDiagram
 | project_type | VARCHAR(32) | Y | |
 | template_kind | VARCHAR(32) | Y | 见 `template_kind` |
 | period_id | BIGINT FK | N | 可绑定期数；空=通用 |
-| s3_uri | VARCHAR(512) | Y | crop 或整图 |
+| s3_uri | VARCHAR(512) | Y | crop 或整图（模版 pack 内部路径键，非请求 `file_url`） |
 | version | VARCHAR(32) | Y | 与 template_pack_version 对齐 |
 | crop_meta | JSONB | N | `{x,y,w,h,source_asset,note}` |
 | is_active | BOOLEAN | Y | 默认 true |
 
-### photo_embedding（查重索引）
+### photo_embedding / image_dup_history（查重索引）
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | id | BIGINT PK | Y | |
-| meeting_id | BIGINT FK | Y | |
-| asset_id | BIGINT FK | Y | |
-| period_id | BIGINT FK | N | 便于按期检索 |
+| meeting_id | VARCHAR(36) | Y | |
+| photo_id | VARCHAR(36) | Y | |
+| photo_type | VARCHAR(32) | N | |
+| period_id | VARCHAR(36) | N | 便于按期检索 |
 | phash | VARCHAR(64) | N | 感知哈希 |
 | embedding | BYTEA / VECTOR | N | 向量（若用 pgvector） |
 | created_at | TIMESTAMPTZ | Y | |
@@ -314,58 +319,54 @@ erDiagram
 | LECTURE_HALL | 药师大讲堂 |
 | MICRO | 微型药师 |
 
-### meeting_subtype
+### meeting_type
 
 | 码 | 适用 | 含义 |
 |----|------|------|
 | SINGLE | MICRO | 单讲者 |
 | DUAL | MICRO | 双讲者 |
+| （null） | LECTURE_HALL | 大讲堂不传 |
 
-### asset_type
+### photo_type（与 CRM `PhotoType` / API 同值）
 
 #### 药师大讲堂（LECTURE_HALL）
 
 | 码 | 中文 | 数量要求 |
 |----|------|----------|
-| E_POSTER | 电子日程海报 | ≥1 |
-| POSTER | 日程海报 | ≥1 |
-| STAND | 日程展架 | ≥1 |
-| NAME_CARD | 台卡 | ≥1 |
-| HANDBOOK | 手册 | ≥1 |
-| SPEAKER_PHOTO | 讲者照片 | 每讲者 2 张（TITLE_GROUP + LECTURING） |
-| PANORAMA | 参会人员全景 | ≥1 |
-| SIGNIN | 签到表 | ≥1（jpg/png/pdf） |
+| EDM | 电子日程海报 | ≥1 |
+| Poster | 日程海报 | ≥1 |
+| Stand | 日程展架 | ≥1 |
+| TableCard | 台卡 | ≥1 |
+| Manual | 手册 | ≥1 |
+| SpeakerTitle | 讲者标题合影 | 每讲者 ≥1（须 `speaker_id`） |
+| SpeakerLecture | 讲者讲课照 | 每讲者 ≥1（须 `speaker_id`） |
+| Panorama | 参会人员全景 | ≥1 |
+| SignSheet | 签到表 | ≥1（jpg/png/pdf） |
 
 #### 微型药师（MICRO）
 
 | 码 | 中文 | 数量要求 |
 |----|------|----------|
-| E_POSTER | 电子日程海报 | ≥1 |
-| E_POSTER_DISPLAY | 电子日程海报展示 | ≥1 |
-| PROJECT_INTRO_DISPLAY | 项目介绍展示 | ≥1 |
-| SPEAKER_PHOTO | 讲者照片（标题合影） | 单 1 / 双 2 |
-| PANORAMA | 参会人员全景 | ≥1 |
-| SIGNIN | 签到表 | ≥1 |
-
-### speaker_shot_kind
-
-| 码 | 含义 |
-|----|------|
-| TITLE_GROUP | 与课件标题合影 |
-| LECTURING | 讲课过程照 |
+| EDM | 电子日程海报 | ≥1 |
+| EDMDisplay | 电子日程海报展示 | ≥1 |
+| ProjectIntro | 项目介绍展示 | ≥1 |
+| SpeakerTitle | 讲者标题合影 | 单 1 / 双 2（须 `speaker_id`） |
+| Panorama | 参会人员全景 | ≥1 |
+| SignSheet | 签到表 | ≥1 |
 
 ### template_kind
 
 | 码 | 含义 |
 |----|------|
-| POSTER | 日程海报版式 |
-| STAND | 展架版式 |
-| NAME_CARD | 台卡底纹 |
-| HANDBOOK | 手册封面 |
+| Poster | 日程海报版式 |
+| Stand | 展架版式 |
+| TableCard | 台卡底纹 |
+| Manual | 手册封面 |
 | PPT_INTRO | 项目介绍 PPT 页 |
 | PPT_AGENDA | 电子日程 PPT 页 |
-| SIGNIN | 签到表标准模版 |
+| SignSheet | 签到表标准模版 |
 | LOGO_BAYER | 拜耳 Logo 参考 |
+| SpeakerTitle | 讲者标题条 crop（评测用） |
 
 ### ai_check_job.overall_status / rule status
 
@@ -434,8 +435,8 @@ erDiagram
 - `meeting(period_id, status)`
 - `meeting(project_type, meeting_date)`
 - `speaker(meeting_id)`
-- `meeting_asset(meeting_id, asset_type)`
-- `ai_check_job(request_id)` UNIQUE
+- `meeting_asset(meeting_id, photo_type)`
+- `ai_check_job(task_id)` UNIQUE
 - `ai_check_job(meeting_id, attempt_no)`
 - `ai_rule_result(job_id, rule_code)`
 - `photo_embedding(period_id)` + phash / vector 索引

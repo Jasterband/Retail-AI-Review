@@ -24,6 +24,10 @@ class TemplatePack:
     equity1_full: Optional[Path]
     equity2_agenda: Optional[Path]
     equity2_full: Optional[Path]
+    # 关键字段区（会议时间/地点/日程讲者）参考 crop
+    poster_key_fields: Optional[Path]
+    edm_key_fields: Optional[Path]
+    micro_edm_key_fields: Optional[Path]
 
     def as_dict(self) -> Dict[str, Optional[str]]:
         def rel(p: Optional[Path]) -> Optional[str]:
@@ -44,6 +48,9 @@ class TemplatePack:
             "handbook_stale": rel(self.handbook_stale),
             "equity1_ribbon": rel(self.equity1_ribbon),
             "equity2_agenda": rel(self.equity2_agenda),
+            "poster_key_fields": rel(self.poster_key_fields),
+            "edm_key_fields": rel(self.edm_key_fields),
+            "micro_edm_key_fields": rel(self.micro_edm_key_fields),
         }
 
 
@@ -84,6 +91,17 @@ def get_template_pack(version: str = "2026Q2") -> TemplatePack:
             root, "micro/equity2_agenda_table_crop.jpg"
         ),
         equity2_full=_first_existing(root, "micro/equity2_screen_full.jpg"),
+        poster_key_fields=_first_existing(
+            root, "lecture_hall/poster_key_fields_crop.jpg"
+        ),
+        edm_key_fields=_first_existing(
+            root,
+            "lecture_hall/edm_key_fields_crop.jpg",
+            "lecture_hall/poster_key_fields_crop.jpg",
+        ),
+        micro_edm_key_fields=_first_existing(
+            root, "micro/edm_key_fields_crop.jpg"
+        ),
     )
 
 

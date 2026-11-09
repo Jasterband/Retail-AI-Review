@@ -1,6 +1,6 @@
 # 药师会零售会议材料检查（AI 服务）
 
-FastAPI 服务：对齐 `docs/PE接口文档-v1.8.md`。已接入 **本地样例读图 + OpenAI 兼容多模态** 与规则引擎（手册等缺口材料规则 SKIP）。
+FastAPI 服务：PE 对接以 `docs/README-PE-simple对接.md` 为准（历史全文见 `docs/PE接口文档-v1.8.md`）。已接入 **本地样例读图 + OpenAI 兼容多模态** 与规则引擎（手册等缺口材料规则 SKIP）。
 
 ## 目录
 
@@ -10,7 +10,7 @@ app/
   api/retail_meeting_checks.py
   schemas/ models/
   services/
-    asset_fetch.py      # s3_uri → 本地映射（PDF 渲首页）
+    asset_fetch.py      # file_url → 本地映射（PDF 渲首页）
     vision/             # OpenAI 兼容多模态
     pipeline/           # AssetContext + 聚合
     rules/              # 通用 / 大讲堂 / 微型规则
@@ -91,7 +91,7 @@ curl -s 'http://127.0.0.1:8000/v1/retail_meeting_checks/req-hall-143-20260623-00
   -H 'Authorization: Bearer dev-token-change-me'
 ```
 
-其它夹具：微型合格 `micro-000090-pass.json`（000606）、双讲 `micro-000125-pass.json`（000921）、不合格 `micro-000089-pass.json`（000620）。  
+其它夹具：微型合格 `micro-000090-pass.json`（000606）、双讲 `micro-000125-pass.json`（000921）、不合格如 `micro-000728-fail.json`。  
 样例根目录：`零售照片ai审核/药师大讲堂` · `零售照片ai审核/微型药师`。  
 跨会查重：先跑一场会写入 `image_dup_history`，再提交 `docs/fixtures/dup-hit.json`。
 
@@ -108,4 +108,4 @@ python scripts/smoke_offline.py
 - PE simple 对接：[`docs/README-PE-simple对接.md`](docs/README-PE-simple对接.md)  
 - 黄金集 / SKIP：[`docs/05-golden-set.md`](docs/05-golden-set.md)  
 
-`HANDBOOK_DETECT` / `HANDBOOK_NOT_STALE`：请求未带 `HANDBOOK` 资产时 **SKIP**，不挡 PASS。
+`HANDBOOK_DETECT` / `HANDBOOK_NOT_STALE`：请求未带 `Manual` 照片时 **SKIP**，不挡 PASS。

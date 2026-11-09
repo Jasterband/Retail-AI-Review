@@ -33,7 +33,7 @@ def _rule_summary(full: dict) -> list:
                 "rule_code": r.get("rule_code"),
                 "status": r.get("status"),
                 "reason_text": r.get("reason_text"),
-                "related_asset_ids": r.get("related_asset_ids"),
+                "related_photo_ids": r.get("related_photo_ids"),
             }
         )
     return rows
@@ -46,7 +46,7 @@ def run_one(label: str, path: Path, out_dir: Path) -> dict:
         raise SystemExit("OPENAI_API_KEY 未配置，无法真跑")
 
     fixture = json.loads(path.read_text(encoding="utf-8"))
-    fixture["request_id"] = "req-run-{0}-{1}".format(
+    fixture["task_id"] = "req-run-{0}-{1}".format(
         label, uuid.uuid4().hex[:8]
     )
     # 要看 checks / ocr，强制 full
@@ -65,7 +65,7 @@ def run_one(label: str, path: Path, out_dir: Path) -> dict:
         job = AiCheckJob(
             meeting_id=fixture["meeting_id"],
             attempt_no=int(max_attempt or 0) + 1,
-            request_id=fixture["request_id"],
+            task_id=fixture["task_id"],
             pe_snapshot=fixture,
             processing_status="RUNNING",
         )
@@ -73,11 +73,11 @@ def run_one(label: str, path: Path, out_dir: Path) -> dict:
         db.commit()
         db.refresh(job)
         jid = job.id
-        rid = job.request_id
+        rid = job.task_id
     finally:
         db.close()
 
-    print("=== {0} job_id={1} request_id={2} ===".format(label, jid, rid))
+    print("=== {0} job_id={1} task_id={2} ===".format(label, jid, rid))
     t0 = time.time()
     run_check_sync(jid)
     elapsed = time.time() - t0
@@ -90,7 +90,7 @@ def run_one(label: str, path: Path, out_dir: Path) -> dict:
         summary = {
             "label": label,
             "fixture": str(path.relative_to(ROOT)),
-            "request_id": rid,
+            "task_id": rid,
             "job_id": jid,
             "elapsed_sec": round(elapsed, 1),
             "processing_status": job.processing_status,
@@ -99,16 +99,16 @@ def run_one(label: str, path: Path, out_dir: Path) -> dict:
             "error_message": job.error_message,
             "model_version": job.model_version,
             "rule_results": _rule_summary(full),
-            "asset_results_brief": [
+            "photo_results_brief": [
                 {
-                    "asset_id": a.get("asset_id"),
-                    "declared_type": a.get("declared_type"),
-                    "asset_status": a.get("asset_status"),
+                    "photo_id": a.get("photo_id"),
+                    "photo_type": a.get("photo_type"),
+                    "photo_status": a.get("photo_status"),
                     "checks": a.get("checks"),
                     "ocr_fields": a.get("ocr_fields"),
                     "fail_reasons": a.get("fail_reasons"),
                 }
-                for a in (full.get("asset_results") or [])
+                for a in (full.get("photo_results") or [])
             ],
         }
         (out_dir / "{0}.full.json".format(label)).write_text(

@@ -34,7 +34,7 @@ uvicorn app.main:app --reload --port 8000
 
 | 文件 | 说明 |
 |------|------|
-| `scenarios.json` | 场次目录：`id` / `label` / `auditable` / `fixture?` / `photo_base` / `assets_meta` / `expect` |
+| `scenarios.json` | 场次目录：`id` / `label` / `auditable` / `fixture?` / `photo_base` / `photos_meta` / `expect` |
 | `capabilities.json` | C/D/E 能力 → `rule_code` + 适用项目 |
 | `roadmap.json` | A–G 条目 + `status`: `blocked` / `todo` / `wip` / `done` |
 
@@ -56,7 +56,7 @@ uvicorn app.main:app --reload --port 8000
 
 **可审 · 合格：** 大讲堂 143 / 204 / 208 / 209 / 224；微型 000606 / 000670；双讲 000921 / 000938
 
-**可审 · 不合格：** 大讲堂 185（缺材）、负样本图包；微型 000620 / 000823 / 001421 / 001499 / 001541
+**可审 · 不合格：** 大讲堂 185（缺材）、负样本拼盘 NEG-HALL；微型 000728 / 001348 / 001358 / 001453 / 000664
 
 **浏览（命名已修、待补 form）：** 169 / 183 / 218 / 225 / 231
 
@@ -75,6 +75,6 @@ uvicorn app.main:app --reload --port 8000
 
 ## 说明
 
-- Live 每次生成新 `request_id`（`req-demo-{timestamp}-…`）
+- Live 每次生成新 `task_id`（`req-demo-{timestamp}-…`）
 - 无 `OPENAI_API_KEY` 时任务会 `ERROR` / `MODEL_UNAVAILABLE`
 - 大讲堂一场约十几张图，多模态可能需 1～3 分钟；批量跑会更久

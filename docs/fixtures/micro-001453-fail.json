@@ -1,0 +1,72 @@
+{
+  "task_id": "req-micro-001453-fail-001",
+  "meeting_id": "101453",
+  "meeting_no": "001453",
+  "project_type": "MICRO",
+  "meeting_type": "SINGLE",
+  "project_id": "2",
+  "form": {
+    "meeting_name": "单讲师",
+    "meeting_date": "2026-09-30",
+    "start_time": "14:00",
+    "end_time": "14:45",
+    "chain_or_store_name": "河南美锐大药房连锁有限公司平桥平西街分店",
+    "meeting_location": "信阳市河南美锐大药房连锁有限公司平桥平西街分店",
+    "total_attendees": 6,
+    "speakers": [
+      {
+        "speaker_id": "1",
+        "speaker_name": "讲者",
+        "topic": "微型药店健康服务赋能",
+        "store_name": "河南美锐大药房连锁有限公司平桥平西街分店",
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      }
+    ]
+  },
+  "photos": [
+    {
+      "photo_id": "14531",
+      "photo_type": "EDM",
+      "file_url": "s3://pe-meetings/micro/001453/agenda.png",
+      "content_type": "image/png",
+      "sort": 1
+    },
+    {
+      "photo_id": "14532",
+      "photo_type": "ProjectIntro",
+      "file_url": "s3://pe-meetings/micro/001453/intro.jpeg",
+      "content_type": "image/jpeg",
+      "sort": 2
+    },
+    {
+      "photo_id": "14533",
+      "photo_type": "EDMDisplay",
+      "file_url": "s3://pe-meetings/micro/001453/display.jpeg",
+      "content_type": "image/jpeg",
+      "sort": 3
+    },
+    {
+      "photo_id": "14535",
+      "photo_type": "Panorama",
+      "file_url": "s3://pe-meetings/micro/001453/panorama.jpeg",
+      "content_type": "image/jpeg",
+      "sort": 4
+    },
+    {
+      "photo_id": "14536",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/micro/001453/signin.pdf",
+      "content_type": "application/pdf",
+      "sort": 5
+    }
+  ],
+  "refs": {
+    "template_pack_version": "2026Q2"
+  },
+  "options": {
+    "response_mode": "simple"
+  }
+}

@@ -1,66 +1,74 @@
 {
-  "request_id": "req-micro-000670-001",
-  "meeting_id": 1670,
-  "session_no": "000670",
+  "task_id": "req-micro-000670-001",
+  "meeting_id": "1670",
+  "meeting_no": "000670",
   "project_type": "MICRO",
-  "meeting_subtype": "SINGLE",
-  "period_id": 2,
+  "meeting_type": "SINGLE",
+  "project_id": "2",
   "form": {
     "meeting_name": "单讲师",
     "meeting_date": "2026-08-13",
     "start_time": "14:00",
     "end_time": "14:45",
     "chain_or_store_name": "河南张仲景大药房股份有限公司",
-    "location": "洛阳市河南张仲景大药房股份有限公司洛阳关林路店",
+    "meeting_location": "洛阳市河南张仲景大药房股份有限公司洛阳关林路店",
     "total_attendees": 8,
     "speakers": [
       {
-        "speaker_id": 1,
+        "speaker_id": "1",
         "speaker_name": "讲者",
         "topic": "微型药店健康服务赋能",
         "store_name": "洛阳关林路店",
-        "service_minutes": 30
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       }
     ]
   },
-  "assets": [
+  "photos": [
     {
-      "asset_id": 6701,
-      "asset_type": "E_POSTER",
-      "s3_uri": "s3://pe-meetings/micro/000670/agenda.png",
-      "content_type": "image/png"
-    },
-    {
-      "asset_id": 6702,
-      "asset_type": "PROJECT_INTRO_DISPLAY",
-      "s3_uri": "s3://pe-meetings/micro/000670/intro.jpeg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 6703,
-      "asset_type": "E_POSTER_DISPLAY",
-      "s3_uri": "s3://pe-meetings/micro/000670/display.jpeg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 6704,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/micro/000670/speaker.png",
+      "photo_id": "6701",
+      "photo_type": "EDM",
+      "file_url": "s3://pe-meetings/micro/000670/agenda.png",
       "content_type": "image/png",
-      "speaker_id": 1,
-      "speaker_shot_kind": "TITLE_GROUP"
+      "sort": 1
     },
     {
-      "asset_id": 6705,
-      "asset_type": "PANORAMA",
-      "s3_uri": "s3://pe-meetings/micro/000670/panorama.jpeg",
-      "content_type": "image/jpeg"
+      "photo_id": "6702",
+      "photo_type": "ProjectIntro",
+      "file_url": "s3://pe-meetings/micro/000670/intro.jpeg",
+      "content_type": "image/jpeg",
+      "sort": 2
     },
     {
-      "asset_id": 6706,
-      "asset_type": "SIGNIN",
-      "s3_uri": "s3://pe-meetings/micro/000670/signin.pdf",
-      "content_type": "application/pdf"
+      "photo_id": "6703",
+      "photo_type": "EDMDisplay",
+      "file_url": "s3://pe-meetings/micro/000670/display.jpeg",
+      "content_type": "image/jpeg",
+      "sort": 3
+    },
+    {
+      "photo_id": "6704",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/micro/000670/speaker.png",
+      "content_type": "image/png",
+      "speaker_id": "1",
+      "sort": 4
+    },
+    {
+      "photo_id": "6705",
+      "photo_type": "Panorama",
+      "file_url": "s3://pe-meetings/micro/000670/panorama.jpeg",
+      "content_type": "image/jpeg",
+      "sort": 5
+    },
+    {
+      "photo_id": "6706",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/micro/000670/signin.pdf",
+      "content_type": "application/pdf",
+      "sort": 6
     }
   ],
   "refs": {

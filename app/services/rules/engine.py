@@ -25,7 +25,7 @@ def run_all_rules(
 
     dispatch = {
         "ASSET_MISSING": lambda: common.rule_asset_missing(contexts, snap),
-        "ASSET_TYPE_CHECK": lambda: common.rule_asset_type_check(contexts, options),
+        "ASSET_TYPE_CHECK": lambda: common.rule_photo_type_check(contexts, options),
         "CLARITY": lambda: common.rule_clarity(contexts, options),
         "KEY_FIELD_MATCH": lambda: common.rule_key_field_match(contexts, form, options),
         "TIME_CONSISTENCY": lambda: common.rule_time_consistency(

@@ -1,60 +1,68 @@
 {
-  "request_id": "req-hall-negatives-001",
-  "meeting_id": 999001,
-  "session_no": "NEG-HALL",
+  "task_id": "req-hall-negatives-001",
+  "meeting_id": "999001",
+  "meeting_no": "NEG-HALL",
   "project_type": "LECTURE_HALL",
-  "meeting_subtype": null,
-  "period_id": 1,
+  "meeting_type": null,
+  "project_id": "1",
   "form": {
     "meeting_name": "菁英药师大讲堂项目",
     "meeting_date": "2026-06-01",
     "start_time": "14:00",
     "end_time": "16:10",
     "chain_or_store_name": "负样本合成连锁",
-    "location": "负样本合成地点",
+    "meeting_location": "负样本合成地点",
     "total_attendees": 35,
     "speakers": [
       {
-        "speaker_id": 1,
+        "speaker_id": "1",
         "speaker_name": "测试讲者",
         "topic": "测试主题",
         "store_name": "测试店",
-        "service_minutes": 130
+        "service_minutes": 130,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
       }
     ]
   },
-  "assets": [
+  "photos": [
     {
-      "asset_id": 9000,
-      "asset_type": "STAND",
-      "s3_uri": "s3://pe-meetings/hall/fail/stand_blur.jpg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 9001,
-      "asset_type": "STAND",
-      "s3_uri": "s3://pe-meetings/hall/fail/stand_incomplete.jpg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 9002,
-      "asset_type": "PANORAMA",
-      "s3_uri": "s3://pe-meetings/hall/fail/panorama_few.jpg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 9003,
-      "asset_type": "HANDBOOK",
-      "s3_uri": "s3://pe-meetings/hall/fail/handbook_overlap.jpg",
-      "content_type": "image/jpeg"
-    },
-    {
-      "asset_id": 9004,
-      "asset_type": "SPEAKER_PHOTO",
-      "s3_uri": "s3://pe-meetings/hall/fail/speaker_closeup.jpg",
+      "photo_id": "9000",
+      "photo_type": "Stand",
+      "file_url": "s3://pe-meetings/hall/fail/stand_no_time.jpg",
       "content_type": "image/jpeg",
-      "speaker_id": 1,
-      "speaker_shot_kind": "LECTURING"
+      "sort": 1
+    },
+    {
+      "photo_id": "9001",
+      "photo_type": "Stand",
+      "file_url": "s3://pe-meetings/hall/fail/stand_incomplete.jpg",
+      "content_type": "image/jpeg",
+      "sort": 2
+    },
+    {
+      "photo_id": "9002",
+      "photo_type": "Panorama",
+      "file_url": "s3://pe-meetings/hall/fail/panorama_few.jpg",
+      "content_type": "image/jpeg",
+      "sort": 3
+    },
+    {
+      "photo_id": "9003",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/fail/speaker_blur.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "1",
+      "sort": 4
+    },
+    {
+      "photo_id": "9004",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/fail/speaker_no_face.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "1",
+      "sort": 5
     }
   ],
   "refs": {

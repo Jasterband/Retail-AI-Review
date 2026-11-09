@@ -2,54 +2,68 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pe.local/schemas/retail-meeting-check-request.schema.json",
   "title": "RetailMeetingCheckRequest",
-  "description": "PE → AI：一场零售会议材料检查请求。AI 仅按 s3_uri 拉取材料。",
+  "description": "PE → AI：一场零售会议材料检查请求。AI 仅按 file_url 拉取材料。",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "request_id",
+    "task_id",
     "meeting_id",
-    "session_no",
+    "meeting_no",
     "project_type",
-    "period_id",
+    "project_id",
     "form",
-    "assets"
+    "photos"
   ],
   "properties": {
-    "request_id": {
+    "task_id": {
       "type": "string",
       "minLength": 8,
-      "maxLength": 64,
-      "description": "幂等键；重复提交返回已有结果且不计次"
+      "maxLength": 50,
+      "description": "幂等键；对齐 CRM TaskID nvarchar(50)；重复提交返回已有结果且不计次"
     },
     "meeting_id": {
-      "type": "integer",
-      "minimum": 1
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 36,
+      "description": "对齐 CRM MeetingID（nvarchar）；可为 GUID 等字符串"
     },
-    "session_no": {
+    "meeting_no": {
       "type": "string",
       "maxLength": 20
     },
     "project_type": {
       "type": "string",
-      "enum": ["LECTURE_HALL", "MICRO"]
+      "enum": [
+        "LECTURE_HALL",
+        "MICRO"
+      ]
     },
-    "meeting_subtype": {
-      "type": ["string", "null"],
-      "enum": ["SINGLE", "DUAL", null],
+    "meeting_type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "SINGLE",
+        "DUAL",
+        null
+      ],
       "description": "MICRO 必填；LECTURE_HALL 为 null"
     },
-    "period_id": {
-      "type": "integer",
-      "minimum": 1
+    "project_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 36,
+      "description": "对齐 CRM ProjectID（nvarchar）"
     },
     "form": {
       "$ref": "#/$defs/MeetingForm"
     },
-    "assets": {
+    "photos": {
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "#/$defs/AssetItem"
+        "$ref": "#/$defs/PhotoItem"
       }
     },
     "refs": {
@@ -62,14 +76,23 @@
   "allOf": [
     {
       "if": {
-        "properties": { "project_type": { "const": "MICRO" } }
+        "properties": {
+          "project_type": {
+            "const": "MICRO"
+          }
+        }
       },
       "then": {
-        "required": ["meeting_subtype"],
+        "required": [
+          "meeting_type"
+        ],
         "properties": {
-          "meeting_subtype": {
+          "meeting_type": {
             "type": "string",
-            "enum": ["SINGLE", "DUAL"]
+            "enum": [
+              "SINGLE",
+              "DUAL"
+            ]
           }
         }
       }
@@ -85,12 +108,15 @@
         "start_time",
         "end_time",
         "chain_or_store_name",
-        "location",
+        "meeting_location",
         "total_attendees",
         "speakers"
       ],
       "properties": {
-        "meeting_name": { "type": "string", "maxLength": 50 },
+        "meeting_name": {
+          "type": "string",
+          "maxLength": 50
+        },
         "meeting_date": {
           "type": "string",
           "format": "date",
@@ -110,17 +136,28 @@
           "maxLength": 50,
           "description": "大讲堂=连锁名；微型=药店名"
         },
-        "location": {
+        "meeting_location": {
           "type": "string",
           "maxLength": 200,
           "description": "会议地点；与海报/水印 OCR 地点比对"
         },
-        "remark": { "type": ["string", "null"], "maxLength": 200 },
-        "total_attendees": { "type": "integer", "minimum": 0 },
+        "remark": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 200
+        },
+        "total_attendees": {
+          "type": "integer",
+          "minimum": 0
+        },
         "speakers": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/Speaker" }
+          "items": {
+            "$ref": "#/$defs/Speaker"
+          }
         }
       }
     },
@@ -132,54 +169,109 @@
         "speaker_name",
         "topic",
         "store_name",
-        "service_minutes"
+        "service_minutes",
+        "identity_name",
+        "lecture_fee",
+        "tax"
       ],
       "properties": {
-        "speaker_id": { "type": "integer", "minimum": 1 },
-        "role_title": { "type": "string", "maxLength": 10 },
-        "store_name": { "type": "string", "maxLength": 50 },
-        "speaker_name": { "type": "string", "maxLength": 20 },
-        "topic": { "type": "string", "maxLength": 50 },
-        "service_minutes": { "type": "integer", "minimum": 1 },
-        "fee": { "type": "number" },
-        "tax": { "type": ["number", "null"] }
+        "speaker_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 36,
+          "description": "对齐 CRM SpeakerID（nvarchar）"
+        },
+        "identity_name": {
+          "type": "string",
+          "maxLength": 10,
+          "description": "对齐 CRM IdentityName NotNull"
+        },
+        "store_name": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "speaker_name": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "topic": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "service_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lecture_fee": {
+          "type": "number",
+          "description": "对齐 CRM LectureFee NotNull"
+        },
+        "tax": {
+          "type": "number",
+          "description": "对齐 CRM Tax NotNull"
+        }
       }
     },
-    "AssetItem": {
+    "PhotoItem": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["asset_id", "asset_type", "s3_uri", "content_type"],
+      "required": [
+        "photo_id",
+        "photo_type",
+        "file_url",
+        "content_type",
+        "sort"
+      ],
       "properties": {
-        "asset_id": { "type": "integer", "minimum": 1 },
-        "asset_type": {
+        "photo_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 36,
+          "description": "对齐 CRM PhotoID（nvarchar）"
+        },
+        "photo_type": {
           "type": "string",
           "enum": [
-            "E_POSTER",
-            "POSTER",
-            "STAND",
-            "NAME_CARD",
-            "HANDBOOK",
-            "SPEAKER_PHOTO",
-            "PANORAMA",
-            "SIGNIN",
-            "E_POSTER_DISPLAY",
-            "PROJECT_INTRO_DISPLAY"
+            "EDM",
+            "Poster",
+            "Stand",
+            "TableCard",
+            "Manual",
+            "EDMDisplay",
+            "ProjectIntro",
+            "Panorama",
+            "SignSheet",
+            "SpeakerTitle",
+            "SpeakerLecture"
           ]
         },
-        "s3_uri": {
+        "file_url": {
           "type": "string",
+          "maxLength": 1000,
           "pattern": "^s3://[\\w.\\-]+/.+",
-          "description": "s3://bucket/key"
+          "description": "s3://bucket/key；对齐 CRM FileUrl nvarchar(1000)"
         },
         "content_type": {
           "type": "string",
-          "enum": ["image/jpeg", "image/png", "image/jpg", "application/pdf"]
+          "enum": [
+            "image/jpeg",
+            "image/png",
+            "image/jpg",
+            "application/pdf"
+          ]
         },
-        "sort_no": { "type": "integer", "minimum": 1, "default": 1 },
-        "speaker_id": { "type": ["integer", "null"], "minimum": 1 },
-        "speaker_shot_kind": {
-          "type": ["string", "null"],
-          "enum": ["TITLE_GROUP", "LECTURING", null]
+        "sort": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "对齐 CRM Sort NotNull"
+        },
+        "speaker_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 36
         }
       }
     },
@@ -191,22 +283,34 @@
           "type": "string",
           "description": "如 2026Q2；空则用当期默认 active pack"
         },
-        "logo_ref_s3": { "type": "string", "pattern": "^s3://.+" },
+        "logo_ref_s3": {
+          "type": "string",
+          "pattern": "^s3://.+"
+        },
         "topic_search_scope": {
           "type": "string",
-          "enum": ["period", "all"],
+          "enum": [
+            "period",
+            "all"
+          ],
           "default": "period",
           "description": "跨会议主题查重范围；兼容旧字段名 duplicate_search_scope"
         },
         "image_dup_search_scope": {
           "type": "string",
-          "enum": ["period", "all"],
+          "enum": [
+            "period",
+            "all"
+          ],
           "default": "period",
           "description": "跨会议图片混用检索范围"
         },
         "duplicate_search_scope": {
           "type": "string",
-          "enum": ["period", "all"],
+          "enum": [
+            "period",
+            "all"
+          ],
           "default": "period",
           "description": "已弃用别名，等同 topic_search_scope"
         }
@@ -236,12 +340,18 @@
         },
         "name_match_mode": {
           "type": "string",
-          "enum": ["exact", "fuzzy"],
+          "enum": [
+            "exact",
+            "fuzzy"
+          ],
           "default": "fuzzy"
         },
         "response_mode": {
           "type": "string",
-          "enum": ["simple", "full"],
+          "enum": [
+            "simple",
+            "full"
+          ],
           "default": "simple",
           "description": "回调默认响应模式；查询可用 ?mode= 覆盖。simple=PE展示；full=AI debug"
         },

@@ -1,14 +1,12 @@
 {
   "session_id": "micro-000606",
   "project_type": "MICRO",
-  "session_no": "000606",
   "label": "微型 · 太极东大街 000606",
   "updated_at": "2026-11-03T08:10:02.630003+00:00",
-  "assets": {
+  "session_notes": "",
+  "photos": {
     "电子日程海报.png": {
-      "declared_type": "E_POSTER",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "bayer_logo",
@@ -144,12 +142,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "EDM"
     },
     "项目介绍展示.jpeg": {
-      "declared_type": "PROJECT_INTRO_DISPLAY",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "colorful_ribbon",
@@ -207,12 +204,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "ProjectIntro"
     },
     "电子日程海报展示.jpeg": {
-      "declared_type": "E_POSTER_DISPLAY",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "agenda_table",
@@ -270,12 +266,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "EDMDisplay"
     },
     "标题合影.jpeg": {
-      "declared_type": "SPEAKER_PHOTO",
       "speaker_name": null,
-      "speaker_shot_kind": "TITLE_GROUP",
       "boxes": [
         {
           "label": "speaker",
@@ -359,12 +354,11 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SpeakerTitle"
     },
     "全景照片.jpeg": {
-      "declared_type": "PANORAMA",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [],
       "points": [
         {
@@ -402,12 +396,11 @@
         "people_count": 6
       },
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "Panorama"
     },
     "签到表.pdf": {
-      "declared_type": "SIGNIN",
       "speaker_name": null,
-      "speaker_shot_kind": null,
       "boxes": [
         {
           "label": "start_time",
@@ -517,8 +510,9 @@
       "points": [],
       "fields": {},
       "done": true,
-      "notes": ""
+      "notes": "",
+      "photo_type": "SignSheet"
     }
   },
-  "session_notes": ""
+  "meeting_no": "000606"
 }

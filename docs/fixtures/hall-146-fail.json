@@ -1,0 +1,180 @@
+{
+  "task_id": "req-hall-146-fail-001",
+  "meeting_id": "1146",
+  "meeting_no": "146",
+  "project_type": "LECTURE_HALL",
+  "meeting_type": null,
+  "project_id": "1",
+  "form": {
+    "meeting_name": "菁英药师大讲堂",
+    "meeting_date": "2026-06-22",
+    "start_time": "09:00",
+    "end_time": "11:10",
+    "chain_or_store_name": "湖北省昌盛大药房连锁有限公司",
+    "meeting_location": "湖北省昌盛大药房连锁总部",
+    "total_attendees": 35,
+    "speakers": [
+      {
+        "speaker_id": "1",
+        "speaker_name": "熊锦华",
+        "topic": "从血压波动到24小时平稳达标 ——高血压药事服务要点培训",
+        "store_name": "湖北省昌盛大药房连锁有限公司橡树湾店",
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      },
+      {
+        "speaker_id": "2",
+        "speaker_name": "何超梅",
+        "topic": "长期抗凝，精准用药更安心——抗凝患者门店管理",
+        "store_name": "湖北省昌盛大药房连锁有限公司保利心语店",
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      },
+      {
+        "speaker_id": "3",
+        "speaker_name": "张黎",
+        "topic": "规范抗栓治疗，为心脑血管患者带来长期获益",
+        "store_name": "湖北省昌盛大药房连锁有限公司大湾社区店",
+        "service_minutes": 30,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      },
+      {
+        "speaker_id": "4",
+        "speaker_name": "龚仁艳",
+        "topic": "慢病用药管理中的原研药历程",
+        "store_name": "湖北省昌盛大药房连锁有限公司大湾社区店",
+        "service_minutes": 40,
+        "identity_name": "药师",
+        "lecture_fee": 0,
+        "tax": 0
+      }
+    ]
+  },
+  "photos": [
+    {
+      "photo_id": "14601",
+      "photo_type": "EDM",
+      "file_url": "s3://pe-meetings/hall/146/eposter.png",
+      "content_type": "image/png",
+      "sort": 1
+    },
+    {
+      "photo_id": "14602",
+      "photo_type": "Manual",
+      "file_url": "s3://pe-meetings/hall/146/handbook.jpg",
+      "content_type": "image/jpeg",
+      "sort": 2
+    },
+    {
+      "photo_id": "14603",
+      "photo_type": "Poster",
+      "file_url": "s3://pe-meetings/hall/146/poster.jpg",
+      "content_type": "image/jpeg",
+      "sort": 3
+    },
+    {
+      "photo_id": "14604",
+      "photo_type": "Stand",
+      "file_url": "s3://pe-meetings/hall/146/stand.jpg",
+      "content_type": "image/jpeg",
+      "sort": 4
+    },
+    {
+      "photo_id": "14605",
+      "photo_type": "TableCard",
+      "file_url": "s3://pe-meetings/hall/146/name_card.jpg",
+      "content_type": "image/jpeg",
+      "sort": 5
+    },
+    {
+      "photo_id": "14611",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/146/s1_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "1",
+      "sort": 6
+    },
+    {
+      "photo_id": "14612",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/146/s1_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "1",
+      "sort": 7
+    },
+    {
+      "photo_id": "14621",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/146/s2_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "2",
+      "sort": 8
+    },
+    {
+      "photo_id": "14622",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/146/s2_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "2",
+      "sort": 9
+    },
+    {
+      "photo_id": "14631",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/146/s3_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "3",
+      "sort": 10
+    },
+    {
+      "photo_id": "14632",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/146/s3_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "3",
+      "sort": 11
+    },
+    {
+      "photo_id": "14641",
+      "photo_type": "SpeakerTitle",
+      "file_url": "s3://pe-meetings/hall/146/s4_1.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "4",
+      "sort": 12
+    },
+    {
+      "photo_id": "14642",
+      "photo_type": "SpeakerLecture",
+      "file_url": "s3://pe-meetings/hall/146/s4_2.jpg",
+      "content_type": "image/jpeg",
+      "speaker_id": "4",
+      "sort": 13
+    },
+    {
+      "photo_id": "14650",
+      "photo_type": "Panorama",
+      "file_url": "s3://pe-meetings/hall/146/panorama.jpg",
+      "content_type": "image/jpeg",
+      "sort": 14
+    },
+    {
+      "photo_id": "14660",
+      "photo_type": "SignSheet",
+      "file_url": "s3://pe-meetings/hall/146/signin.pdf",
+      "content_type": "application/pdf",
+      "sort": 15
+    }
+  ],
+  "refs": {
+    "template_pack_version": "2026Q2"
+  },
+  "options": {
+    "response_mode": "full"
+  }
+}

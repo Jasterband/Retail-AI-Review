@@ -22,12 +22,11 @@ from app.services.asset_fetch import fetch_object
 
 def _ctx(asset: dict, vision: dict, body=None) -> AssetContext:
     c = AssetContext(
-        asset_id=asset["asset_id"],
-        declared_type=asset["asset_type"],
-        s3_uri=asset["s3_uri"],
+        photo_id=asset["photo_id"],
+        photo_type=asset["photo_type"],
+        file_url=asset["file_url"],
         content_type=asset.get("content_type") or "image/jpeg",
         speaker_id=asset.get("speaker_id"),
-        speaker_shot_kind=asset.get("speaker_shot_kind"),
         body=body or b"x",
         vision=vision,
         phash=compute_phash(body) if body else "ffffffffffffffff",
@@ -41,28 +40,28 @@ def hall_contexts(snap: dict) -> list:
     poster = fetch_object("s3://pe-meetings/hall/143/poster.jpg", "image/jpeg")
     assert poster.body
     out = []
-    for a in snap["assets"]:
-        t = a["asset_type"]
+    for a in snap["photos"]:
+        t = a["photo_type"]
         v = {
             "clarity_score": 0.92,
             "detected_type": t,
             "type_confidence": 0.95,
-            "has_bayer_logo": t in ("POSTER", "STAND", "E_POSTER"),
+            "has_bayer_logo": t in ("Poster", "Stand", "EDM"),
             "logo_confidence": 0.9,
-            "handbook_ok": True if t == "HANDBOOK" else None,
-            "handbook_year": 2026 if t == "HANDBOOK" else None,
+            "handbook_ok": True if t == "Manual" else None,
+            "handbook_year": 2026 if t == "Manual" else None,
             "ocr_fields": {
                 "meeting_date": form.get("meeting_date") or "2026-06-23",
                 "start_time": form.get("start_time") or "14:00",
                 "end_time": form.get("end_time") or "16:10",
-                "location": form["location"],
+                "meeting_location": form["meeting_location"],
                 "speaker_names": names,
                 "has_watermark": False,
             },
-            "people_count": 36 if t == "PANORAMA" else None,
+            "people_count": 36 if t == "Panorama" else None,
             "people_count_confidence": 0.85,
-            "name_card_names": names if t == "NAME_CARD" else None,
-            "is_standard_name_card_style": True if t == "NAME_CARD" else None,
+            "name_card_names": names if t == "TableCard" else None,
+            "is_standard_name_card_style": True if t == "TableCard" else None,
             "name_card_style_confidence": 0.9,
             "signin": {
                 "start_time": form.get("start_time") or "14:00",
@@ -71,18 +70,18 @@ def hall_contexts(snap: dict) -> list:
                 "audience_count": 31,
                 "store_names": ["美锐A", "美锐B"],
             }
-            if t == "SIGNIN"
+            if t == "SignSheet"
             else None,
         }
-        if t == "SPEAKER_PHOTO" and a.get("speaker_shot_kind") == "TITLE_GROUP":
+        if t == "SpeakerTitle":
             sp = next(
                 s for s in form["speakers"] if s["speaker_id"] == a["speaker_id"]
             )
             v["ocr_fields"]["topic_title"] = sp["topic"]
             v["ocr_fields"]["speaker_name_on_slide"] = sp["speaker_name"]
-        body = poster.body if t == "POSTER" else poster.body
+        body = poster.body if t == "Poster" else poster.body
         # unique-ish phash per type by using real file when possible
-        fo = fetch_object(a["s3_uri"], a.get("content_type") or "image/jpeg")
+        fo = fetch_object(a["file_url"], a.get("content_type") or "image/jpeg")
         body = fo.body or poster.body
         out.append(_ctx(a, v, body))
     return out
@@ -107,13 +106,13 @@ def main() -> int:
         for r in full["rule_results"]:
             print(" ", r["rule_code"], r["status"], r.get("reason_text", "")[:60])
         assert full["overall_status"] == "PASS", full["overall_status"]
-        hb = [r for r in rules if r.rule_code.startswith("HANDBOOK")]
+        hb = [r for r in rules if r.rule_code.startswith("Manual")]
         assert all(r.status == "PASS" for r in hb), [
             (r.rule_code, r.status, r.reason_text) for r in hb
         ]
         # 资产 checks 应回填关键字段
         poster_ar = next(
-            a for a in full["asset_results"] if a["declared_type"] == "POSTER"
+            a for a in full["photo_results"] if a["photo_type"] == "Poster"
         )
         assert poster_ar["checks"].get("date_matches_form") is True
         assert poster_ar["checks"].get("has_bayer_logo") is True
@@ -125,13 +124,13 @@ def main() -> int:
         snap2 = json.loads(
             (ROOT / "docs/fixtures/dup-hit.json").read_text(encoding="utf-8")
         )
-        fo = fetch_object(snap2["assets"][0]["s3_uri"], "image/jpeg")
+        fo = fetch_object(snap2["photos"][0]["file_url"], "image/jpeg")
         ctx2 = [
             _ctx(
-                snap2["assets"][0],
+                snap2["photos"][0],
                 {
                     "clarity_score": 0.9,
-                    "detected_type": "POSTER",
+                    "detected_type": "Poster",
                     "type_confidence": 0.9,
                     "has_bayer_logo": True,
                     "ocr_fields": {"meeting_date": "2026-04-18", "has_watermark": False},

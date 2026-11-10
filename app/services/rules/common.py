@@ -243,32 +243,27 @@ def rule_key_field_match(
 def rule_time_consistency(
     contexts: List[AssetContext], form: dict, options: dict
 ) -> RuleOutcome:
+    """只比对海报/展架等材料上的日程起止时间；不做时间水印检测。"""
     skew = int(_opts(options).get("watermark_time_skew_minutes", 120))
     start = time_to_minutes(form.get("start_time"))
     end = time_to_minutes(form.get("end_time"))
     if start is None or end is None:
         return skip("TIME_CONSISTENCY", "表单无时段")
 
+    # 日程类材料：比对画面上的 start_time / end_time（不是相机时间水印）
+    agenda_types = {"Poster", "Stand", "EDM", "EDMDisplay"}
     related = []
     bad = []
     saw = False
     for c in contexts:
-        if not c.ok:
+        if not c.ok or c.photo_type not in agenda_types:
             continue
         of = c.ocr_fields()
         times = []
-        for key in ("start_time", "watermark_time"):
-            tm = time_to_minutes(of.get(key) if key != "start_time" else of.get(key))
-            if key == "watermark_time":
-                tm = time_to_minutes(of.get("watermark_time"))
-            else:
-                tm = time_to_minutes(of.get("start_time"))
+        for key in ("start_time", "end_time"):
+            tm = time_to_minutes(of.get(key))
             if tm is not None:
                 times.append(tm)
-        # also end_time from poster
-        et = time_to_minutes(of.get("end_time"))
-        if et is not None:
-            times.append(et)
         if not times:
             continue
         saw = True
@@ -278,28 +273,120 @@ def rule_time_consistency(
                 bad.append(c.photo_id)
                 break
     if not saw:
-        return skip("TIME_CONSISTENCY", "无时间信息可抽")
+        return skip("TIME_CONSISTENCY", "无日程时间可抽")
     if bad:
         return fail(
             "TIME_CONSISTENCY",
             "FIELD_MISMATCH",
-            "部分材料时间偏离会议时段: {0}".format(bad),
+            "部分材料日程时间偏离会议时段: {0}".format(bad),
             related=bad,
         )
-    return pass_("TIME_CONSISTENCY", "各图时间与会议时段一致", related=related)
+    return pass_("TIME_CONSISTENCY", "各图日程时间与会议时段一致", related=related)
+
+
+# 大讲堂海报类须出现的赞助方全称
+_BAYER_SPONSOR_TEXT = "拜耳医药保健有限公司"
+
+
+def _sponsor_text_hit(vision: dict) -> Optional[bool]:
+    """True/False/None：赞助方文案是否命中。"""
+    flag = vision.get("has_bayer_sponsor")
+    if flag is True or flag is False:
+        return bool(flag)
+    raw = vision.get("sponsor_text") or ""
+    of = vision.get("ocr_fields") or {}
+    if not raw and isinstance(of, dict):
+        raw = of.get("sponsor_text") or ""
+    blob = "{0}".format(raw)
+    # 兜底：从常见 OCR 拼串里找全称
+    for key in ("meeting_location", "chain_or_store_name", "topic_title"):
+        if isinstance(of, dict) and of.get(key):
+            blob += " {0}".format(of.get(key))
+    norm = "".join(ch for ch in blob if not ch.isspace())
+    target = "".join(ch for ch in _BAYER_SPONSOR_TEXT if not ch.isspace())
+    if not norm:
+        return None
+    return target in norm
 
 
 def rule_bayer_logo(
     contexts: List[AssetContext], project_type: str, options: Optional[dict] = None
 ) -> RuleOutcome:
+    """微型：EDM/EDMDisplay/ProjectIntro 查拜耳 Logo；
+    大讲堂：EDM/Poster/Stand 查图最下方赞助方文案「拜耳医药保健有限公司」。
+    """
+    thr = merge_thresholds(options)
     if project_type == "LECTURE_HALL":
         want = {"Poster", "Stand", "EDM"}
-    else:
-        want = {"EDM", "EDMDisplay", "ProjectIntro"}
+        targets = [c for c in contexts if c.photo_type in want and c.ok]
+        if not targets:
+            return skip("BAYER_LOGO", "无线索材料")
+        sponsor_pass = float(thr.get("sponsor_confidence_pass", 0.55))
+        hits: List[str] = []
+        miss: List[str] = []
+        gray: List[str] = []
+        evidence_rows: List[dict] = []
+        for c in targets:
+            flag = _sponsor_text_hit(c.vision)
+            conf = c.vision.get("sponsor_confidence")
+            try:
+                conf_f = float(conf) if conf is not None else 0.8
+            except (TypeError, ValueError):
+                conf_f = 0.8
+            if flag is True:
+                if conf_f < sponsor_pass:
+                    gray.append(c.photo_id)
+                else:
+                    hits.append(c.photo_id)
+            elif flag is False:
+                miss.append(c.photo_id)
+            else:
+                gray.append(c.photo_id)
+            evidence_rows.append(
+                {
+                    "photo_id": c.photo_id,
+                    "kind": "sponsor",
+                    "flag": flag,
+                    "conf": conf_f,
+                    "sponsor_text": c.vision.get("sponsor_text"),
+                    "expect": _BAYER_SPONSOR_TEXT,
+                }
+            )
+        if miss:
+            return fail(
+                "BAYER_LOGO",
+                "SPONSOR_MISSING",
+                "应检材料底部未检出赞助方「{0}」: {1}".format(
+                    _BAYER_SPONSOR_TEXT, miss
+                ),
+                related=miss,
+                evidence={
+                    "rows": evidence_rows,
+                    "miss": miss,
+                    "gray": gray,
+                    "hits": hits,
+                },
+            )
+        if gray:
+            return uncertain(
+                "BAYER_LOGO",
+                "SPONSOR_UNCERTAIN",
+                "赞助方文案检出置信度灰区",
+                related=gray,
+                evidence={"rows": evidence_rows, "hits": hits},
+            )
+        return pass_(
+            "BAYER_LOGO",
+            "图片最下方赞助方「{0}」均已检出".format(_BAYER_SPONSOR_TEXT),
+            related=hits,
+            evidence={"rows": evidence_rows},
+        )
+
+    # 微型：拜耳 Logo
+    want = {"EDM", "EDMDisplay", "ProjectIntro"}
     targets = [c for c in contexts if c.photo_type in want and c.ok]
     if not targets:
         return skip("BAYER_LOGO", "无线索材料")
-    thr = merge_thresholds(options)
     logo_pass = float(thr.get("logo_confidence_pass", 0.55))
     hits = []
     miss = []
@@ -315,7 +402,7 @@ def rule_bayer_logo(
                 gray.append(c.photo_id)
             else:
                 miss.append(c.photo_id)
-            evidence_rows.append({"photo_id": c.photo_id, "logo": tm})
+            evidence_rows.append({"photo_id": c.photo_id, "kind": "logo", "logo": tm})
             continue
 
         flag = c.vision.get("has_bayer_logo")
@@ -334,9 +421,14 @@ def rule_bayer_logo(
         else:
             gray.append(c.photo_id)
         evidence_rows.append(
-            {"photo_id": c.photo_id, "vision_only": True, "flag": flag, "conf": conf_f}
+            {
+                "photo_id": c.photo_id,
+                "kind": "logo",
+                "vision_only": True,
+                "flag": flag,
+                "conf": conf_f,
+            }
         )
-    # 应检材料均需检出（任一缺失 → FAIL）
     if miss:
         return fail(
             "BAYER_LOGO",
@@ -690,69 +782,162 @@ def rule_topic_reuse(
     return pass_("TOPIC_REUSE", "讲者照 OCR 标题未与历史主题重复", related=related)
 
 
-def rule_watermark(
-    contexts: List[AssetContext], form: dict, options: dict
+# WATERMARK_CONSISTENCY 已下线：时间/日期/地点水印均不审核。
+
+
+def _truthy_flag(vision: dict, key: str) -> Optional[bool]:
+    flag = vision.get(key)
+    if flag is True or flag is False:
+        return bool(flag)
+    return None
+
+
+def _speaker_title_composition(c: AssetContext) -> Dict[str, Any]:
+    """标题合影须同时有：讲者、标题、讲者姓名、日期。"""
+    v = c.vision or {}
+    of = c.ocr_fields()
+    person = _truthy_flag(v, "has_speaker_person")
+    title = of.get("topic_title") or v.get("topic_title")
+    name = of.get("speaker_name_on_slide")
+    if not name:
+        names = of.get("speaker_names")
+        if isinstance(names, list) and names:
+            name = names[0]
+        elif isinstance(names, str) and names.strip():
+            name = names.strip()
+    date = of.get("meeting_date") or v.get("meeting_date")
+    parts = {
+        "has_speaker_person": person,
+        "has_topic_title": bool(title and str(title).strip()),
+        "has_speaker_name": bool(name and str(name).strip()),
+        "has_date": bool(date and str(date).strip()),
+    }
+    missing: List[str] = []
+    if person is False:
+        missing.append("讲者")
+    if not parts["has_topic_title"]:
+        missing.append("标题")
+    if not parts["has_speaker_name"]:
+        missing.append("讲者姓名")
+    if not parts["has_date"]:
+        missing.append("日期")
+    person_unc = person is None
+    return {
+        "ok": not missing and not person_unc,
+        "uncertain": person_unc and not missing,
+        "missing": missing,
+        "parts": parts,
+    }
+
+
+def _speaker_lecture_composition(c: AssetContext) -> Dict[str, Any]:
+    """授课照须同时有：讲者 + PPT/投影。"""
+    v = c.vision or {}
+    person = _truthy_flag(v, "has_speaker_person")
+    ppt = _truthy_flag(v, "has_ppt_screen")
+    missing = []
+    if person is False:
+        missing.append("讲者")
+    if ppt is False:
+        missing.append("PPT")
+    uncertain = (person is None or ppt is None) and not missing
+    ok = person is True and ppt is True
+    return {
+        "ok": ok,
+        "uncertain": uncertain and not ok,
+        "missing": missing if not ok else [],
+        "parts": {"has_speaker_person": person, "has_ppt_screen": ppt},
+    }
+
+
+def rule_speaker_composition(
+    contexts: List[AssetContext], options: Optional[dict] = None
 ) -> RuleOutcome:
-    form_date = form.get("meeting_date")
-    form_loc = form.get("meeting_location") or ""
-    chain = form.get("chain_or_store_name") or ""
-    skew = int(_opts(options).get("watermark_time_skew_minutes", 120))
-    start = time_to_minutes(form.get("start_time"))
-    end = time_to_minutes(form.get("end_time"))
+    """讲者照构图：标题合影=人+标题+姓名+日期；授课照=人+PPT。"""
+    titles = [c for c in contexts if c.photo_type == "SpeakerTitle" and c.ok]
+    lectures = [c for c in contexts if c.photo_type == "SpeakerLecture" and c.ok]
+    if not titles and not lectures:
+        return skip("SPEAKER_COMPOSITION", "无讲者照")
 
-    with_wm = []
-    bad = []
+    fails = []
     uncs = []
-    for c in contexts:
-        if not c.ok:
-            continue
-        of = c.ocr_fields()
-        has = of.get("has_watermark")
-        if has is not True and not of.get("watermark_date") and not of.get(
-            "watermark_location"
-        ):
-            continue
-        with_wm.append(c.photo_id)
-        if _is_blurry(c, options):
+    related = []
+    evidence_rows = []
+    for c in titles:
+        related.append(c.photo_id)
+        if _is_blurry(c, options or {}):
             uncs.append(c.photo_id)
+            evidence_rows.append({"photo_id": c.photo_id, "kind": "title", "blurry": True})
             continue
-        ok = True
-        if of.get("watermark_date") and form_date:
-            if not date_equal(of.get("watermark_date"), form_date):
-                ok = False
-        loc = of.get("watermark_location") or ""
-        if loc and form_loc:
-            if not (
-                fuzzy_contains(loc, form_loc)
-                or fuzzy_contains(loc, chain)
-                or fuzzy_contains(form_loc, loc)
-            ):
-                ok = False
-        wt = time_to_minutes(of.get("watermark_time"))
-        if wt is not None and start is not None and end is not None:
-            if wt < start - skew or wt > end + skew:
-                ok = False
-        if not ok:
-            bad.append(c.photo_id)
+        comp = _speaker_title_composition(c)
+        evidence_rows.append({"photo_id": c.photo_id, "kind": "title", **comp})
+        if comp["ok"]:
+            continue
+        if comp["uncertain"]:
+            uncs.append(c.photo_id)
+        else:
+            fails.append(
+                {
+                    "photo_id": c.photo_id,
+                    "kind": "SpeakerTitle",
+                    "missing": comp["missing"],
+                }
+            )
 
-    if not with_wm:
-        return skip("WATERMARK_CONSISTENCY", "无水印")
-    if bad:
+    for c in lectures:
+        related.append(c.photo_id)
+        if _is_blurry(c, options or {}):
+            uncs.append(c.photo_id)
+            evidence_rows.append(
+                {"photo_id": c.photo_id, "kind": "lecture", "blurry": True}
+            )
+            continue
+        comp = _speaker_lecture_composition(c)
+        evidence_rows.append({"photo_id": c.photo_id, "kind": "lecture", **comp})
+        if comp["ok"]:
+            continue
+        if comp["uncertain"]:
+            uncs.append(c.photo_id)
+        else:
+            fails.append(
+                {
+                    "photo_id": c.photo_id,
+                    "kind": "SpeakerLecture",
+                    "missing": comp["missing"],
+                }
+            )
+
+    if fails:
+        bits = []
+        for f in fails:
+            need = (
+                "讲者+标题+讲者姓名+日期"
+                if f["kind"] == "SpeakerTitle"
+                else "讲者+PPT"
+            )
+            bits.append(
+                "{0}缺{1}（须同时有{2}）".format(
+                    f["photo_id"], "、".join(f["missing"]) or "要素", need
+                )
+            )
         return fail(
-            "WATERMARK_CONSISTENCY",
-            "FIELD_MISMATCH",
-            "水印日期/地点/时间与表单不符: {0}".format(bad),
-            related=bad,
+            "SPEAKER_COMPOSITION",
+            "TYPE_MISMATCH",
+            "；".join(bits),
+            related=[f["photo_id"] for f in fails],
+            evidence={"rows": evidence_rows, "fails": fails},
         )
     if uncs:
         return uncertain(
-            "WATERMARK_CONSISTENCY",
+            "SPEAKER_COMPOSITION",
             "OCR_LOW_CONFIDENCE",
-            "水印 OCR 差",
+            "讲者照构图要素识别不清",
             related=uncs,
+            evidence={"rows": evidence_rows},
         )
     return pass_(
-        "WATERMARK_CONSISTENCY",
-        "水印日期地点与表单一致",
-        related=with_wm,
+        "SPEAKER_COMPOSITION",
+        "标题合影含讲者/标题/姓名/日期；授课照含讲者与PPT",
+        related=related,
+        evidence={"rows": evidence_rows},
     )

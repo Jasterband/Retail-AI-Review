@@ -36,13 +36,13 @@
         },
         {
           "id": "bayer_logo",
-          "label": "拜耳 Logo",
+          "label": "拜耳品牌标识",
           "rule_code": "BAYER_LOGO",
           "projects": [
             "LECTURE_HALL",
             "MICRO"
           ],
-          "detail": "大讲堂：海报+展架；微型：电子日程+项目介绍。"
+          "detail": "微型：电子日程海报/展示/项目介绍查拜耳 Logo；大讲堂：电子日程海报/日程海报/日程展架查图最下方赞助方「拜耳医药保健有限公司」。"
         },
         {
           "id": "signin_duration",
@@ -63,16 +63,6 @@
             "MICRO"
           ],
           "detail": "每张独立：表头时间/地点；行内姓名/职称/连锁/签名齐；说明/其他不强制。"
-        },
-        {
-          "id": "watermark",
-          "label": "水印一致性",
-          "rule_code": "WATERMARK_CONSISTENCY",
-          "projects": [
-            "LECTURE_HALL",
-            "MICRO"
-          ],
-          "detail": "有水印的图：时间/地点与表单一致。"
         },
         {
           "id": "image_dup",
@@ -145,6 +135,16 @@
             "LECTURE_HALL"
           ],
           "detail": "每位讲者各一张合影 + 一张讲课照。"
+        },
+        {
+          "id": "speaker_composition",
+          "label": "讲者照构图完整",
+          "rule_code": "SPEAKER_COMPOSITION",
+          "projects": [
+            "LECTURE_HALL",
+            "MICRO"
+          ],
+          "detail": "标题合影须同时有讲者、标题、讲者姓名、日期；授课照须同时有讲者与PPT。"
         },
         {
           "id": "speaker_topic",

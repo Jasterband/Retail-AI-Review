@@ -1,99 +1,97 @@
 {
-  "task_id": "req-micro-000938-001",
-  "meeting_id": "1938",
-  "meeting_no": "000938",
-  "project_type": "MICRO",
-  "meeting_type": "DUAL",
-  "project_id": "2",
-  "form": {
-    "meeting_name": "双讲师",
-    "meeting_date": "2026-09-03",
-    "start_time": "14:00",
-    "end_time": "15:10",
-    "chain_or_store_name": "洛阳德心堂药业有限公司",
-    "meeting_location": "洛阳市洛阳德心堂药业有限公司红山二店",
-    "total_attendees": 14,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "李吉鹏",
-        "topic": "微型药店健康服务赋能",
-        "store_name": "红山二店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "2",
-        "speaker_name": "董灵娟",
-        "topic": "门店药学服务实践",
-        "store_name": "红山二店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "2",
+    "projectType": 2,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "1938",
+    "meetingNo": "000938",
+    "meetingName": "双讲师",
+    "meetingType": 2,
+    "meetingDate": "2026-09-03",
+    "startTime": "14:00",
+    "endTime": "15:10",
+    "chainName": null,
+    "pharmacyName": "洛阳德心堂药业有限公司",
+    "meetingLocation": "洛阳市洛阳德心堂药业有限公司红山二店",
+    "remark": null,
+    "totalAttendees": 14
+  },
+  "speakers": [
     {
-      "photo_id": "93801",
-      "photo_type": "EDM",
-      "file_url": "s3://pe-meetings/micro/000938/agenda.jpg",
-      "content_type": "image/jpeg",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "红山二店",
+      "speakerName": "李吉鹏",
+      "topic": "微型药店健康服务赋能",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "93804",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/micro/000938/speaker1.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "93802",
-      "photo_type": "ProjectIntro",
-      "file_url": "s3://pe-meetings/micro/000938/intro.jpg",
-      "content_type": "image/jpeg",
-      "sort": 2
+      "speakerId": "2",
+      "identityName": "药师",
+      "storeName": "红山二店",
+      "speakerName": "董灵娟",
+      "topic": "门店药学服务实践",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "93805",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/micro/000938/speaker2.jpg",
+          "fileName": null
+        }
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "93801",
+      "photoType": "EDM",
+      "fileUrl": "s3://pe-meetings/micro/000938/agenda.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "93803",
-      "photo_type": "EDMDisplay",
-      "file_url": "s3://pe-meetings/micro/000938/display.jpg",
-      "content_type": "image/jpeg",
-      "sort": 3
+      "photoId": "93802",
+      "photoType": "ProjectIntro",
+      "fileUrl": "s3://pe-meetings/micro/000938/intro.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "93804",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/micro/000938/speaker1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 4
+      "photoId": "93803",
+      "photoType": "EDMDisplay",
+      "fileUrl": "s3://pe-meetings/micro/000938/display.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "93805",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/micro/000938/speaker2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 5
+      "photoId": "93806",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/micro/000938/panorama1.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "93806",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/micro/000938/panorama1.jpg",
-      "content_type": "image/jpeg",
-      "sort": 6
+      "photoId": "93807",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/micro/000938/panorama2.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "93807",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/micro/000938/panorama2.jpg",
-      "content_type": "image/jpeg",
-      "sort": 7
-    },
-    {
-      "photo_id": "93808",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/micro/000938/signin.pdf",
-      "content_type": "application/pdf",
-      "sort": 8
+      "photoId": "93808",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/micro/000938/signin.pdf",
+      "fileName": null
     }
   ],
   "refs": {

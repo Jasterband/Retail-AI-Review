@@ -9,6 +9,7 @@ from typing import Any, Dict, Optional
 DEFAULTS: Dict[str, Any] = {
     "clarity_threshold": 0.60,
     "human_confidence_threshold": 0.75,
+    # 海报等日程起止时间容差；不做时间水印检测
     "watermark_time_skew_minutes": 120,
     "name_match_mode": "fuzzy",
     "image_phash_max_distance": 10,
@@ -27,6 +28,7 @@ DEFAULTS: Dict[str, Any] = {
     "signin_audience_per_speaker": 6,
     "signin_min_store_kinds": 2,
     "logo_confidence_pass": 0.55,
+    "sponsor_confidence_pass": 0.55,
 }
 
 

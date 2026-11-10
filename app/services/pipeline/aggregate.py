@@ -289,8 +289,26 @@ def _build_checks(
         "type_match": True if pt else None,
         "is_clear": None,
         "image_not_duplicated": not image_dup_hit,
-        "has_bayer_logo": _coerce_bool(v.get("has_bayer_logo")),
+        "has_bayer_logo": None,
+        "has_bayer_sponsor": None,
     }
+    # 微型海报/展示查 Logo；大讲堂海报/展架/电子日程查赞助方文案
+    hall_brand_types = {"Poster", "Stand", "EDM"}
+    micro_logo_types = {"EDM", "EDMDisplay", "ProjectIntro"}
+    if project_type == "LECTURE_HALL" and pt in hall_brand_types:
+        sponsor = _coerce_bool(v.get("has_bayer_sponsor"))
+        if sponsor is None:
+            raw = v.get("sponsor_text") or ""
+            expect = "拜耳医药保健有限公司"
+            if raw:
+                sponsor = expect.replace(" ", "") in "".join(
+                    ch for ch in str(raw) if not ch.isspace()
+                )
+        checks["has_bayer_sponsor"] = sponsor
+    elif project_type == "MICRO" and pt in micro_logo_types:
+        checks["has_bayer_logo"] = _coerce_bool(v.get("has_bayer_logo"))
+    else:
+        checks["has_bayer_logo"] = _coerce_bool(v.get("has_bayer_logo"))
     score = ctx.clarity_score()
     if score is not None:
         checks["is_clear"] = score >= clarity_thr
@@ -323,8 +341,9 @@ def _build_checks(
         else:
             checks["speakers_match_form"] = None
 
+        # 只比对材料上的日程起止时间；不做时间水印检测
         times = []
-        for key in ("start_time", "end_time", "watermark_time"):
+        for key in ("start_time", "end_time"):
             tm_m = time_to_minutes(of.get(key))
             if tm_m is not None:
                 times.append(tm_m)
@@ -382,7 +401,34 @@ def _build_checks(
             checks["speaker_name_visible_ok"] = True
         else:
             checks["speaker_name_visible_ok"] = None
-    # SpeakerLecture（授课照）：不做主题比对 / 主题查重 / 讲者姓名检测点
+
+        # 构图：讲者 + 标题 + 讲者姓名 + 日期 须同时具备
+        person = _coerce_bool(v.get("has_speaker_person"))
+        date_v = of.get("meeting_date")
+        checks["has_speaker_person"] = person
+        checks["has_topic_title"] = bool(of.get("topic_title"))
+        checks["has_speaker_name"] = bool(visible)
+        checks["has_date"] = bool(date_v)
+        if person is None:
+            checks["speaker_title_composition_ok"] = None
+        else:
+            checks["speaker_title_composition_ok"] = bool(
+                person
+                and checks["has_topic_title"]
+                and checks["has_speaker_name"]
+                and checks["has_date"]
+            )
+
+    if pt == "SpeakerLecture":
+        # 构图：讲者 + PPT 须同时具备；不做主题比对 / 主题查重
+        person = _coerce_bool(v.get("has_speaker_person"))
+        ppt = _coerce_bool(v.get("has_ppt_screen"))
+        checks["has_speaker_person"] = person
+        checks["has_ppt_screen"] = ppt
+        if person is None or ppt is None:
+            checks["speaker_lecture_composition_ok"] = None
+        else:
+            checks["speaker_lecture_composition_ok"] = bool(person and ppt)
 
     if pt == "Panorama":
         pc = v.get("people_count")
@@ -427,7 +473,7 @@ def _build_checks(
         kind = v.get("ppt_page_kind")
         checks["ppt_page_kind_ok"] = kind == "AGENDA" if kind else None
 
-    if tm.get("bayer_logo"):
+    if tm.get("bayer_logo") and project_type == "MICRO" and pt in micro_logo_types:
         checks["has_bayer_logo"] = tm["bayer_logo"].get("hit")
     if tm.get("handbook_current") and pt == "Manual":
         checks["handbook_detected"] = tm["handbook_current"].get("hit")

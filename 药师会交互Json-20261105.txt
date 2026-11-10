@@ -1,0 +1,70 @@
+{
+  "project": {
+    "projectId": "P2026Q1",
+    "projectType": 1,
+    "projectName": "2026年Q1药师大讲堂",
+    "startDate": "2026-01-01",
+    "endDate": "2026-03-31"
+  },
+  "meeting": {
+    "meetingId": "M0001",
+    "meetingNo": "SM2026010001",
+    "meetingName": "药师会-第一期",
+    "meetingType": 0,
+    "meetingTypeName": "",
+    "meetingDate": "2026-01-15",
+    "startTime": "14:00",
+    "endTime": "16:00",
+    "durationMinutes": 120,
+    "chainName": "国大药房",
+    "pharmacyName": null,
+    "meetingLocation": "上海市静安区xx路xx号",
+    "remark": "本场为第一季度重点场次",
+    "totalAttendees": 42,
+    "otherCost": 350.0
+  },
+  "speakers": [
+    {
+      "speakerId": "S0001",
+      "identityName": "药师",
+      "storeName": "国大药房静安店",
+      "speakerName": "张三",
+      "topic": "高血压用药指导",
+      "serviceMinutes": 40,
+      "lectureFee": 1200.0,
+      "tax": 72.0,
+      "photos": [
+        {
+          "photoId": "PH0001",
+          "photoType": "SpeakerTitle",
+          "photoTypeName": "标题合影",
+          "fileName": "标题合影_张三.jpg",
+          "fileUrl": "https://xxx/标题合影_张三.jpg"
+        },
+        {
+          "photoId": "PH0002",
+          "photoType": "SpeakerLecture",
+          "photoTypeName": "讲课照片",
+          "fileName": "讲课照片_张三.jpg",
+          "fileUrl": "https://xxx/讲课照片_张三.jpg"
+        }
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "PH0010",
+      "photoType": "Panorama",
+      "photoTypeName": "参会人员全景",
+      "fileName": "参会人员全景.jpg",
+      "fileUrl": "https://xxx/参会人员全景.jpg"
+    },
+    {
+      "photoId": "PH0011",
+      "photoType": "SignSheet",
+      "photoTypeName": "签到表",
+      "fileName": "签到表.pdf",
+      "fileUrl": "https://xxx/签到表.pdf"
+    }
+  ]
+}

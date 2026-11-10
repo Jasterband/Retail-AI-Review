@@ -1,181 +1,169 @@
 {
-  "task_id": "req-hall-208-golden-001",
-  "meeting_id": "1208",
-  "meeting_no": "208",
-  "project_type": "LECTURE_HALL",
-  "meeting_type": null,
-  "project_id": "1",
-  "form": {
-    "meeting_name": "菁英药师大讲堂项目",
-    "meeting_date": "2026-07-10",
-    "start_time": "14:00",
-    "end_time": "16:10",
-    "chain_or_store_name": "康佰家医药集团股份有限公司",
-    "meeting_location": "康佰家医药集团股份有限公司",
-    "total_attendees": 36,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "彭艳梅",
-        "topic": "合理用药与患者教育",
-        "store_name": "康佰家医药集团股",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "2",
-        "speaker_name": "蔡诗晴",
-        "topic": "慢病管理实践分享",
-        "store_name": "康佰家医药集团股",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "3",
-        "speaker_name": "郭雅惠",
-        "topic": "药学服务要点",
-        "store_name": "康佰家医药集团股",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "4",
-        "speaker_name": "蔡黎宁",
-        "topic": "门店健康服务赋能",
-        "store_name": "康佰家医药集团股",
-        "service_minutes": 40,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "1",
+    "projectType": 1,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "1208",
+    "meetingNo": "208",
+    "meetingName": "菁英药师大讲堂项目",
+    "meetingType": 0,
+    "meetingDate": "2026-07-10",
+    "startTime": "14:00",
+    "endTime": "16:10",
+    "chainName": "康佰家医药集团股份有限公司",
+    "pharmacyName": null,
+    "meetingLocation": "康佰家医药集团股份有限公司",
+    "remark": null,
+    "totalAttendees": 36
+  },
+  "speakers": [
     {
-      "photo_id": "20801",
-      "photo_type": "EDM",
-      "file_url": "s3://pe-meetings/hall/208/eposter.png",
-      "content_type": "image/png",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "康佰家医药集团股",
+      "speakerName": "彭艳梅",
+      "topic": "合理用药与患者教育",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "20853",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/208/speaker1_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "20854",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/208/speaker1_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "20811",
-      "photo_type": "Manual",
-      "file_url": "s3://pe-meetings/hall/208/handbook.jpg",
-      "content_type": "image/jpeg",
-      "sort": 2
+      "speakerId": "2",
+      "identityName": "药师",
+      "storeName": "康佰家医药集团股",
+      "speakerName": "蔡诗晴",
+      "topic": "慢病管理实践分享",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "20855",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/208/speaker2_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "20856",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/208/speaker2_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "20812",
-      "photo_type": "Poster",
-      "file_url": "s3://pe-meetings/hall/208/poster.jpg",
-      "content_type": "image/jpeg",
-      "sort": 3
+      "speakerId": "3",
+      "identityName": "药师",
+      "storeName": "康佰家医药集团股",
+      "speakerName": "郭雅惠",
+      "topic": "药学服务要点",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "20857",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/208/speaker3_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "20858",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/208/speaker3_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "20813",
-      "photo_type": "Stand",
-      "file_url": "s3://pe-meetings/hall/208/stand.jpg",
-      "content_type": "image/jpeg",
-      "sort": 4
+      "speakerId": "4",
+      "identityName": "药师",
+      "storeName": "康佰家医药集团股",
+      "speakerName": "蔡黎宁",
+      "topic": "门店健康服务赋能",
+      "serviceMinutes": 40,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "20859",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/208/speaker4_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "20860",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/208/speaker4_2.jpg",
+          "fileName": null
+        }
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "20801",
+      "photoType": "EDM",
+      "fileUrl": "s3://pe-meetings/hall/208/eposter.png",
+      "fileName": null
     },
     {
-      "photo_id": "20814",
-      "photo_type": "TableCard",
-      "file_url": "s3://pe-meetings/hall/208/name_card.jpg",
-      "content_type": "image/jpeg",
-      "sort": 5
+      "photoId": "20811",
+      "photoType": "Manual",
+      "fileUrl": "s3://pe-meetings/hall/208/handbook.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "20853",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/208/speaker1_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 6
+      "photoId": "20812",
+      "photoType": "Poster",
+      "fileUrl": "s3://pe-meetings/hall/208/poster.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "20854",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/208/speaker1_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 7
+      "photoId": "20813",
+      "photoType": "Stand",
+      "fileUrl": "s3://pe-meetings/hall/208/stand.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "20855",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/208/speaker2_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 8
+      "photoId": "20814",
+      "photoType": "TableCard",
+      "fileUrl": "s3://pe-meetings/hall/208/name_card.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "20856",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/208/speaker2_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 9
+      "photoId": "20880",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/hall/208/panorama.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "20857",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/208/speaker3_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "3",
-      "sort": 10
+      "photoId": "20891",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/hall/208/signin_1.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "20858",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/208/speaker3_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "3",
-      "sort": 11
-    },
-    {
-      "photo_id": "20859",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/208/speaker4_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "4",
-      "sort": 12
-    },
-    {
-      "photo_id": "20860",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/208/speaker4_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "4",
-      "sort": 13
-    },
-    {
-      "photo_id": "20880",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/hall/208/panorama.jpg",
-      "content_type": "image/jpeg",
-      "sort": 14
-    },
-    {
-      "photo_id": "20891",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/hall/208/signin_1.jpg",
-      "content_type": "image/jpeg",
-      "sort": 15
-    },
-    {
-      "photo_id": "20892",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/hall/208/signin_2.jpg",
-      "content_type": "image/jpeg",
-      "sort": 16
+      "photoId": "20892",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/hall/208/signin_2.jpg",
+      "fileName": null
     }
   ],
   "refs": {

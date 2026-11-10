@@ -1,20 +1,26 @@
 from __future__ import annotations
 
+import uuid
 from typing import Literal, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Query, status
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from app.auth import require_token
 from app.db import get_db
 from app.models import AiCheckJob
 from app.schemas.request import RetailMeetingCheckRequest
-from app.schemas.response import AcceptedResponse, ErrorEnvelope, RunningResponse
+from app.schemas.response import AcceptedResponse, RunningResponse
 from app.services.check_runner import schedule_check
 from app.services.projection import project_response
 
 router = APIRouter(tags=["RetailMeetingChecks"])
+
+
+def _new_task_id() -> str:
+    # 8~50；req- + uuid4 hex
+    return "req-" + uuid.uuid4().hex
 
 
 @router.get("/health")
@@ -35,36 +41,36 @@ def create_check(
     x_callback_url: Optional[str] = Header(default=None, alias="X-Callback-URL"),
     idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
 ) -> AcceptedResponse:
-    if idempotency_key and idempotency_key != body.task_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "error": {
-                    "code": "IDEMPOTENCY_MISMATCH",
-                    "message": "Idempotency-Key 须与 task_id 一致",
-                    "retryable": False,
-                }
-            },
+    if idempotency_key:
+        existing = db.scalar(
+            select(AiCheckJob).where(
+                text(
+                    "json_extract(pe_snapshot, '$.idempotency_key') = :k"
+                ).bindparams(k=idempotency_key)
+            )
         )
+        if existing:
+            return AcceptedResponse(task_id=existing.task_id)
 
-    existing = db.scalar(
-        select(AiCheckJob).where(AiCheckJob.task_id == body.task_id)
-    )
-    if existing:
-        return AcceptedResponse(task_id=existing.task_id)
+    task_id = _new_task_id()
+    # 入库 snap 为管道形态；HTTP 契约为 PE 交互 JSON
+    snap = body.to_pipeline_snap()
+    snap["task_id"] = task_id
+    if idempotency_key:
+        snap["idempotency_key"] = idempotency_key
 
     max_attempt = db.scalar(
         select(func.max(AiCheckJob.attempt_no)).where(
-            AiCheckJob.meeting_id == body.meeting_id
+            AiCheckJob.meeting_id == body.meeting.meetingId
         )
     )
     attempt_no = int(max_attempt or 0) + 1
 
     job = AiCheckJob(
-        meeting_id=body.meeting_id,
+        meeting_id=body.meeting.meetingId,
         attempt_no=attempt_no,
-        task_id=body.task_id,
-        pe_snapshot=body.model_dump(mode="json"),
+        task_id=task_id,
+        pe_snapshot=snap,
         processing_status="RUNNING",
         callback_url=x_callback_url,
     )

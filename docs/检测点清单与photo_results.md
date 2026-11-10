@@ -125,7 +125,7 @@
 
 | 检测点 key | true 表示 |
 |------------|-----------|
-| `has_bayer_logo` | 含拜耳 Logo |
+| `has_bayer_sponsor` | 图片最下方页脚含赞助方全称「拜耳医药保健有限公司」（不要求十字 Logo） |
 | `date_matches_form` | 日期与表单一致 |
 | `time_matches_form` | 时间与表单一致 |
 | `location_matches_form` | 地点与 `form.meeting_location` 一致 |
@@ -147,15 +147,19 @@
 | `handbook_detected` | 识别为规定宣传手册 |
 | `handbook_not_stale` | 非旧版封面 |
 
-### 3.5 大讲堂 · 讲者照（SpeakerTitle）
+### 3.5 大讲堂 · 讲者照（SpeakerTitle / SpeakerLecture）
 
 | 检测点 key | true 表示 |
 |------------|-----------|
-| `topic_matches_form` | 课件标题与该讲者 `topic` 一致（**仅 SpeakerTitle**；`SpeakerLecture` 不产出） |
-| `topic_not_reused_in_period` | OCR 标题未与历史会议重复（**仅 SpeakerTitle**；见 §4.B；`SpeakerLecture` 不产出） |
-| `speaker_name_visible_ok` | 能关联到正确讲者（若可抽名；**仅 SpeakerTitle**；`SpeakerLecture` 不产出） |
+| `speaker_title_composition_ok` | **SpeakerTitle**：同时有讲者、标题、讲者姓名、日期 |
+| `has_speaker_person` / `has_topic_title` / `has_speaker_name` / `has_date` | 标题合影各要素 |
+| `speaker_lecture_composition_ok` | **SpeakerLecture**：同时有讲者与 PPT/投影 |
+| `has_ppt_screen` | 授课照可见 PPT/投影 |
+| `topic_matches_form` | 课件标题与该讲者 `topic` 一致（**仅 SpeakerTitle**） |
+| `topic_not_reused_in_period` | OCR 标题未与历史会议重复（**仅 SpeakerTitle**；见 §4.B） |
+| `speaker_name_visible_ok` | 能关联到正确讲者（**仅 SpeakerTitle**） |
 
-> 讲者照同时做：通用 **图片查重** + **主题不重复**（抽标题）。
+> 讲者照同时做：通用 **图片查重** + 构图完整（`SPEAKER_COMPOSITION`）+ **主题不重复**（仅标题合影抽标题）。
 
 ### 3.6 全景（Panorama）
 
@@ -205,7 +209,8 @@
 | `PANORAMA_COUNT` | 多张全景人数合计是否达标 |
 | `IMAGE_DUP` | 是否盗用他场现场照（pHash/embedding，仅跨会，见 §4.A） |
 | `TOPIC_REUSE` | **讲者照** OCR 标题是否与历史会议主题重复（见 §4.B） |
-| `TIME_CONSISTENCY` | 多图时间是否一致 |
+| `TIME_CONSISTENCY` | 海报等材料日程时间是否落在会议时段（不做时间水印） |
+| ~~`WATERMARK_CONSISTENCY`~~ | 已下线（时间/日期/地点水印均不审） |
 | `KEY_FIELD_MATCH` | 跨材料交叉比对汇总 |
 | `SPEAKER_SHOT_PAIR` | 每位讲者是否两类照齐全 |
 | `SIGNIN_RATIO_AND_STORES` | 微型签到人数与门店 |
@@ -218,7 +223,7 @@
   "rule_code": "BAYER_LOGO",
   "passed": true,
   "status": "PASS",
-  "reason_text": "海报与展架均检出拜耳Logo"
+  "reason_text": "赞助方「拜耳医药保健有限公司」均已检出"
 }
 ```
 

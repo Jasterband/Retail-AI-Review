@@ -1,66 +1,66 @@
 {
-  "task_id": "req-micro-001453-fail-001",
-  "meeting_id": "101453",
-  "meeting_no": "001453",
-  "project_type": "MICRO",
-  "meeting_type": "SINGLE",
-  "project_id": "2",
-  "form": {
-    "meeting_name": "单讲师",
-    "meeting_date": "2026-09-30",
-    "start_time": "14:00",
-    "end_time": "14:45",
-    "chain_or_store_name": "河南美锐大药房连锁有限公司平桥平西街分店",
-    "meeting_location": "信阳市河南美锐大药房连锁有限公司平桥平西街分店",
-    "total_attendees": 6,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "讲者",
-        "topic": "微型药店健康服务赋能",
-        "store_name": "河南美锐大药房连锁有限公司平桥平西街分店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "2",
+    "projectType": 2,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "101453",
+    "meetingNo": "001453",
+    "meetingName": "单讲师",
+    "meetingType": 1,
+    "meetingDate": "2026-09-30",
+    "startTime": "14:00",
+    "endTime": "14:45",
+    "chainName": null,
+    "pharmacyName": "河南美锐大药房连锁有限公司平桥平西街分店",
+    "meetingLocation": "信阳市河南美锐大药房连锁有限公司平桥平西街分店",
+    "remark": null,
+    "totalAttendees": 6
+  },
+  "speakers": [
     {
-      "photo_id": "14531",
-      "photo_type": "EDM",
-      "file_url": "s3://pe-meetings/micro/001453/agenda.png",
-      "content_type": "image/png",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "河南美锐大药房连锁有限公司平桥平西街分店",
+      "speakerName": "讲者",
+      "topic": "微型药店健康服务赋能",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": []
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "14531",
+      "photoType": "EDM",
+      "fileUrl": "s3://pe-meetings/micro/001453/agenda.png",
+      "fileName": null
     },
     {
-      "photo_id": "14532",
-      "photo_type": "ProjectIntro",
-      "file_url": "s3://pe-meetings/micro/001453/intro.jpeg",
-      "content_type": "image/jpeg",
-      "sort": 2
+      "photoId": "14532",
+      "photoType": "ProjectIntro",
+      "fileUrl": "s3://pe-meetings/micro/001453/intro.jpeg",
+      "fileName": null
     },
     {
-      "photo_id": "14533",
-      "photo_type": "EDMDisplay",
-      "file_url": "s3://pe-meetings/micro/001453/display.jpeg",
-      "content_type": "image/jpeg",
-      "sort": 3
+      "photoId": "14533",
+      "photoType": "EDMDisplay",
+      "fileUrl": "s3://pe-meetings/micro/001453/display.jpeg",
+      "fileName": null
     },
     {
-      "photo_id": "14535",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/micro/001453/panorama.jpeg",
-      "content_type": "image/jpeg",
-      "sort": 4
+      "photoId": "14535",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/micro/001453/panorama.jpeg",
+      "fileName": null
     },
     {
-      "photo_id": "14536",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/micro/001453/signin.pdf",
-      "content_type": "application/pdf",
-      "sort": 5
+      "photoId": "14536",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/micro/001453/signin.pdf",
+      "fileName": null
     }
   ],
   "refs": {

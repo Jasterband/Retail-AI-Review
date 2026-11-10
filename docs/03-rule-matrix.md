@@ -2,19 +2,19 @@
 
 默认阈值（可被请求 `options` 覆盖）：
 
-| 参数 | 默认值 |
-|------|--------|
-| clarity_threshold | 0.60 |
-| human_confidence_threshold | 0.75 |
-| watermark_time_skew_minutes | 120 |
-| name_match_mode | fuzzy |
-| template_similarity_pass | ≥ 0.85 → PASS |
-| template_similarity_uncertain | 0.65 ~ 0.85 → UNCERTAIN |
-| template_similarity_fail | < 0.65 → FAIL |
-| topic_match_mode | exact（归一化后逐字；PPT「字一模一样」） |
-| panorama 人数容差 | 计数 confidence < 0.7 → UNCERTAIN |
-| image_phash_max_distance | 默认 10（≤ 则判 similar 重复） |
-| image_similarity_threshold | 默认 0.92（embedding 余弦 ≥ 则判 similar 重复） |
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| clarity_threshold | 0.60 | |
+| human_confidence_threshold | 0.75 | |
+| watermark_time_skew_minutes | 120 | 仅海报等日程起止时间容差；不做时间水印检测 |
+| name_match_mode | fuzzy | |
+| template_similarity_pass | ≥ 0.85 → PASS | |
+| template_similarity_uncertain | 0.65 ~ 0.85 → UNCERTAIN | |
+| template_similarity_fail | < 0.65 → FAIL | |
+| topic_match_mode | exact（归一化后逐字；PPT「字一模一样」） | |
+| panorama 人数容差 | 计数 confidence < 0.7 → UNCERTAIN | |
+| image_phash_max_distance | 默认 10（≤ 则判 similar 重复） | |
+| image_similarity_threshold | 默认 0.92（embedding 余弦 ≥ 则判 similar 重复） | |
 
 **UNCERTAIN 策略：** 该规则 `trigger_human=true`；若无硬 FAIL，总状态 `NEED_HUMAN`。
 
@@ -30,14 +30,14 @@
 | ASSET_TYPE_CHECK | 全部照片 + 声明 type | detected_type 与 photo_type 一致；讲者照可抽姓名 | 明显类别错误 | 类别置信度 < human_confidence_threshold | PDF 签到可放宽视觉分类 |
 | CLARITY | 全部图 | clarity ≥ clarity_threshold | —（单独一般不 FAIL） | 模糊且该图承载关键规则 | PDF 页面渲染失败走 ERROR/UNCERTAIN |
 | KEY_FIELD_MATCH | 海报/展架/讲者照/全景/签到 + form | 抽取 date/time/location/speaker_names 与 form 交叉比对；地点比 `meeting_location`；姓名按 name_match_mode | 高置信且不一致 | OCR conf 低或字段缺失 | 无对应材料 |
-| TIME_CONSISTENCY | 含时间的照片（水印/海报） | 各图时间落在会议时段 ± skew；大讲堂强调场内时间一致 | 高置信跨日/明显偏离 | 部分图无时间可抽 | 无时间信息则 SKIP |
-| BAYER_LOGO | 大讲堂：Poster+Stand；微型：EDM + ProjectIntro（及展示图中 PPT） | 检出拜耳 Logo（与 logo_ref 匹配） | 应检材料均未检出 | 检出 conf 灰区 | 材料缺失时由 ASSET_MISSING 覆盖 |
+| TIME_CONSISTENCY | 海报/展架/电子日程等 | 画面上的日程起止时间落在会议时段 ± skew；**不读时间水印** | 高置信明显偏离 | 部分图无日程时间可抽 | 无日程时间则 SKIP |
+| BAYER_LOGO | 大讲堂：EDM+Poster+Stand；微型：EDM+EDMDisplay+ProjectIntro | **微型**：检出拜耳十字 Logo（可与 logo_ref 匹配）；**大讲堂**：图片**最下方**页脚检出赞助方全称「拜耳医药保健有限公司」（不要求 Logo） | 应检材料均未检出 | 检出 conf 灰区 | 材料缺失时由 ASSET_MISSING 覆盖 |
 | PANORAMA_COUNT | Panorama（可多张合计） | 大讲堂 ≥35；微型 SINGLE≥6、DUAL≥12 | 高置信低于阈值 | 计数 conf < 0.7 | 无全景 |
 | SIGNIN_DURATION | SignSheet（多页合并） | 多张签到表合并后取可读最大时长：大讲堂 >120；微型 SINGLE>30、DUAL>60；模版=打印手签表 | 高置信不足 | 模糊/手写难读 | 无签到 |
 | SIGNIN_COMPLETE | SignSheet（每张独立） | 表头（若有）时间/时长/地点已填；已占用行姓名/职称/连锁/签名齐；说明/其他不强制 | 任一张缺项 | 模糊难判 | 无签到 |
 | IMAGE_DUP | **本场全部照片** pHash/embedding vs **其他会议** `image_dup_history` | **跨会议不得盗用/混用现场照**；近似相似也算。**不查会内**相似图 | 命中其他 meeting | 指纹算不出 → UNCERTAIN | 库空（首场）或无图可读 |
 | TOPIC_REUSE | **仅讲者 SpeakerTitle**（优先）OCR 标题 + form.topic + topic_history | 同期内主题/标题归一化后不得与他场重复（范围见 refs） | 讲者照标题命中历史 | OCR 标题不清 | 库空，或无标题合影/抽不出标题 |
-| WATERMARK_CONSISTENCY | 含水印的图 | 水印日期≈meeting_date；地点文本与 meeting_location / chain_or_store_name 模糊匹配；时间在时段±skew | 高置信日期错误 | 无水印或 OCR 差 → 有水印期望时 UNCERTAIN，无水印则 SKIP | 无水印 |
+| SPEAKER_COMPOSITION | SpeakerTitle / SpeakerLecture | **标题合影**须同时有讲者、标题、讲者姓名、日期；**授课照**须同时有讲者与 PPT/投影 | 缺任一要素 | 人物/PPT 识别不清 | 无讲者照 |
 
 ---
 
@@ -97,7 +97,7 @@
 | SIGNIN_COMPLETE | ✓ | ✓ |
 | IMAGE_DUP | ✓ | ✓ |
 | TOPIC_REUSE | ✓（大讲堂必做） | ✓（若有标题合影则做） |
-| WATERMARK_CONSISTENCY | ✓ | ✓ |
+| SPEAKER_COMPOSITION | ✓ | ✓（仅 SpeakerTitle 四要素；无授课照） |
 | NAME_CARD_SPEAKER_MATCH | ✓ | SKIP |
 | HANDBOOK_DETECT | ✓ | SKIP |
 | HANDBOOK_NOT_STALE | ✓ | SKIP |
@@ -115,11 +115,12 @@
 
 - `KEY_FIELD_MATCH`：海报/展架日期时间地点与表单一致
 - `NAME_CARD_SPEAKER_MATCH`：台卡姓名与系统讲者一致（列出姓名）
-- `BAYER_LOGO`：海报与展架（或微型权益页）检出拜耳 Logo
+- `BAYER_LOGO`：大讲堂海报/展架/电子日程检出赞助方「拜耳医药保健有限公司」；微型电子日程/展示/项目介绍检出拜耳 Logo
 - `PANORAMA_COUNT`：全景合计 N 人，满足阈值
 - `HANDBOOK_DETECT`：识别到当期宣传手册
 - `PPT_TEMPLATE_MATCH`：现场公示 PPT 与规定模版一致
 - `IMAGE_DUP`：全部照片未盗用其他会议现场照（pHash/embedding；不查会内）
 - `TOPIC_REUSE`：讲者照 OCR 标题未与历史主题字符串重复
+- `SPEAKER_COMPOSITION`：标题合影含讲者/标题/姓名/日期；授课照含讲者与 PPT
 
 不合格时 `summary_failed` 使用 `reason_text` 聚合，避免只给「不通过」。

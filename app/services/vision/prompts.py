@@ -14,6 +14,11 @@ SCHEMA_HINT = """
 {
   "has_bayer_logo": boolean|null,
   "logo_confidence": number|null,
+  "has_bayer_sponsor": boolean|null,
+  "sponsor_confidence": number|null,
+  "sponsor_text": string|null,
+  "has_speaker_person": boolean|null,
+  "has_ppt_screen": boolean|null,
   "handbook_ok": boolean|null,
   "handbook_year": number|null,
   "ocr_fields": {
@@ -25,11 +30,7 @@ SCHEMA_HINT = """
     "chain_or_store_name": string|null,
     "speaker_names": string[]|null,
     "topic_title": string|null,
-    "speaker_name_on_slide": string|null,
-    "watermark_date": string|null,
-    "watermark_time": string|null,
-    "watermark_location": string|null,
-    "has_watermark": boolean|null
+    "speaker_name_on_slide": string|null
   },
   "people_count": number|null,
   "people_count_confidence": number|null,
@@ -56,6 +57,8 @@ SCHEMA_HINT = """
     "signin_complete_ok": boolean|null
   }|null
 }
+说明：大讲堂海报类的 sponsor_text / has_bayer_sponsor 只看图片最下方页脚文字。
+不要抽取或核验任何水印（含时间/日期/地点相机水印）。
 """
 
 
@@ -83,17 +86,38 @@ NAME_CARD_FULL_PROMPT = """这是会议现场的【台卡/席卡整图】，桌�
 """
 
 
+SPONSOR_TEXT = "拜耳医药保健有限公司"
+
+
 def user_prompt(photo_type: str, project_type: str) -> str:
+    hall_sponsor = (
+        "抽取日期、时间、地点、讲者姓名；"
+        "并重点读取图片【最下方】一行/一小段页脚文字，核查赞助方全称「{0}」"
+        "（把读到的底部原文写入 sponsor_text；完整出现则 has_bayer_sponsor=true，"
+        "底部没有或文案不符则 false）。"
+        "不要把画面中部/上部其它位置的「拜耳」字样当成赞助方。"
+        "大讲堂本类材料不要求拜耳十字 Logo，has_bayer_logo 填 null。"
+    ).format(SPONSOR_TEXT)
+    micro_logo = "同时核查拜耳十字 Logo（has_bayer_logo）；赞助方字段填 null。"
+
     focus = {
-        "Poster": "抽取日程海报上的日期、时间、地点、讲者姓名；是否有拜耳十字 Logo。",
-        "Stand": "抽取展架上的日期、时间、地点、讲者；是否有拜耳 Logo。",
-        "EDM": "电子日程海报：日期时间地点讲者；拜耳 Logo。",
+        "Poster": hall_sponsor if project_type == "LECTURE_HALL" else (
+            "抽取日程海报上的日期、时间、地点、讲者姓名；" + micro_logo
+        ),
+        "Stand": hall_sponsor if project_type == "LECTURE_HALL" else (
+            "抽取展架上的日期、时间、地点、讲者；" + micro_logo
+        ),
+        "EDM": (
+            hall_sponsor
+            if project_type == "LECTURE_HALL"
+            else ("电子日程海报：日期时间地点讲者；" + micro_logo)
+        ),
         "EDMDisplay": (
             "微型「权益二」现场展示（日程页）。核心检测："
             "画面中的规定模版上是否有【日程表】（通常含时间/内容/人员等表格行列）；"
             "有则为 has_agenda_table=true，页类 AGENDA。"
             "底部也可能有彩色波浪丝带，但权益二以日程表为准。"
-            "同时看拜耳 Logo、水印。"
+            "同时核查拜耳十字 Logo（has_bayer_logo）；赞助方字段填 null；不抽水印。"
         ),
         "ProjectIntro": (
             "微型「权益一」现场展示（项目介绍页）。核心检测："
@@ -101,26 +125,35 @@ def user_prompt(photo_type: str, project_type: str) -> str:
             "（蓝绿黄橙粉等多色流畅丝带图形，非普通单色线）；"
             "有则为 has_colorful_ribbon=true，页类 PROJECT_INTRO。"
             "本页一般是大段项目介绍文字，通常没有会议日程表。"
-            "同时看拜耳 Logo、水印。"
+            "同时核查拜耳十字 Logo（has_bayer_logo）；赞助方字段填 null；不抽水印。"
         ),
         "TableCard": (
             "这是台卡整图。请直接读出桌上所有台卡印刷的中文姓名，"
             "写入 name_card_names（数组，常见 2~4 个）；不要编造；不做裁框。"
         ),
         "SpeakerTitle": (
-            "这是讲者与课件标题合影。请抽取投影上的讲题标题（topic_title）、"
-            "讲者姓名；日期/水印若有则抽。主题比对只在本类型做。"
+            "这是【讲者与标题合影】。画面必须同时具备："
+            "①讲者本人（人物，has_speaker_person）；"
+            "②课件/投影上的讲题标题（写入 ocr_fields.topic_title）；"
+            "③讲者姓名（投影或画面可见，写入 ocr_fields.speaker_name_on_slide）；"
+            "④日期（投影/画面可见日期，写入 ocr_fields.meeting_date；不抽相机水印）。"
+            "缺任一项也要如实填 null/false，不要编造。"
+            "has_ppt_screen=投影/屏幕是否可见。"
+            "主题比对只在本类型做。"
         ),
         "SpeakerLecture": (
-            "这是讲者授课现场照。只需确认画面清晰、为授课场景；"
+            "这是【讲者授课过程照】。画面必须同时具备："
+            "①讲者本人（人物，has_speaker_person=true）；"
+            "②正在演示的 PPT/投影画面（has_ppt_screen=true）。"
+            "缺讲者或缺 PPT 则对应字段 false。"
             "不要抽取讲题标题、讲者姓名（topic_title / speaker_name_on_slide 填 null）；"
-            "不做主题查重；水印若有则抽 watermark_*。"
+            "不做主题查重；不抽水印。"
         ),
         "Panorama": (
             "这是会场全景照片。请仔细数画面中【可见的人头/参会者】，"
             "含前排、侧排、后排，含讲者若在画面中；不要把椅子空位、投影人影、海报人像算进去。"
             "给出整数 people_count 与 people_count_confidence（0~1）。"
-            "水印若有则抽 watermark_*。"
+            "不抽水印。"
         ),
         "SignSheet": (
             "这是【打印出来的签到表】扫描/照片（可多页之一）：纸质打印表格，"

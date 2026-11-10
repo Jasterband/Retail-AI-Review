@@ -18,6 +18,7 @@
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| v1.10 | 2026-11-10 | 请求对齐药师会交互 JSON（camelCase + 数字枚举 + 嵌套照片）；`task_id` 由 AI 生成；权威见 simple 对接文档 |
 | v1.9 | 2026-11-05 | 字段名/`photo_type` 对齐 CRM；去掉 `speaker_shot_kind`；讲者照用 `SpeakerTitle`/`SpeakerLecture` |
 | v1.8 | 2026-10-23 | 两类查重定稿：主题=OCR文字；照片盗用= pHash/embedding **仅跨会议**（不查会内相似） |
 | v1.7 | 2026-10-23 | 拆开两类查重：图片查重 vs 主题不重复（仅讲者照） |
@@ -78,9 +79,9 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 | 项 | 约定 |
 |----|------|
 | 协议 | HTTPS，`Content-Type: application/json`，UTF-8 |
-| 幂等 | 相同 `task_id` 不重复计次，返回首次结果 |
-| 重提 | 用户改材料后再审 → **换新** `task_id` |
-| S3 | `s3://{bucket}/{key}`；AI 需有只读权限 |
+| 幂等 | Header `Idempotency-Key`；相同 Key 返回同一 `task_id` |
+| 重提 | 用户改材料后再审 → **勿复用** Idempotency-Key（AI 会发新 `task_id`） |
+| 材料 URL | `s3://` 或 `http(s)://`；AI 需可读 |
 | 轮询建议 | 首次 3s，之后每 5s，最长约 10 分钟 |
 | 限流 | 默认 60 次/分钟/Token，超限 `429` |
 
@@ -101,7 +102,11 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 | 方法 / 路径 | `POST /v1/retail_meeting_checks` |
 | 说明 | 提交一场会议材料检查任务（异步） |
 | 成功 | `202 Accepted` |
-| 幂等键 | Body.`task_id` |
+| 幂等键 | Header `Idempotency-Key`（可选）；`task_id` 由 AI 生成 |
+
+> **请求体权威**：与药师会交互 JSON 同构 `{ project, meeting, speakers, meetingPhotos }`。  
+> 字段表 / 大讲堂完整示例见 **[README-PE-simple对接.md](README-PE-simple对接.md) §2**；映射见 [CRM与AI-API字段对照.md](CRM与AI-API字段对照.md)。  
+> 下文仅保留微型精简示例与 202/400 形状，便于对照历史稿。
 
 ### 3.1 请求头
 
@@ -110,103 +115,18 @@ Token 由 AI 侧按环境发放。未带或无效 → `401`；无权限 → `403
 | Authorization | 是 | `Bearer <token>` |
 | Content-Type | 是 | `application/json` |
 | X-Callback-URL | 否 | 完成后回调的 HTTPS 地址；不传则只靠轮询 |
-| Idempotency-Key | 否 | 若传须与 `task_id` 一致 |
+| Idempotency-Key | 否 | PE 侧重试键；相同 Key → 同一 `task_id` |
 
-### 3.2 请求体字段
+### 3.2 请求体（摘要）
 
-**顶层**
+| 块 | 关键字段 |
+|----|----------|
+| `project` | `projectId` · `projectType`（`1`\|`2`） |
+| `meeting` | `meetingId` · `meetingNo` · `meetingType`（`0`\|`1`\|`2`）· `meetingDate` · `startTime`/`endTime` · `chainName`/`pharmacyName` · `meetingLocation` · `totalAttendees` |
+| `speakers[]` | `speakerId` · `speakerName` · `topic` · `storeName` · `serviceMinutes` · `identityName` · `photos[]`（讲者照） |
+| `meetingPhotos[]` / `speakers[].photos[]` | `photoId` · `photoType` · `fileUrl`（`s3://` 或 `http(s)://`）· `fileName` |
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| task_id | string | 是 | 请求唯一 ID，8~50 字符（对齐 CRM TaskID） |
-| meeting_id | string | 是 | PE 会议主键 |
-| meeting_no | string | 是 | 场次编号，≤20 |
-| project_type | string | 是 | `LECTURE_HALL` \| `MICRO` |
-| meeting_type | string/null | 条件 | 微型：`SINGLE`\|`DUAL`；大讲堂：`null` |
-| project_id | string | 是 | 项目期数 ID |
-| form | object | 是 | 会议表单 |
-| photos | array | 是 | 材料列表，≥1 |
-| refs | object | 否 | 模版包/主题查重范围 |
-| options | object | 否 | 阈值等 |
-
-**form**
-
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| meeting_name | string | 是 | 会议名称 |
-| meeting_date | string | 是 | `YYYY-MM-DD` |
-| start_time | string | 是 | `HH:mm` |
-| end_time | string | 是 | `HH:mm` |
-| chain_or_store_name | string | 是 | 大讲堂=连锁名；微型=药店名 |
-| meeting_location | string | 是 | 会议地点（与海报/水印比对） |
-| remark | string | 否 | 备注 |
-| total_attendees | integer | 是 | 总参会人数 |
-| speakers | array | 是 | 讲者列表，≥1 |
-
-**speakers[]**
-
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| speaker_id | string | 是 | 讲者 ID |
-| speaker_name | string | 是 | 姓名 |
-| topic | string | 是 | 讲题 |
-| store_name | string | 是 | 所属门店 |
-| service_minutes | integer | 是 | 服务时长（分钟） |
-| identity_name | string | 是 | 身份（≤10；CRM NotNull） |
-| lecture_fee | number | 是 | 讲课费（CRM NotNull） |
-| tax | number | 是 | 税金（CRM NotNull） |
-
-**photos[]**
-
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| photo_id | string | 是 | 材料 ID |
-| photo_type | string | 是 | 见下表枚举 |
-| file_url | string | 是 | `s3://bucket/key` |
-| content_type | string | 是 | `image/jpeg` \| `image/png` \| `application/pdf` |
-| sort | integer | 是 | 同类型多张顺序，≥1（CRM NotNull） |
-| speaker_id | string | 条件 | `SpeakerTitle`/`SpeakerLecture` 必填 |
-
-**photo_type（大讲堂）** — 与 CRM `PhotoType` 同值
-
-| 码 | 含义 | 数量 |
-|----|------|------|
-| EDM | 电子日程海报 | ≥1 |
-| Poster | 日程海报 | ≥1 |
-| Stand | 日程展架 | ≥1 |
-| TableCard | 台卡 | ≥1 |
-| Manual | 手册 | ≥1 |
-| SpeakerTitle | 讲者标题合影 | 每讲者 ≥1（须 `speaker_id`） |
-| SpeakerLecture | 讲者讲课照 | 每讲者 ≥1（须 `speaker_id`） |
-| Panorama | 全景 | ≥1 |
-| SignSheet | 签到表 | ≥1 |
-
-**photo_type（微型）** — 与 CRM `PhotoType` 同值
-
-| 码 | 含义 | 数量 |
-|----|------|------|
-| EDM | 电子日程海报 | ≥1 |
-| EDMDisplay | 电子日程海报展示 | ≥1 |
-| ProjectIntro | 项目介绍展示 | ≥1 |
-| SpeakerTitle | 讲者标题合影 | 单 1 / 双 2（须 `speaker_id`） |
-| Panorama | 全景 | ≥1 |
-| SignSheet | 签到表 | ≥1 |
-
-**refs / options（可选）**
-
-| 字段 | 说明 |
-|------|------|
-| refs.template_pack_version | 模版包版本，如 `2026Q2` |
-| refs.logo_ref_s3 | Logo 参考图 |
-| refs.topic_search_scope | 主题跨会议检索范围：`period`（默认）\| `all`（兼容旧名 `duplicate_search_scope`） |
-| refs.image_dup_search_scope | 图片跨会议检索范围：`period`（默认）\| `all` |
-| options.clarity_threshold | 默认 0.6 |
-| options.human_confidence_threshold | 默认 0.75 |
-| options.watermark_time_skew_minutes | 默认 120 |
-| options.name_match_mode | `exact` \| `fuzzy`（默认） |
-| options.response_mode | 回调默认响应模式：`simple`（默认）\| `full`；查询接口可用 query `mode` 覆盖 |
-| options.image_phash_max_distance | 图片近似相似：pHash 汉明距离上限，默认 10 |
-| options.image_similarity_threshold | 图片近似相似：embedding 相似度下限，默认 0.92 |
+`photoType` 枚举与 CRM 同值（大讲堂：`EDM`/`Poster`/`Stand`/`TableCard`/`Manual`/`SpeakerTitle`/`SpeakerLecture`/`Panorama`/`SignSheet`；微型：`EDM`/`EDMDisplay`/`ProjectIntro`/`SpeakerTitle`/`Panorama`/`SignSheet`）。
 
 ### 3.3 请求示例（微型）
 
@@ -216,57 +136,54 @@ curl -X POST 'https://retail-meeting-check-test.example.com/v1/retail_meeting_ch
   -H 'Content-Type: application/json' \
   -d @- <<'EOF'
 {
-  "task_id": "req-micro-000090-001",
-  "meeting_id": "1090",
-  "meeting_no": "000090",
-  "project_type": "MICRO",
-  "meeting_type": "SINGLE",
-  "project_id": "2",
-  "form": {
-    "meeting_name": "单讲师",
-    "meeting_date": "2026-05-27",
-    "start_time": "14:00",
-    "end_time": "14:35",
-    "chain_or_store_name": "老百姓大药房连锁（安徽）有限公司",
-    "meeting_location": "合肥市老百姓大药房连锁（安徽）有限公司淠河路店",
-    "total_attendees": 7,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "示例讲者",
-        "topic": "慢病管理",
-        "store_name": "淠河路店",
-        "service_minutes": 30,
-          "identity_name": "药师",
-          "lecture_fee": 0,
-          "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "2",
+    "projectType": 2,
+    "projectName": "微型药师会"
   },
-  "photos": [
-    {"photo_id": "301", "photo_type": "EDM", "file_url": "s3://pe-meetings/micro/000090/agenda.png", "content_type": "image/png", "sort": 1},
-    {"photo_id": "302", "photo_type": "EDMDisplay", "file_url": "s3://pe-meetings/micro/000090/display1.jpg", "content_type": "image/jpeg", "sort": 2},
-    {"photo_id": "303", "photo_type": "ProjectIntro", "file_url": "s3://pe-meetings/micro/000090/intro.jpg", "content_type": "image/jpeg", "sort": 3},
-    {"photo_id": "304", "photo_type": "SpeakerTitle", "file_url": "s3://pe-meetings/micro/000090/speaker.jpg", "content_type": "image/jpeg", "sort": 4, "speaker_id": "1"},
-    {"photo_id": "305", "photo_type": "Panorama", "file_url": "s3://pe-meetings/micro/000090/panorama.jpg", "content_type": "image/jpeg", "sort": 5},
-    {"photo_id": "306", "photo_type": "SignSheet", "file_url": "s3://pe-meetings/micro/000090/signin.pdf", "content_type": "application/pdf", "sort": 6}
+  "meeting": {
+    "meetingId": "1090",
+    "meetingNo": "000090",
+    "meetingName": "单讲师",
+    "meetingType": 1,
+    "meetingDate": "2026-05-27",
+    "startTime": "14:00",
+    "endTime": "14:35",
+    "chainName": null,
+    "pharmacyName": "老百姓大药房连锁（安徽）有限公司",
+    "meetingLocation": "合肥市老百姓大药房连锁（安徽）有限公司淠河路店",
+    "totalAttendees": 7
+  },
+  "speakers": [
+    {
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "淠河路店",
+      "speakerName": "示例讲者",
+      "topic": "慢病管理",
+      "serviceMinutes": 30,
+      "photos": [
+        {"photoId": "304", "photoType": "SpeakerTitle", "fileName": "speaker.jpg", "fileUrl": "s3://pe-meetings/micro/000090/speaker.jpg"}
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {"photoId": "301", "photoType": "EDM", "fileName": "agenda.png", "fileUrl": "s3://pe-meetings/micro/000090/agenda.png"},
+    {"photoId": "302", "photoType": "EDMDisplay", "fileName": "display1.jpg", "fileUrl": "s3://pe-meetings/micro/000090/display1.jpg"},
+    {"photoId": "303", "photoType": "ProjectIntro", "fileName": "intro.jpg", "fileUrl": "s3://pe-meetings/micro/000090/intro.jpg"},
+    {"photoId": "305", "photoType": "Panorama", "fileName": "panorama.jpg", "fileUrl": "s3://pe-meetings/micro/000090/panorama.jpg"},
+    {"photoId": "306", "photoType": "SignSheet", "fileName": "signin.pdf", "fileUrl": "s3://pe-meetings/micro/000090/signin.pdf"}
   ]
 }
 EOF
 ```
-
-大讲堂完整请求示例见 [README-PE-simple对接.md](README-PE-simple对接.md) §3.3；字段映射见 [CRM与AI-API字段对照.md](CRM与AI-API字段对照.md)。
 
 ### 3.4 响应
 
 **202 受理成功**
 
 ```json
-{
-  "task_id": "req-micro-000090-001",
-  "job_id": 9001,
-  "status": "ACCEPTED"
-}
+{ "task_id": "req-a1b2c3d4e5f64789a0b1c2d3e4f56789" }
 ```
 
 **400 参数错误**
@@ -275,7 +192,7 @@ EOF
 {
   "error": {
     "code": "SCHEMA_INVALID",
-    "message": "meeting_type 在 project_type=MICRO 时必填",
+    "message": "projectType=2（微型）时 meetingType 须为 1 或 2",
     "retryable": false
   }
 }
@@ -815,7 +732,9 @@ curl -X GET 'https://retail-meeting-check-test.example.com/health' \
 | BLURRY | 清晰度不足 |
 | TYPE_MISMATCH | 类别不符 |
 | FIELD_MISMATCH | 与表单不一致 |
-| LOGO_MISSING | 无拜耳 Logo |
+| LOGO_MISSING | 无拜耳 Logo（微型：电子日程海报/展示/项目介绍） |
+| SPONSOR_MISSING | 无赞助方「拜耳医药保健有限公司」（大讲堂：电子日程海报/日程海报/日程展架） |
+| SPONSOR_UNCERTAIN | 赞助方文案检出灰区 |
 | COUNT_BELOW_THRESHOLD | 人数不足 |
 | DURATION_BELOW_THRESHOLD | 时长不足 |
 | IMAGE_DUP | 盗用/混用其他会议现场照（pHash/embedding，跨会议） |

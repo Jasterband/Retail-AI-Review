@@ -2,234 +2,101 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pe.local/schemas/retail-meeting-check-request.schema.json",
   "title": "RetailMeetingCheckRequest",
-  "description": "PE → AI：一场零售会议材料检查请求。AI 仅按 file_url 拉取材料。",
+  "description": "PE → AI：与药师会交互 JSON 同构 { project, meeting, speakers, meetingPhotos }",
   "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "task_id",
-    "meeting_id",
-    "meeting_no",
-    "project_type",
-    "project_id",
-    "form",
-    "photos"
-  ],
+  "additionalProperties": true,
+  "required": ["project", "meeting", "speakers"],
   "properties": {
-    "task_id": {
-      "type": "string",
-      "minLength": 8,
-      "maxLength": 50,
-      "description": "幂等键；对齐 CRM TaskID nvarchar(50)；重复提交返回已有结果且不计次"
-    },
-    "meeting_id": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 36,
-      "description": "对齐 CRM MeetingID（nvarchar）；可为 GUID 等字符串"
-    },
-    "meeting_no": {
-      "type": "string",
-      "maxLength": 20
-    },
-    "project_type": {
-      "type": "string",
-      "enum": [
-        "LECTURE_HALL",
-        "MICRO"
-      ]
-    },
-    "meeting_type": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "enum": [
-        "SINGLE",
-        "DUAL",
-        null
-      ],
-      "description": "MICRO 必填；LECTURE_HALL 为 null"
-    },
-    "project_id": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 36,
-      "description": "对齐 CRM ProjectID（nvarchar）"
-    },
-    "form": {
-      "$ref": "#/$defs/MeetingForm"
-    },
-    "photos": {
+    "project": { "$ref": "#/$defs/Project" },
+    "meeting": { "$ref": "#/$defs/Meeting" },
+    "speakers": {
       "type": "array",
       "minItems": 1,
-      "items": {
-        "$ref": "#/$defs/PhotoItem"
-      }
+      "items": { "$ref": "#/$defs/Speaker" }
     },
-    "refs": {
-      "$ref": "#/$defs/Refs"
-    },
-    "options": {
-      "$ref": "#/$defs/Options"
+    "meetingPhotos": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PePhoto" }
     }
   },
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "project_type": {
-            "const": "MICRO"
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "meeting_type"
-        ],
-        "properties": {
-          "meeting_type": {
-            "type": "string",
-            "enum": [
-              "SINGLE",
-              "DUAL"
-            ]
-          }
-        }
-      }
-    }
-  ],
   "$defs": {
-    "MeetingForm": {
+    "Project": {
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
+      "required": ["projectId", "projectType"],
+      "properties": {
+        "projectId": { "type": "string", "minLength": 1, "maxLength": 36 },
+        "projectType": { "type": "integer", "enum": [1, 2] },
+        "projectName": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" }
+      }
+    },
+    "Meeting": {
+      "type": "object",
+      "additionalProperties": true,
       "required": [
-        "meeting_name",
-        "meeting_date",
-        "start_time",
-        "end_time",
-        "chain_or_store_name",
-        "meeting_location",
-        "total_attendees",
-        "speakers"
+        "meetingId",
+        "meetingNo",
+        "meetingName",
+        "meetingType",
+        "meetingDate",
+        "startTime",
+        "endTime",
+        "meetingLocation",
+        "totalAttendees"
       ],
       "properties": {
-        "meeting_name": {
-          "type": "string",
-          "maxLength": 50
-        },
-        "meeting_date": {
-          "type": "string",
-          "format": "date",
-          "description": "YYYY-MM-DD"
-        },
-        "start_time": {
-          "type": "string",
-          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
-          "description": "HH:mm"
-        },
-        "end_time": {
-          "type": "string",
-          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
-        },
-        "chain_or_store_name": {
-          "type": "string",
-          "maxLength": 50,
-          "description": "大讲堂=连锁名；微型=药店名"
-        },
-        "meeting_location": {
-          "type": "string",
-          "maxLength": 200,
-          "description": "会议地点；与海报/水印 OCR 地点比对"
-        },
-        "remark": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "maxLength": 200
-        },
-        "total_attendees": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "speakers": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/Speaker"
-          }
-        }
+        "meetingId": { "type": "string", "minLength": 1, "maxLength": 36 },
+        "meetingNo": { "type": "string", "maxLength": 20 },
+        "meetingName": { "type": "string", "maxLength": 50 },
+        "meetingType": { "type": "integer", "enum": [0, 1, 2] },
+        "meetingTypeName": { "type": ["string", "null"] },
+        "meetingDate": { "type": "string", "format": "date" },
+        "startTime": { "type": "string", "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$" },
+        "endTime": { "type": "string", "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$" },
+        "durationMinutes": { "type": ["integer", "null"] },
+        "chainName": { "type": ["string", "null"], "maxLength": 50 },
+        "pharmacyName": { "type": ["string", "null"], "maxLength": 50 },
+        "meetingLocation": { "type": "string", "maxLength": 200 },
+        "remark": { "type": ["string", "null"], "maxLength": 200 },
+        "totalAttendees": { "type": "integer", "minimum": 0 },
+        "otherCost": { "type": ["number", "null"] }
       }
     },
     "Speaker": {
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "required": [
-        "speaker_id",
-        "speaker_name",
+        "speakerId",
+        "identityName",
+        "storeName",
+        "speakerName",
         "topic",
-        "store_name",
-        "service_minutes",
-        "identity_name",
-        "lecture_fee",
-        "tax"
+        "serviceMinutes"
       ],
       "properties": {
-        "speaker_id": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 36,
-          "description": "对齐 CRM SpeakerID（nvarchar）"
-        },
-        "identity_name": {
-          "type": "string",
-          "maxLength": 10,
-          "description": "对齐 CRM IdentityName NotNull"
-        },
-        "store_name": {
-          "type": "string",
-          "maxLength": 50
-        },
-        "speaker_name": {
-          "type": "string",
-          "maxLength": 20
-        },
-        "topic": {
-          "type": "string",
-          "maxLength": 50
-        },
-        "service_minutes": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "lecture_fee": {
-          "type": "number",
-          "description": "对齐 CRM LectureFee NotNull"
-        },
-        "tax": {
-          "type": "number",
-          "description": "对齐 CRM Tax NotNull"
+        "speakerId": { "type": "string", "minLength": 1, "maxLength": 36 },
+        "identityName": { "type": "string", "maxLength": 10 },
+        "storeName": { "type": "string", "maxLength": 50 },
+        "speakerName": { "type": "string", "maxLength": 20 },
+        "topic": { "type": "string", "maxLength": 50 },
+        "serviceMinutes": { "type": "integer", "minimum": 1 },
+        "lectureFee": { "type": ["number", "null"] },
+        "tax": { "type": ["number", "null"] },
+        "photos": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PePhoto" }
         }
       }
     },
-    "PhotoItem": {
+    "PePhoto": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "photo_id",
-        "photo_type",
-        "file_url",
-        "content_type",
-        "sort"
-      ],
+      "additionalProperties": true,
+      "required": ["photoId", "photoType", "fileUrl"],
       "properties": {
-        "photo_id": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 36,
-          "description": "对齐 CRM PhotoID（nvarchar）"
-        },
-        "photo_type": {
+        "photoId": { "type": "string", "minLength": 1, "maxLength": 36 },
+        "photoType": {
           "type": "string",
           "enum": [
             "EDM",
@@ -245,129 +112,13 @@
             "SpeakerLecture"
           ]
         },
-        "file_url": {
+        "fileUrl": {
           "type": "string",
           "maxLength": 1000,
-          "pattern": "^s3://[\\w.\\-]+/.+",
-          "description": "s3://bucket/key；对齐 CRM FileUrl nvarchar(1000)"
+          "pattern": "^(s3|https?)://.+"
         },
-        "content_type": {
-          "type": "string",
-          "enum": [
-            "image/jpeg",
-            "image/png",
-            "image/jpg",
-            "application/pdf"
-          ]
-        },
-        "sort": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "对齐 CRM Sort NotNull"
-        },
-        "speaker_id": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "minLength": 1,
-          "maxLength": 36
-        }
-      }
-    },
-    "Refs": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "template_pack_version": {
-          "type": "string",
-          "description": "如 2026Q2；空则用当期默认 active pack"
-        },
-        "logo_ref_s3": {
-          "type": "string",
-          "pattern": "^s3://.+"
-        },
-        "topic_search_scope": {
-          "type": "string",
-          "enum": [
-            "period",
-            "all"
-          ],
-          "default": "period",
-          "description": "跨会议主题查重范围；兼容旧字段名 duplicate_search_scope"
-        },
-        "image_dup_search_scope": {
-          "type": "string",
-          "enum": [
-            "period",
-            "all"
-          ],
-          "default": "period",
-          "description": "跨会议图片混用检索范围"
-        },
-        "duplicate_search_scope": {
-          "type": "string",
-          "enum": [
-            "period",
-            "all"
-          ],
-          "default": "period",
-          "description": "已弃用别名，等同 topic_search_scope"
-        }
-      }
-    },
-    "Options": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "clarity_threshold": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1,
-          "default": 0.6
-        },
-        "human_confidence_threshold": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1,
-          "default": 0.75
-        },
-        "watermark_time_skew_minutes": {
-          "type": "integer",
-          "minimum": 0,
-          "default": 120,
-          "description": "水印时间相对会议时段允许偏移（分钟）"
-        },
-        "name_match_mode": {
-          "type": "string",
-          "enum": [
-            "exact",
-            "fuzzy"
-          ],
-          "default": "fuzzy"
-        },
-        "response_mode": {
-          "type": "string",
-          "enum": [
-            "simple",
-            "full"
-          ],
-          "default": "simple",
-          "description": "回调默认响应模式；查询可用 ?mode= 覆盖。simple=PE展示；full=AI debug"
-        },
-        "image_phash_max_distance": {
-          "type": "integer",
-          "minimum": 0,
-          "default": 10,
-          "description": "图片近似相似：pHash 汉明距离 ≤ 该值则判重复"
-        },
-        "image_similarity_threshold": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1,
-          "default": 0.92,
-          "description": "图片近似相似：embedding 余弦相似度 ≥ 该值则判重复"
-        }
+        "fileName": { "type": "string" },
+        "photoTypeName": { "type": "string" }
       }
     }
   }

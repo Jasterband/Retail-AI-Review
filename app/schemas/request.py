@@ -1,13 +1,18 @@
+"""PE → AI 请求体：与药师会交互 JSON 同构（camelCase + 数字枚举 + 嵌套照片）。"""
+
 from __future__ import annotations
 
-from typing import List, Literal, Optional, Set
+from typing import Any, Dict, List, Literal, Optional, Set
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-ProjectType = Literal["LECTURE_HALL", "MICRO"]
-MeetingType = Literal["SINGLE", "DUAL"]  # CRM MeetingType 1/2；大讲堂请求里必须 null
+from app.services.pe_normalize import (
+    infer_content_type,
+    legacy_flat_to_pe_envelope,
+    pe_request_to_pipeline_snap,
+    validate_file_url,
+)
 
-# 与 CRM r_Seminar_Photo.PhotoType 一致
 PhotoType = Literal[
     "EDM",
     "Poster",
@@ -46,58 +51,73 @@ MICRO_PHOTO_TYPES: Set[str] = {
     "SignSheet",
 }
 
-class Speaker(BaseModel):
-    speaker_id: str = Field(min_length=1, max_length=36)  # CRM SpeakerID
-    speaker_name: str = Field(max_length=20)  # SpeakerName
-    topic: str = Field(max_length=50)  # Topic
-    store_name: str = Field(max_length=50)  # StoreName
-    service_minutes: int  # ServiceMinutes
-    identity_name: str = Field(max_length=10)  # CRM IdentityName NotNull
-    lecture_fee: float  # CRM LectureFee NotNull
-    tax: float  # CRM Tax NotNull
+# 兼容旧代码 import
+ProjectType = Literal["LECTURE_HALL", "MICRO"]
+MeetingType = Literal["SINGLE", "DUAL"]
 
 
-class MeetingForm(BaseModel):
-    meeting_name: str = Field(max_length=50)  # MeetingName
-    meeting_date: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}$",
-        description="YYYY-MM-DD；CRM MeetingDate",
-    )
-    start_time: str = Field(max_length=5, pattern=r"^\d{2}:\d{2}$")  # StartTime
-    end_time: str = Field(max_length=5, pattern=r"^\d{2}:\d{2}$")  # EndTime
-    # CRM 为 ChainName + PharmacyName 两列；API 合成一列由 PE 按项目类型填入
-    chain_or_store_name: str = Field(max_length=50)
-    meeting_location: str = Field(max_length=200)  # MeetingLocation
-    remark: Optional[str] = Field(default=None, max_length=200)  # Remark
-    total_attendees: int  # TotalAttendees
-    speakers: List[Speaker] = Field(min_length=1)
+class PePhoto(BaseModel):
+    model_config = ConfigDict(extra="ignore")
 
+    photoId: str = Field(min_length=1, max_length=36)
+    photoType: PhotoType
+    fileUrl: str = Field(max_length=1000)
+    fileName: Optional[str] = None
+    photoTypeName: Optional[str] = None
 
-class PhotoItem(BaseModel):
-    photo_id: str = Field(min_length=1, max_length=36)  # PhotoID
-    photo_type: PhotoType  # 与 CRM PhotoType 同值
-    file_url: str = Field(max_length=1000)  # FileUrl；须 s3://
-    content_type: ContentType  # 由 FileExt 映射的 MIME
-    sort: int = Field(ge=1)  # CRM Sort NotNull
-    speaker_id: Optional[str] = Field(default=None, max_length=36)
-
-    @field_validator("file_url")
+    @field_validator("fileUrl")
     @classmethod
-    def must_be_s3(cls, v: str) -> str:
-        if not v.startswith("s3://"):
-            raise ValueError("file_url must start with s3://")
-        return v
+    def check_file_url(cls, v: str) -> str:
+        return validate_file_url(v)
 
-    @model_validator(mode="after")
-    def speaker_fields(self) -> "PhotoItem":
-        if self.photo_type in SPEAKER_PHOTO_TYPES and self.speaker_id is None:
-            raise ValueError(
-                "{0} 须带 speaker_id".format(self.photo_type)
-            )
-        return self
+
+class Speaker(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    speakerId: str = Field(min_length=1, max_length=36)
+    identityName: str = Field(max_length=10)
+    storeName: str = Field(max_length=50)
+    speakerName: str = Field(max_length=20)
+    topic: str = Field(max_length=50)
+    serviceMinutes: int
+    lectureFee: Optional[float] = None
+    tax: Optional[float] = None
+    photos: List[PePhoto] = Field(default_factory=list)
+
+
+class Project(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    projectId: str = Field(min_length=1, max_length=36)
+    projectType: int = Field(ge=1, le=2)  # 1 大讲堂；2 微型
+    projectName: Optional[str] = None
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
+
+
+class Meeting(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    meetingId: str = Field(min_length=1, max_length=36)
+    meetingNo: str = Field(max_length=20)
+    meetingName: str = Field(max_length=50)
+    meetingType: int = Field(ge=0, le=2)  # 0 大讲堂；1 单讲；2 双讲
+    meetingTypeName: Optional[str] = None
+    meetingDate: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
+    startTime: str = Field(max_length=5, pattern=r"^\d{2}:\d{2}$")
+    endTime: str = Field(max_length=5, pattern=r"^\d{2}:\d{2}$")
+    durationMinutes: Optional[int] = None
+    chainName: Optional[str] = Field(default=None, max_length=50)
+    pharmacyName: Optional[str] = Field(default=None, max_length=50)
+    meetingLocation: str = Field(max_length=200)
+    remark: Optional[str] = Field(default=None, max_length=200)
+    totalAttendees: int
+    otherCost: Optional[float] = None
 
 
 class Refs(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     template_pack_version: Optional[str] = None
     logo_ref_s3: Optional[str] = None
     topic_search_scope: Literal["period", "all"] = "period"
@@ -106,8 +126,11 @@ class Refs(BaseModel):
 
 
 class Options(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     clarity_threshold: float = 0.6
     human_confidence_threshold: float = 0.75
+    # 仅用于海报等材料上的日程起止时间容差；不做时间水印检测
     watermark_time_skew_minutes: int = 120
     name_match_mode: Literal["exact", "fuzzy"] = "fuzzy"
     response_mode: ResponseMode = "simple"
@@ -126,44 +149,100 @@ class Options(BaseModel):
 
 
 class RetailMeetingCheckRequest(BaseModel):
-    """POST /v1/retail_meeting_checks 请求体。
+    """与药师会交互 JSON 同构。task_id 由 AI 生成，不在请求体。"""
 
-    字段名与 photo_type 枚举对齐 CRM 数据字典。
-    """
+    model_config = ConfigDict(extra="ignore")
 
-    task_id: str = Field(min_length=8, max_length=50)  # CRM TaskID / 幂等键
-    meeting_id: str = Field(min_length=1, max_length=36)  # MeetingID
-    meeting_no: str = Field(max_length=20)  # MeetingNo
-    project_type: ProjectType  # ProjectType（值：LECTURE_HALL|MICRO）
-    meeting_type: Optional[MeetingType] = None  # MeetingType → SINGLE|DUAL；大讲堂 null
-    project_id: str = Field(min_length=1, max_length=36)  # ProjectID
-    form: MeetingForm
-    photos: List[PhotoItem] = Field(min_length=1)
+    project: Project
+    meeting: Meeting
+    speakers: List[Speaker] = Field(min_length=1)
+    meetingPhotos: List[PePhoto] = Field(default_factory=list)
     refs: Optional[Refs] = None
     options: Optional[Options] = None
 
-    @model_validator(mode="after")
-    def check_type_and_photos(self) -> "RetailMeetingCheckRequest":
-        if self.project_type == "MICRO" and self.meeting_type not in (
-            "SINGLE",
-            "DUAL",
-        ):
-            raise ValueError("meeting_type is required for MICRO (SINGLE|DUAL)")
-        if self.project_type == "LECTURE_HALL" and self.meeting_type is not None:
-            raise ValueError("meeting_type must be null for LECTURE_HALL")
+    @model_validator(mode="before")
+    @classmethod
+    def coerce_legacy_or_pass(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        # 已是 PE 信封
+        if "project" in data and "meeting" in data:
+            return data
+        # 旧扁平夹具 / 中间形态 → 提成 PE 信封
+        return legacy_flat_to_pe_envelope(data)
 
-        allowed = (
-            HALL_PHOTO_TYPES
-            if self.project_type == "LECTURE_HALL"
-            else MICRO_PHOTO_TYPES
-        )
-        bad = sorted(
-            {p.photo_type for p in self.photos if p.photo_type not in allowed}
-        )
+    @model_validator(mode="after")
+    def check_types_and_photos(self) -> "RetailMeetingCheckRequest":
+        pt = self.project.projectType
+        mt = self.meeting.meetingType
+        if pt == 1 and mt != 0:
+            raise ValueError("projectType=1（大讲堂）时 meetingType 须为 0")
+        if pt == 2 and mt not in (1, 2):
+            raise ValueError("projectType=2（微型）时 meetingType 须为 1 或 2")
+
+        if pt == 1:
+            if not (self.meeting.chainName or "").strip():
+                raise ValueError("大讲堂须提供 chainName")
+        else:
+            if not (self.meeting.pharmacyName or self.meeting.chainName or "").strip():
+                raise ValueError("微型须提供 pharmacyName")
+
+        flat = self.pipeline_photos()
+        if not flat:
+            raise ValueError("须提供 speakers[].photos 与/或 meetingPhotos")
+
+        allowed = HALL_PHOTO_TYPES if pt == 1 else MICRO_PHOTO_TYPES
+        bad = sorted({p["photo_type"] for p in flat if p["photo_type"] not in allowed})
         if bad:
             raise ValueError(
-                "photo_type 与 project_type={0} 不匹配: {1}".format(
-                    self.project_type, ", ".join(bad)
-                )
+                "photoType 与 projectType={0} 不匹配: {1}".format(pt, ", ".join(bad))
             )
+        for p in flat:
+            if p["photo_type"] in SPEAKER_PHOTO_TYPES and not p.get("speaker_id"):
+                raise ValueError("{0} 须挂在对应 speakers[].photos 下".format(p["photo_type"]))
         return self
+
+    def pipeline_photos(self) -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        n = 1
+        for sp in self.speakers:
+            for p in sp.photos:
+                out.append(
+                    {
+                        "photo_id": p.photoId,
+                        "photo_type": p.photoType,
+                        "file_url": p.fileUrl,
+                        "content_type": infer_content_type(p.fileUrl, p.fileName),
+                        "sort": n,
+                        "speaker_id": sp.speakerId,
+                    }
+                )
+                n += 1
+        for p in self.meetingPhotos:
+            out.append(
+                {
+                    "photo_id": p.photoId,
+                    "photo_type": p.photoType,
+                    "file_url": p.fileUrl,
+                    "content_type": infer_content_type(p.fileUrl, p.fileName),
+                    "sort": n,
+                    "speaker_id": None,
+                }
+            )
+            n += 1
+        return out
+
+    def to_pipeline_snap(self) -> Dict[str, Any]:
+        return pe_request_to_pipeline_snap(self)
+
+    # --- 兼容旧调用方属性名 ---
+    @property
+    def meeting_id(self) -> str:
+        return self.meeting.meetingId
+
+    @property
+    def project_type(self) -> str:
+        return "LECTURE_HALL" if self.project.projectType == 1 else "MICRO"
+
+    def flattened_photos(self) -> List[Dict[str, Any]]:
+        return self.pipeline_photos()

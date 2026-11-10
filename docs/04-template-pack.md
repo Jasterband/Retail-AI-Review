@@ -51,7 +51,7 @@ s3://pe-templates/2026Q2/
 | TableCard | `3台卡.jpg` | （可选）单卡参考图 | — | 姓名改为**整图 OCR**，不依赖裁框 |
 | Manual | **缺失独立文件** | 需从 Teams/补拍：手册封面正面 | full cover | `HANDBOOK_DETECT` |
 | Manual | 台卡图桌面手册仅作弱参考 | 不建议作主 ref | — | 正式以封面照为准 |
-| LOGO_BAYER | 海报/展架角标 | Logo 外接矩形 | 紧裁 | `BAYER_LOGO` |
+| LOGO_BAYER | 微型电子日程/展示角标 | Logo 外接矩形 | 紧裁 | `BAYER_LOGO`（仅微型；大讲堂改查赞助方文案） |
 | SignSheet | `9签到表-35（1）.jpg` 等 | 表头模版区（会议时间/时长栏） | 上半表头 | 模版一致性（可选） |
 | SpeakerTitle | `4讲者-高芳1.jpg` 等 `*1` | 课件标题条区域 | 投影/屏幕 ROI | `SPEAKER_TOPIC_OCR` 评测 |
 

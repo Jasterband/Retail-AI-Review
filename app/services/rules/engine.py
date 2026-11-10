@@ -43,8 +43,8 @@ def run_all_rules(
         "TOPIC_REUSE": lambda: common.rule_topic_reuse(
             contexts, snap, form, refs, options, db
         ),
-        "WATERMARK_CONSISTENCY": lambda: common.rule_watermark(
-            contexts, form, options
+        "SPEAKER_COMPOSITION": lambda: common.rule_speaker_composition(
+            contexts, options
         ),
         "NAME_CARD_SPEAKER_MATCH": lambda: hall.rule_name_card_speaker(
             contexts, form, options

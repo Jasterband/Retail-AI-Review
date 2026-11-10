@@ -37,6 +37,53 @@ def parse_file_url(file_url: str) -> Tuple[str, str]:
     return bucket, key
 
 
+def _is_http_url(file_url: str) -> bool:
+    return file_url.startswith("https://") or file_url.startswith("http://")
+
+
+def _fetch_http(file_url: str, content_type: str) -> FetchedObject:
+    try:
+        import urllib.request
+
+        req = urllib.request.Request(
+            file_url,
+            headers={"User-Agent": "retail-meeting-check/1.0"},
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            raw = resp.read()
+            hdr = (resp.headers.get_content_type() or "").strip()
+        if not raw:
+            return FetchedObject(
+                file_url=file_url,
+                content_type=content_type,
+                error_code="S3_CORRUPT",
+                error_message="empty HTTP body",
+            )
+        out_type = content_type or hdr or "application/octet-stream"
+        body = raw
+        path_hint = file_url.split("?", 1)[0].lower()
+        if out_type == "application/pdf" or path_hint.endswith(".pdf"):
+            body = _pdf_first_page_jpeg(raw)
+            out_type = "image/jpeg"
+        body, out_type, exif_o = normalize_image_bytes(body, out_type)
+        return FetchedObject(
+            file_url=file_url,
+            content_type=out_type,
+            body=body,
+            exif_orientation=exif_o,
+        )
+    except Exception as e:
+        logger.exception("http fetch failed %s", file_url)
+        msg = str(e)
+        code = "S3_NOT_FOUND" if "404" in msg or "Not Found" in msg else "S3_CORRUPT"
+        return FetchedObject(
+            file_url=file_url,
+            content_type=content_type,
+            error_code=code,
+            error_message=msg,
+        )
+
+
 def _load_map() -> Dict[str, str]:
     settings = get_settings()
     path = Path(settings.s3_local_map_path)
@@ -134,6 +181,42 @@ def _fetch_real_s3(file_url: str, content_type: str) -> FetchedObject:
 
 def fetch_object(file_url: str, content_type: str) -> FetchedObject:
     settings = get_settings()
+
+    if _is_http_url(file_url):
+        mapping = _load_map()
+        rel = mapping.get(file_url)
+        if rel:
+            # 允许把 https URL 映射到本地样例
+            path = Path(rel)
+            if not path.is_absolute():
+                path = settings.asset_root / path
+            if path.exists():
+                try:
+                    raw = path.read_bytes()
+                    out_type = content_type
+                    body = raw
+                    if content_type == "application/pdf" or path.suffix.lower() == ".pdf":
+                        body = _pdf_first_page_jpeg(raw)
+                        out_type = "image/jpeg"
+                    body, out_type, exif_o = normalize_image_bytes(body, out_type)
+                    return FetchedObject(
+                        file_url=file_url,
+                        content_type=out_type,
+                        body=body,
+                        local_path=str(path),
+                        exif_orientation=exif_o,
+                    )
+                except Exception as e:
+                    logger.exception("http-mapped local fetch failed %s", file_url)
+                    return FetchedObject(
+                        file_url=file_url,
+                        content_type=content_type,
+                        error_code="S3_CORRUPT",
+                        error_message=str(e),
+                        local_path=str(path),
+                    )
+        return _fetch_http(file_url, content_type)
+
     try:
         parse_file_url(file_url)
     except ValueError as e:

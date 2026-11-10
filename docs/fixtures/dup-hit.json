@@ -1,38 +1,42 @@
 {
-  "task_id": "req-dup-hit-001",
-  "meeting_id": "9999",
-  "meeting_no": "DUP1",
-  "project_type": "LECTURE_HALL",
-  "meeting_type": null,
-  "project_id": "1",
-  "form": {
-    "meeting_name": "查重测试场",
-    "meeting_date": "2026-04-18",
-    "start_time": "14:00",
-    "end_time": "16:00",
-    "chain_or_store_name": "测试连锁",
-    "meeting_location": "测试酒店",
-    "total_attendees": 35,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "测试",
-        "topic": "查重主题",
-        "store_name": "测试店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "1",
+    "projectType": 1,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "9999",
+    "meetingNo": "DUP1",
+    "meetingName": "查重测试场",
+    "meetingType": 0,
+    "meetingDate": "2026-04-18",
+    "startTime": "14:00",
+    "endTime": "16:00",
+    "chainName": "测试连锁",
+    "pharmacyName": null,
+    "meetingLocation": "测试酒店",
+    "remark": null,
+    "totalAttendees": 35
+  },
+  "speakers": [
     {
-      "photo_id": "901",
-      "photo_type": "Poster",
-      "file_url": "s3://pe-meetings/dup-test/poster.jpg",
-      "content_type": "image/jpeg",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "测试店",
+      "speakerName": "测试",
+      "topic": "查重主题",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": []
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "901",
+      "photoType": "Poster",
+      "fileUrl": "s3://pe-meetings/dup-test/poster.jpg",
+      "fileName": null
     }
   ],
   "refs": {

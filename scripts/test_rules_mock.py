@@ -46,8 +46,13 @@ def hall_contexts(snap: dict) -> list:
             "clarity_score": 0.92,
             "detected_type": t,
             "type_confidence": 0.95,
-            "has_bayer_logo": t in ("Poster", "Stand", "EDM"),
-            "logo_confidence": 0.9,
+            "has_bayer_logo": None,
+            "logo_confidence": None,
+            "has_bayer_sponsor": t in ("Poster", "Stand", "EDM"),
+            "sponsor_confidence": 0.9,
+            "sponsor_text": "拜耳医药保健有限公司"
+            if t in ("Poster", "Stand", "EDM")
+            else None,
             "handbook_ok": True if t == "Manual" else None,
             "handbook_year": 2026 if t == "Manual" else None,
             "ocr_fields": {
@@ -76,8 +81,14 @@ def hall_contexts(snap: dict) -> list:
             sp = next(
                 s for s in form["speakers"] if s["speaker_id"] == a["speaker_id"]
             )
+            v["has_speaker_person"] = True
+            v["has_ppt_screen"] = True
             v["ocr_fields"]["topic_title"] = sp["topic"]
             v["ocr_fields"]["speaker_name_on_slide"] = sp["speaker_name"]
+            v["ocr_fields"]["meeting_date"] = form.get("meeting_date") or "2026-06-23"
+        if t == "SpeakerLecture":
+            v["has_speaker_person"] = True
+            v["has_ppt_screen"] = True
         body = poster.body if t == "Poster" else poster.body
         # unique-ish phash per type by using real file when possible
         fo = fetch_object(a["file_url"], a.get("content_type") or "image/jpeg")
@@ -114,7 +125,8 @@ def main() -> int:
             a for a in full["photo_results"] if a["photo_type"] == "Poster"
         )
         assert poster_ar["checks"].get("date_matches_form") is True
-        assert poster_ar["checks"].get("has_bayer_logo") is True
+        assert poster_ar["checks"].get("has_bayer_sponsor") is True
+        assert poster_ar["checks"].get("has_bayer_logo") is None
 
         persist_histories(db, snap, ctxs)
         db.commit()
@@ -131,7 +143,8 @@ def main() -> int:
                     "clarity_score": 0.9,
                     "detected_type": "Poster",
                     "type_confidence": 0.9,
-                    "has_bayer_logo": True,
+                    "has_bayer_sponsor": True,
+                    "sponsor_text": "拜耳医药保健有限公司",
                     "ocr_fields": {"meeting_date": "2026-04-18", "has_watermark": False},
                 },
                 fo.body,

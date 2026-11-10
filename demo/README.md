@@ -75,6 +75,6 @@ uvicorn app.main:app --reload --port 8000
 
 ## 说明
 
-- Live 每次生成新 `task_id`（`req-demo-{timestamp}-…`）
+- Live：`task_id` 由 AI 在 `202` 中生成并返回，Demo 用其轮询
 - 无 `OPENAI_API_KEY` 时任务会 `ERROR` / `MODEL_UNAVAILABLE`
 - 大讲堂一场约十几张图，多模态可能需 1～3 分钟；批量跑会更久

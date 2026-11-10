@@ -349,6 +349,7 @@
       is_clear: "清晰度达标",
       image_not_duplicated: "未盗用他场照片",
       has_bayer_logo: "含拜耳 Logo",
+      has_bayer_sponsor: "图最下方含赞助方「拜耳医药保健有限公司」",
       date_matches_form: "日期与表单一致",
       time_matches_form: "时间与表单一致",
       location_matches_form: "地点与表单一致",
@@ -357,13 +358,18 @@
       name_set_matches_speakers: "台卡姓名集合 = 讲者集合",
       topic_matches_form: "课件标题与表单 topic 一致",
       topic_not_reused_in_period: "主题未在同期重复",
+      speaker_title_composition_ok: "标题合影含讲者/标题/姓名/日期",
+      speaker_lecture_composition_ok: "授课照含讲者与PPT",
+      has_speaker_person: "画面有讲者本人",
+      has_topic_title: "画面有讲题标题",
+      has_speaker_name: "画面有讲者姓名",
+      has_date: "画面有日期",
+      has_ppt_screen: "画面有PPT/投影",
       people_count_recorded: "成功得到本张人数",
       duration_readable: "起止时间可读",
       duration_meets_threshold: "时长达标",
       ppt_template_match: "现场 PPT 与规定模版一致",
       ppt_page_kind_ok: "页类正确（介绍/日程）",
-      watermark_time_ok: "水印时间合理",
-      watermark_location_ok: "水印地点与表单一致",
     };
     const TYPE_LABEL = {
       EDM: "电子日程海报", Poster: "日程海报", Stand: "日程展架",
@@ -502,10 +508,10 @@
         photos_meta: meta.photos_meta || [],
         expect: meta.expect || null,
         request: {
-          project_type: currentProject,
-          meeting_type: meta.meeting_type || null,
-          form: {},
-          meeting_no: meta.meeting_no || "—",
+          project: { projectType: currentProject === "MICRO" ? 2 : 1 },
+          meeting: { meetingNo: meta.meeting_no || "—", meetingType: meta.meeting_type === "DUAL" ? 2 : (currentProject === "MICRO" ? 1 : 0) },
+          speakers: [],
+          meetingPhotos: [],
         },
         response: {
           overall_status: null,
@@ -515,6 +521,36 @@
           summary_matched: [],
           summary_failed: [],
         },
+      };
+    }
+
+    /** 兼容 PE 信封与旧扁平 request，供状态条展示 */
+    function requestView(req) {
+      req = req || {};
+      if (req.project && req.meeting) {
+        const m = req.meeting;
+        const pt = req.project.projectType === 2 ? "MICRO" : "LECTURE_HALL";
+        const mt = m.meetingType === 1 ? "SINGLE" : (m.meetingType === 2 ? "DUAL" : null);
+        return {
+          project_type: pt,
+          meeting_type: mt,
+          meeting_no: m.meetingNo || "—",
+          form: {
+            meeting_date: m.meetingDate,
+            start_time: m.startTime,
+            end_time: m.endTime,
+            chain_or_store_name: m.pharmacyName || m.chainName || "",
+            location: m.meetingLocation,
+            speakers: (req.speakers || []).map((s) => ({ speaker_name: s.speakerName })),
+          },
+        };
+      }
+      const f = req.form || {};
+      return {
+        project_type: req.project_type,
+        meeting_type: req.meeting_type,
+        meeting_no: req.meeting_no || "—",
+        form: Object.assign({}, f, { location: f.meeting_location || f.location }),
       };
     }
 
@@ -555,8 +591,8 @@
         return;
       }
       const r = pack.response;
-      const f = (pack.request && pack.request.form) || {};
-      const req = pack.request || {};
+      const view = requestView(pack.request);
+      const f = view.form || {};
       const status = r.overall_status || r.processing_status || "—";
       const expectOverall = (pack.expect && pack.expect.overall_status) || (scenarioMeta().expect && scenarioMeta().expect.overall_status);
       const expectLine = expectOverall
@@ -586,9 +622,9 @@
         <div class="badge ${status}">${escapeHtml(status)}</div>
         <div>
           <dl class="meta-grid">
-            <div><dt>project_type</dt><dd style="font-family:var(--mono)">${escapeHtml(req.project_type || currentProject || "—")}${req.meeting_type ? ` / ${escapeHtml(req.meeting_type)}` : ""}</dd></div>
+            <div><dt>project_type</dt><dd style="font-family:var(--mono)">${escapeHtml(view.project_type || currentProject || "—")}${view.meeting_type ? ` / ${escapeHtml(view.meeting_type)}` : ""}</dd></div>
             <div><dt>场景</dt><dd>${escapeHtml(pack.label || "")}</dd></div>
-            <div><dt>meeting_no</dt><dd>${escapeHtml(req.meeting_no || scenarioMeta().meeting_no || "—")}</dd></div>
+            <div><dt>meeting_no</dt><dd>${escapeHtml(view.meeting_no || scenarioMeta().meeting_no || "—")}</dd></div>
             ${expectLine}
             <div><dt>会议日期</dt><dd>${escapeHtml(f.meeting_date || "—")} ${escapeHtml(f.start_time || "")}–${escapeHtml(f.end_time || "")}</dd></div>
             <div><dt>连锁/药店</dt><dd>${escapeHtml(f.chain_or_store_name || "—")}</dd></div>
@@ -899,7 +935,7 @@
         return r.json();
       });
       const body = JSON.parse(JSON.stringify(fixture));
-      body.task_id = "req-demo-" + Date.now() + "-" + (meta.meeting_no || meta.id);
+      delete body.task_id; // task_id 由 AI 受理生成，经 202 返回
       body.options = Object.assign({}, body.options || {}, { response_mode: "full" });
       const post = await fetch("/v1/retail_meeting_checks", {
         method: "POST",
@@ -910,7 +946,8 @@
       if (!post.ok) {
         throw new Error((accepted.error && accepted.error.message) || ("提交失败 HTTP " + post.status));
       }
-      const requestId = accepted.task_id || body.task_id;
+      const requestId = accepted.task_id;
+      if (!requestId) throw new Error("202 未返回 task_id");
       const result = await pollResult(requestId);
       return { body, result };
     }

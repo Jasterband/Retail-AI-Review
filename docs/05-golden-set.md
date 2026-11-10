@@ -1,6 +1,6 @@
 # 黄金集与负样本清单
 
-黄金集用于回归：给定构造的 `RetailMeetingCheckRequest`（表单与路径对齐），期望 `overall_status=PASS` 且关键规则 `PASS`。本地目录同时含合格与不合格样本（见下方「本地样本库」）。
+黄金集用于回归：给定构造的 `RetailMeetingCheckRequest`（PE 信封 `{project,meeting,speakers,meetingPhotos}`，与路径对齐），期望 `overall_status=PASS` 且关键规则 `PASS`。本地目录同时含合格与不合格样本（见下方「本地样本库」）。
 
 路径均相对仓库根：`/Users/ruining.yu/project/零售/`。
 
@@ -89,7 +89,7 @@
 | ASSET_TYPE_CHECK | PASS | |
 | CLARITY | PASS | 样例清晰 |
 | KEY_FIELD_MATCH | PASS | 海报日期地点讲者与表单一致 |
-| BAYER_LOGO | PASS | 海报/展架 |
+| BAYER_LOGO | PASS | 海报/展架/电子日程含赞助方「拜耳医药保健有限公司」 |
 | NAME_CARD_SPEAKER_MATCH | PASS | 余艳红/刘亭/袁芳/高芳 |
 | PANORAMA_COUNT | PASS | ≥35 |
 | SIGNIN_DURATION | PASS | >120（结算 130 分钟） |
@@ -125,7 +125,7 @@
 | Panorama | `参会人员.jpg` |
 | SignSheet | `会议签到表.pdf` |
 
-**期望规则：** `PPT_TEMPLATE_MATCH` PASS、`PPT_PAGE_KIND` PASS、`BAYER_LOGO` PASS、`PANORAMA_COUNT` PASS（≥6）、`WATERMARK_CONSISTENCY` PASS（权益照含水印）、`SIGNIN_DURATION` PASS（>30）、`SIGNIN_RATIO_AND_STORES` PASS、`TOPIC_REUSE` PASS（若有标题合影）。
+**期望规则：** `PPT_TEMPLATE_MATCH` PASS、`PPT_PAGE_KIND` PASS、`BAYER_LOGO` PASS、`PANORAMA_COUNT` PASS（≥6）、`SIGNIN_DURATION` PASS（>30）、`SIGNIN_RATIO_AND_STORES` PASS、`TOPIC_REUSE` PASS（若有标题合影）。（水印规则已下线）
 
 ### B2. session_no=`000089` — 淮安广济 单讲者
 
@@ -177,7 +177,7 @@
 |----|------|----------|--------------|---------------|
 | N01 | 模糊图 | 高斯模糊合格海报 | NEED_HUMAN | CLARITY + KEY_FIELD_MATCH UNCERTAIN |
 | N02 | 错模版 | 旧 VI / 非规定权益页（微型） | FAIL | `PPT_TEMPLATE_MATCH`（微型权益） |
-| N03 | 无 Logo | 遮挡或裁掉 Logo | FAIL | BAYER_LOGO |
+| N03 | 无 Logo / 无赞助方 | 微型遮挡 Logo；大讲堂遮挡/抹掉「拜耳医药保健有限公司」 | FAIL | BAYER_LOGO |
 | N04 | 旧手册封面 | 往期手册标题/版式 | FAIL | HANDBOOK_NOT_STALE |
 | N05 | 非手册 | 普通笔记本特写当 Manual | FAIL | HANDBOOK_DETECT |
 | N06 | 台卡缺人 | 仅 3 个台卡入镜 | FAIL | NAME_CARD_SPEAKER_MATCH |
@@ -189,7 +189,7 @@
 | N10 | 投影严重倾斜 | 微型权益照极端角度 | NEED_HUMAN 或 FAIL | PPT_TEMPLATE_MATCH |
 | N11 | 签到时长不足 | 伪造短时长表头 | FAIL | SIGNIN_DURATION |
 | N12 | 签到门店单一 | 微型听众均同一门店 | FAIL | SIGNIN_RATIO_AND_STORES |
-| N13 | 水印日期错误 | 水印改到其他日 | FAIL | WATERMARK_CONSISTENCY |
+| N13 | ~~水印日期错误~~ | 水印规则已下线 | — | — |
 | N14 | 类别错挂 | 全景图声明为 Poster | FAIL | ASSET_TYPE_CHECK |
 | N15 | S3 404 | 错误 file_url | ERROR | S3_NOT_FOUND |
 | N16 | 讲者缺过程照 | 大讲堂仅 SpeakerTitle | FAIL | SPEAKER_SHOT_PAIR |

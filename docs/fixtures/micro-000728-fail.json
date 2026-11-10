@@ -1,74 +1,73 @@
 {
-  "task_id": "req-micro-000728-fail-001",
-  "meeting_id": "100728",
-  "meeting_no": "000728",
-  "project_type": "MICRO",
-  "meeting_type": "SINGLE",
-  "project_id": "2",
-  "form": {
-    "meeting_name": "单讲师",
-    "meeting_date": "2026-08-20",
-    "start_time": "14:00",
-    "end_time": "14:45",
-    "chain_or_store_name": "上海益丰益伟大药房有限公司",
-    "meeting_location": "上海市上海益丰益伟大药房有限公司",
-    "total_attendees": 6,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "讲者",
-        "topic": "微型药店健康服务赋能",
-        "store_name": "上海益丰益伟大药房有限公司",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "2",
+    "projectType": 2,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "100728",
+    "meetingNo": "000728",
+    "meetingName": "单讲师",
+    "meetingType": 1,
+    "meetingDate": "2026-08-20",
+    "startTime": "14:00",
+    "endTime": "14:45",
+    "chainName": null,
+    "pharmacyName": "上海益丰益伟大药房有限公司",
+    "meetingLocation": "上海市上海益丰益伟大药房有限公司",
+    "remark": null,
+    "totalAttendees": 6
+  },
+  "speakers": [
     {
-      "photo_id": "7281",
-      "photo_type": "EDM",
-      "file_url": "s3://pe-meetings/micro/000728/agenda.png",
-      "content_type": "image/png",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "上海益丰益伟大药房有限公司",
+      "speakerName": "讲者",
+      "topic": "微型药店健康服务赋能",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "7284",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/micro/000728/speaker.jpeg",
+          "fileName": null
+        }
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "7281",
+      "photoType": "EDM",
+      "fileUrl": "s3://pe-meetings/micro/000728/agenda.png",
+      "fileName": null
     },
     {
-      "photo_id": "7282",
-      "photo_type": "ProjectIntro",
-      "file_url": "s3://pe-meetings/micro/000728/intro.jpeg",
-      "content_type": "image/jpeg",
-      "sort": 2
+      "photoId": "7282",
+      "photoType": "ProjectIntro",
+      "fileUrl": "s3://pe-meetings/micro/000728/intro.jpeg",
+      "fileName": null
     },
     {
-      "photo_id": "7283",
-      "photo_type": "EDMDisplay",
-      "file_url": "s3://pe-meetings/micro/000728/display.jpeg",
-      "content_type": "image/jpeg",
-      "sort": 3
+      "photoId": "7283",
+      "photoType": "EDMDisplay",
+      "fileUrl": "s3://pe-meetings/micro/000728/display.jpeg",
+      "fileName": null
     },
     {
-      "photo_id": "7284",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/micro/000728/speaker.jpeg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 4
+      "photoId": "7285",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/micro/000728/panorama.jpeg",
+      "fileName": null
     },
     {
-      "photo_id": "7285",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/micro/000728/panorama.jpeg",
-      "content_type": "image/jpeg",
-      "sort": 5
-    },
-    {
-      "photo_id": "7286",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/micro/000728/signin.pdf",
-      "content_type": "application/pdf",
-      "sort": 6
+      "photoId": "7286",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/micro/000728/signin.pdf",
+      "fileName": null
     }
   ],
   "refs": {

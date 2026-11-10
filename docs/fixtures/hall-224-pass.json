@@ -1,174 +1,163 @@
 {
-  "task_id": "req-hall-224-golden-001",
-  "meeting_id": "1224",
-  "meeting_no": "224",
-  "project_type": "LECTURE_HALL",
-  "meeting_type": null,
-  "project_id": "1",
-  "form": {
-    "meeting_name": "菁英药师大讲堂项目",
-    "meeting_date": "2026-07-14",
-    "start_time": "14:00",
-    "end_time": "16:10",
-    "chain_or_store_name": "四川高济海棠药堂零售连锁有限公司",
-    "meeting_location": "四川高济海棠药堂零售连锁有限公司",
-    "total_attendees": 35,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "唐燕",
-        "topic": "合理用药与患者教育",
-        "store_name": "四川高济海棠药堂",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "2",
-        "speaker_name": "宋敏绘",
-        "topic": "慢病管理实践分享",
-        "store_name": "四川高济海棠药堂",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "3",
-        "speaker_name": "虞海燕",
-        "topic": "药学服务要点",
-        "store_name": "四川高济海棠药堂",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "4",
-        "speaker_name": "刘双",
-        "topic": "门店健康服务赋能",
-        "store_name": "四川高济海棠药堂",
-        "service_minutes": 40,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "1",
+    "projectType": 1,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "1224",
+    "meetingNo": "224",
+    "meetingName": "菁英药师大讲堂项目",
+    "meetingType": 0,
+    "meetingDate": "2026-07-14",
+    "startTime": "14:00",
+    "endTime": "16:10",
+    "chainName": "四川高济海棠药堂零售连锁有限公司",
+    "pharmacyName": null,
+    "meetingLocation": "四川高济海棠药堂零售连锁有限公司",
+    "remark": null,
+    "totalAttendees": 35
+  },
+  "speakers": [
     {
-      "photo_id": "22401",
-      "photo_type": "EDM",
-      "file_url": "s3://pe-meetings/hall/224/eposter.png",
-      "content_type": "image/png",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "四川高济海棠药堂",
+      "speakerName": "唐燕",
+      "topic": "合理用药与患者教育",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "22453",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/224/speaker1_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "22454",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/224/speaker1_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "22411",
-      "photo_type": "Manual",
-      "file_url": "s3://pe-meetings/hall/224/handbook.jpg",
-      "content_type": "image/jpeg",
-      "sort": 2
+      "speakerId": "2",
+      "identityName": "药师",
+      "storeName": "四川高济海棠药堂",
+      "speakerName": "宋敏绘",
+      "topic": "慢病管理实践分享",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "22455",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/224/speaker2_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "22456",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/224/speaker2_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "22412",
-      "photo_type": "Poster",
-      "file_url": "s3://pe-meetings/hall/224/poster.jpg",
-      "content_type": "image/jpeg",
-      "sort": 3
+      "speakerId": "3",
+      "identityName": "药师",
+      "storeName": "四川高济海棠药堂",
+      "speakerName": "虞海燕",
+      "topic": "药学服务要点",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "22457",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/224/speaker3_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "22458",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/224/speaker3_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "22413",
-      "photo_type": "Stand",
-      "file_url": "s3://pe-meetings/hall/224/stand.jpg",
-      "content_type": "image/jpeg",
-      "sort": 4
+      "speakerId": "4",
+      "identityName": "药师",
+      "storeName": "四川高济海棠药堂",
+      "speakerName": "刘双",
+      "topic": "门店健康服务赋能",
+      "serviceMinutes": 40,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "22459",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/224/speaker4_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "22460",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/224/speaker4_2.jpg",
+          "fileName": null
+        }
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "22401",
+      "photoType": "EDM",
+      "fileUrl": "s3://pe-meetings/hall/224/eposter.png",
+      "fileName": null
     },
     {
-      "photo_id": "22414",
-      "photo_type": "TableCard",
-      "file_url": "s3://pe-meetings/hall/224/name_card.jpg",
-      "content_type": "image/jpeg",
-      "sort": 5
+      "photoId": "22411",
+      "photoType": "Manual",
+      "fileUrl": "s3://pe-meetings/hall/224/handbook.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "22453",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/224/speaker1_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 6
+      "photoId": "22412",
+      "photoType": "Poster",
+      "fileUrl": "s3://pe-meetings/hall/224/poster.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "22454",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/224/speaker1_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 7
+      "photoId": "22413",
+      "photoType": "Stand",
+      "fileUrl": "s3://pe-meetings/hall/224/stand.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "22455",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/224/speaker2_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 8
+      "photoId": "22414",
+      "photoType": "TableCard",
+      "fileUrl": "s3://pe-meetings/hall/224/name_card.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "22456",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/224/speaker2_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 9
+      "photoId": "22480",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/hall/224/panorama.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "22457",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/224/speaker3_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "3",
-      "sort": 10
-    },
-    {
-      "photo_id": "22458",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/224/speaker3_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "3",
-      "sort": 11
-    },
-    {
-      "photo_id": "22459",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/224/speaker4_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "4",
-      "sort": 12
-    },
-    {
-      "photo_id": "22460",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/224/speaker4_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "4",
-      "sort": 13
-    },
-    {
-      "photo_id": "22480",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/hall/224/panorama.jpg",
-      "content_type": "image/jpeg",
-      "sort": 14
-    },
-    {
-      "photo_id": "22491",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/hall/224/signin_1.pdf",
-      "content_type": "application/pdf",
-      "sort": 15
+      "photoId": "22491",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/hall/224/signin_1.pdf",
+      "fileName": null
     }
   ],
   "refs": {

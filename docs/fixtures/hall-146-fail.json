@@ -1,174 +1,163 @@
 {
-  "task_id": "req-hall-146-fail-001",
-  "meeting_id": "1146",
-  "meeting_no": "146",
-  "project_type": "LECTURE_HALL",
-  "meeting_type": null,
-  "project_id": "1",
-  "form": {
-    "meeting_name": "菁英药师大讲堂",
-    "meeting_date": "2026-06-22",
-    "start_time": "09:00",
-    "end_time": "11:10",
-    "chain_or_store_name": "湖北省昌盛大药房连锁有限公司",
-    "meeting_location": "湖北省昌盛大药房连锁总部",
-    "total_attendees": 35,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "熊锦华",
-        "topic": "从血压波动到24小时平稳达标 ——高血压药事服务要点培训",
-        "store_name": "湖北省昌盛大药房连锁有限公司橡树湾店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "2",
-        "speaker_name": "何超梅",
-        "topic": "长期抗凝，精准用药更安心——抗凝患者门店管理",
-        "store_name": "湖北省昌盛大药房连锁有限公司保利心语店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "3",
-        "speaker_name": "张黎",
-        "topic": "规范抗栓治疗，为心脑血管患者带来长期获益",
-        "store_name": "湖北省昌盛大药房连锁有限公司大湾社区店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "4",
-        "speaker_name": "龚仁艳",
-        "topic": "慢病用药管理中的原研药历程",
-        "store_name": "湖北省昌盛大药房连锁有限公司大湾社区店",
-        "service_minutes": 40,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "1",
+    "projectType": 1,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "1146",
+    "meetingNo": "146",
+    "meetingName": "菁英药师大讲堂",
+    "meetingType": 0,
+    "meetingDate": "2026-06-22",
+    "startTime": "09:00",
+    "endTime": "11:10",
+    "chainName": "湖北省昌盛大药房连锁有限公司",
+    "pharmacyName": null,
+    "meetingLocation": "湖北省昌盛大药房连锁总部",
+    "remark": null,
+    "totalAttendees": 35
+  },
+  "speakers": [
     {
-      "photo_id": "14601",
-      "photo_type": "EDM",
-      "file_url": "s3://pe-meetings/hall/146/eposter.png",
-      "content_type": "image/png",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "湖北省昌盛大药房连锁有限公司橡树湾店",
+      "speakerName": "熊锦华",
+      "topic": "从血压波动到24小时平稳达标 ——高血压药事服务要点培训",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "14611",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/146/s1_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "14612",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/146/s1_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "14602",
-      "photo_type": "Manual",
-      "file_url": "s3://pe-meetings/hall/146/handbook.jpg",
-      "content_type": "image/jpeg",
-      "sort": 2
+      "speakerId": "2",
+      "identityName": "药师",
+      "storeName": "湖北省昌盛大药房连锁有限公司保利心语店",
+      "speakerName": "何超梅",
+      "topic": "长期抗凝，精准用药更安心——抗凝患者门店管理",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "14621",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/146/s2_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "14622",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/146/s2_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "14603",
-      "photo_type": "Poster",
-      "file_url": "s3://pe-meetings/hall/146/poster.jpg",
-      "content_type": "image/jpeg",
-      "sort": 3
+      "speakerId": "3",
+      "identityName": "药师",
+      "storeName": "湖北省昌盛大药房连锁有限公司大湾社区店",
+      "speakerName": "张黎",
+      "topic": "规范抗栓治疗，为心脑血管患者带来长期获益",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "14631",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/146/s3_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "14632",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/146/s3_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "14604",
-      "photo_type": "Stand",
-      "file_url": "s3://pe-meetings/hall/146/stand.jpg",
-      "content_type": "image/jpeg",
-      "sort": 4
+      "speakerId": "4",
+      "identityName": "药师",
+      "storeName": "湖北省昌盛大药房连锁有限公司大湾社区店",
+      "speakerName": "龚仁艳",
+      "topic": "慢病用药管理中的原研药历程",
+      "serviceMinutes": 40,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "14641",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/146/s4_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "14642",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/146/s4_2.jpg",
+          "fileName": null
+        }
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "14601",
+      "photoType": "EDM",
+      "fileUrl": "s3://pe-meetings/hall/146/eposter.png",
+      "fileName": null
     },
     {
-      "photo_id": "14605",
-      "photo_type": "TableCard",
-      "file_url": "s3://pe-meetings/hall/146/name_card.jpg",
-      "content_type": "image/jpeg",
-      "sort": 5
+      "photoId": "14602",
+      "photoType": "Manual",
+      "fileUrl": "s3://pe-meetings/hall/146/handbook.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "14611",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/146/s1_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 6
+      "photoId": "14603",
+      "photoType": "Poster",
+      "fileUrl": "s3://pe-meetings/hall/146/poster.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "14612",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/146/s1_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 7
+      "photoId": "14604",
+      "photoType": "Stand",
+      "fileUrl": "s3://pe-meetings/hall/146/stand.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "14621",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/146/s2_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 8
+      "photoId": "14605",
+      "photoType": "TableCard",
+      "fileUrl": "s3://pe-meetings/hall/146/name_card.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "14622",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/146/s2_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 9
+      "photoId": "14650",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/hall/146/panorama.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "14631",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/146/s3_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "3",
-      "sort": 10
-    },
-    {
-      "photo_id": "14632",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/146/s3_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "3",
-      "sort": 11
-    },
-    {
-      "photo_id": "14641",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/146/s4_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "4",
-      "sort": 12
-    },
-    {
-      "photo_id": "14642",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/146/s4_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "4",
-      "sort": 13
-    },
-    {
-      "photo_id": "14650",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/hall/146/panorama.jpg",
-      "content_type": "image/jpeg",
-      "sort": 14
-    },
-    {
-      "photo_id": "14660",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/hall/146/signin.pdf",
-      "content_type": "application/pdf",
-      "sort": 15
+      "photoId": "14660",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/hall/146/signin.pdf",
+      "fileName": null
     }
   ],
   "refs": {

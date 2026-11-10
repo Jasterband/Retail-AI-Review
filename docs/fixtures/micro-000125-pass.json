@@ -1,99 +1,97 @@
 {
-  "task_id": "req-micro-000921-001",
-  "meeting_id": "1921",
-  "meeting_no": "000921",
-  "project_type": "MICRO",
-  "meeting_type": "DUAL",
-  "project_id": "2",
-  "form": {
-    "meeting_name": "双讲师",
-    "meeting_date": "2026-08-26",
-    "start_time": "14:00",
-    "end_time": "15:10",
-    "chain_or_store_name": "江苏启扬医药连锁有限公司",
-    "meeting_location": "泰州市江苏启扬医药连锁有限公司泰兴东润店",
-    "total_attendees": 14,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "张吉根",
-        "topic": "微型药店健康服务赋能",
-        "store_name": "泰兴东润店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "2",
-        "speaker_name": "郝万君",
-        "topic": "门店药学服务实践",
-        "store_name": "泰兴东润店",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "2",
+    "projectType": 2,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "1921",
+    "meetingNo": "000921",
+    "meetingName": "双讲师",
+    "meetingType": 2,
+    "meetingDate": "2026-08-26",
+    "startTime": "14:00",
+    "endTime": "15:10",
+    "chainName": null,
+    "pharmacyName": "江苏启扬医药连锁有限公司",
+    "meetingLocation": "泰州市江苏启扬医药连锁有限公司泰兴东润店",
+    "remark": null,
+    "totalAttendees": 14
+  },
+  "speakers": [
     {
-      "photo_id": "501",
-      "photo_type": "EDM",
-      "file_url": "s3://pe-meetings/micro/000921/agenda.png",
-      "content_type": "image/png",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "泰兴东润店",
+      "speakerName": "张吉根",
+      "topic": "微型药店健康服务赋能",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "504",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/micro/000921/speaker1.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "502",
-      "photo_type": "ProjectIntro",
-      "file_url": "s3://pe-meetings/micro/000921/intro.jpg",
-      "content_type": "image/jpeg",
-      "sort": 2
+      "speakerId": "2",
+      "identityName": "药师",
+      "storeName": "泰兴东润店",
+      "speakerName": "郝万君",
+      "topic": "门店药学服务实践",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "505",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/micro/000921/speaker2.jpg",
+          "fileName": null
+        }
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "501",
+      "photoType": "EDM",
+      "fileUrl": "s3://pe-meetings/micro/000921/agenda.png",
+      "fileName": null
     },
     {
-      "photo_id": "503",
-      "photo_type": "EDMDisplay",
-      "file_url": "s3://pe-meetings/micro/000921/display.jpg",
-      "content_type": "image/jpeg",
-      "sort": 3
+      "photoId": "502",
+      "photoType": "ProjectIntro",
+      "fileUrl": "s3://pe-meetings/micro/000921/intro.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "504",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/micro/000921/speaker1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 4
+      "photoId": "503",
+      "photoType": "EDMDisplay",
+      "fileUrl": "s3://pe-meetings/micro/000921/display.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "505",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/micro/000921/speaker2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 5
+      "photoId": "506",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/micro/000921/panorama1.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "506",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/micro/000921/panorama1.jpg",
-      "content_type": "image/jpeg",
-      "sort": 6
+      "photoId": "507",
+      "photoType": "Panorama",
+      "fileUrl": "s3://pe-meetings/micro/000921/panorama2.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "507",
-      "photo_type": "Panorama",
-      "file_url": "s3://pe-meetings/micro/000921/panorama2.jpg",
-      "content_type": "image/jpeg",
-      "sort": 7
-    },
-    {
-      "photo_id": "508",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/micro/000921/signin.pdf",
-      "content_type": "application/pdf",
-      "sort": 8
+      "photoId": "508",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/micro/000921/signin.pdf",
+      "fileName": null
     }
   ],
   "refs": {

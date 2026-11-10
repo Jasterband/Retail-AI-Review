@@ -389,19 +389,20 @@ erDiagram
 | CLARITY | 两者 |
 | ASSET_MISSING | 两者 |
 | KEY_FIELD_MATCH | 两者 |
-| TIME_CONSISTENCY | 大讲堂优先 |
+| TIME_CONSISTENCY | 两者（海报等日程时间；不做时间水印） |
 | BAYER_LOGO | 两者 |
 | PANORAMA_COUNT | 两者 |
 | SIGNIN_DURATION | 两者 |
 | SIGNIN_RATIO_AND_STORES | 微型 |
 | IMAGE_DUP | 两者（盗用他场照：pHash/embedding，仅跨会议，不查会内） |
 | TOPIC_REUSE | 两者（仅讲者照主题/标题文本） |
-| WATERMARK_CONSISTENCY | 两者（有水印时） |
+| ~~WATERMARK_CONSISTENCY~~ | 已下线（时间/日期/地点水印均不审） |
 | NAME_CARD_SPEAKER_MATCH | 大讲堂 |
 | HANDBOOK_DETECT | 大讲堂 |
 | HANDBOOK_NOT_STALE | 大讲堂 |
 | SPEAKER_TOPIC_OCR | 大讲堂 |
 | SPEAKER_SHOT_PAIR | 大讲堂 |
+| SPEAKER_COMPOSITION | 两者（标题合影四要素；授课照人+PPT） |
 | PPT_TEMPLATE_MATCH | 微型 |
 | PPT_PAGE_KIND | 微型 |
 
@@ -412,7 +413,9 @@ erDiagram
 | BLURRY | 清晰度不足 |
 | TYPE_MISMATCH | 照片类别与声明不符 |
 | FIELD_MISMATCH | 关键字段与表单不一致 |
-| LOGO_MISSING | 未检出拜耳 Logo |
+| LOGO_MISSING | 未检出拜耳 Logo（微型） |
+| SPONSOR_MISSING | 未检出赞助方「拜耳医药保健有限公司」（大讲堂） |
+| SPONSOR_UNCERTAIN | 赞助方文案检出灰区 |
 | COUNT_BELOW_THRESHOLD | 人数不足 |
 | DURATION_BELOW_THRESHOLD | 时长不足 |
 | IMAGE_DUP | 与其他会议混用照片（完全一致或近似相似） |

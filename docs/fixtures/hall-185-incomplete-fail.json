@@ -1,167 +1,157 @@
 {
-  "task_id": "req-hall-185-incomplete-001",
-  "meeting_id": "1185",
-  "meeting_no": "185",
-  "project_type": "LECTURE_HALL",
-  "meeting_type": null,
-  "project_id": "1",
-  "form": {
-    "meeting_name": "菁英药师大讲堂项目",
-    "meeting_date": "2026-07-06",
-    "start_time": "14:00",
-    "end_time": "16:10",
-    "chain_or_store_name": "江苏嘉伦光彩大药房有限公司",
-    "meeting_location": "江苏嘉伦光彩大药房有限公司",
-    "total_attendees": 35,
-    "speakers": [
-      {
-        "speaker_id": "1",
-        "speaker_name": "李玉侠",
-        "topic": "合理用药",
-        "store_name": "嘉伦光彩",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "2",
-        "speaker_name": "高秀林",
-        "topic": "慢病管理",
-        "store_name": "嘉伦光彩",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "3",
-        "speaker_name": "翁蓉蔚",
-        "topic": "药学服务",
-        "store_name": "嘉伦光彩",
-        "service_minutes": 30,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      },
-      {
-        "speaker_id": "4",
-        "speaker_name": "徐云云",
-        "topic": "门店赋能",
-        "store_name": "嘉伦光彩",
-        "service_minutes": 40,
-        "identity_name": "药师",
-        "lecture_fee": 0,
-        "tax": 0
-      }
-    ]
+  "project": {
+    "projectId": "1",
+    "projectType": 1,
+    "projectName": null
   },
-  "photos": [
+  "meeting": {
+    "meetingId": "1185",
+    "meetingNo": "185",
+    "meetingName": "菁英药师大讲堂项目",
+    "meetingType": 0,
+    "meetingDate": "2026-07-06",
+    "startTime": "14:00",
+    "endTime": "16:10",
+    "chainName": "江苏嘉伦光彩大药房有限公司",
+    "pharmacyName": null,
+    "meetingLocation": "江苏嘉伦光彩大药房有限公司",
+    "remark": null,
+    "totalAttendees": 35
+  },
+  "speakers": [
     {
-      "photo_id": "18500",
-      "photo_type": "EDM",
-      "file_url": "s3://pe-meetings/hall/185/eposter.png",
-      "content_type": "image/png",
-      "sort": 1
+      "speakerId": "1",
+      "identityName": "药师",
+      "storeName": "嘉伦光彩",
+      "speakerName": "李玉侠",
+      "topic": "合理用药",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "18523",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/185/speaker1_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "18524",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/185/speaker1_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "18501",
-      "photo_type": "Manual",
-      "file_url": "s3://pe-meetings/hall/185/handbook.jpg",
-      "content_type": "image/jpeg",
-      "sort": 2
+      "speakerId": "2",
+      "identityName": "药师",
+      "storeName": "嘉伦光彩",
+      "speakerName": "高秀林",
+      "topic": "慢病管理",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "18525",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/185/speaker2_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "18526",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/185/speaker2_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "18502",
-      "photo_type": "Poster",
-      "file_url": "s3://pe-meetings/hall/185/poster.jpg",
-      "content_type": "image/jpeg",
-      "sort": 3
+      "speakerId": "3",
+      "identityName": "药师",
+      "storeName": "嘉伦光彩",
+      "speakerName": "翁蓉蔚",
+      "topic": "药学服务",
+      "serviceMinutes": 30,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "18527",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/185/speaker3_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "18528",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/185/speaker3_2.jpg",
+          "fileName": null
+        }
+      ]
     },
     {
-      "photo_id": "18503",
-      "photo_type": "Stand",
-      "file_url": "s3://pe-meetings/hall/185/stand.jpg",
-      "content_type": "image/jpeg",
-      "sort": 4
+      "speakerId": "4",
+      "identityName": "药师",
+      "storeName": "嘉伦光彩",
+      "speakerName": "徐云云",
+      "topic": "门店赋能",
+      "serviceMinutes": 40,
+      "lectureFee": 0,
+      "tax": 0,
+      "photos": [
+        {
+          "photoId": "18529",
+          "photoType": "SpeakerTitle",
+          "fileUrl": "s3://pe-meetings/hall/185/speaker4_1.jpg",
+          "fileName": null
+        },
+        {
+          "photoId": "18530",
+          "photoType": "SpeakerLecture",
+          "fileUrl": "s3://pe-meetings/hall/185/speaker4_2.jpg",
+          "fileName": null
+        }
+      ]
+    }
+  ],
+  "meetingPhotos": [
+    {
+      "photoId": "18500",
+      "photoType": "EDM",
+      "fileUrl": "s3://pe-meetings/hall/185/eposter.png",
+      "fileName": null
     },
     {
-      "photo_id": "18523",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/185/speaker1_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 5
+      "photoId": "18501",
+      "photoType": "Manual",
+      "fileUrl": "s3://pe-meetings/hall/185/handbook.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "18524",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/185/speaker1_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "1",
-      "sort": 6
+      "photoId": "18502",
+      "photoType": "Poster",
+      "fileUrl": "s3://pe-meetings/hall/185/poster.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "18525",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/185/speaker2_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 7
+      "photoId": "18503",
+      "photoType": "Stand",
+      "fileUrl": "s3://pe-meetings/hall/185/stand.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "18526",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/185/speaker2_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "2",
-      "sort": 8
+      "photoId": "18591",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/hall/185/signin_1.jpg",
+      "fileName": null
     },
     {
-      "photo_id": "18527",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/185/speaker3_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "3",
-      "sort": 9
-    },
-    {
-      "photo_id": "18528",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/185/speaker3_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "3",
-      "sort": 10
-    },
-    {
-      "photo_id": "18529",
-      "photo_type": "SpeakerTitle",
-      "file_url": "s3://pe-meetings/hall/185/speaker4_1.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "4",
-      "sort": 11
-    },
-    {
-      "photo_id": "18530",
-      "photo_type": "SpeakerLecture",
-      "file_url": "s3://pe-meetings/hall/185/speaker4_2.jpg",
-      "content_type": "image/jpeg",
-      "speaker_id": "4",
-      "sort": 12
-    },
-    {
-      "photo_id": "18591",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/hall/185/signin_1.jpg",
-      "content_type": "image/jpeg",
-      "sort": 13
-    },
-    {
-      "photo_id": "18592",
-      "photo_type": "SignSheet",
-      "file_url": "s3://pe-meetings/hall/185/signin_2.jpg",
-      "content_type": "image/jpeg",
-      "sort": 14
+      "photoId": "18592",
+      "photoType": "SignSheet",
+      "fileUrl": "s3://pe-meetings/hall/185/signin_2.jpg",
+      "fileName": null
     }
   ],
   "refs": {

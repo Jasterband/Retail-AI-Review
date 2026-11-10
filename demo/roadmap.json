@@ -73,9 +73,9 @@
         { "id": "c-panorama", "label": "全景人数：换模型 + 加强 prompt + 标点图回归", "status": "done", "note": "prompt 加强；阈值进配置；标点图回归仍建议抽测" },
         { "id": "c-asset-type", "label": "ASSET_TYPE_CHECK（信任 PE 声明）", "status": "done", "note": "不做视觉分类；以 photos[].photo_type 为准" },
         { "id": "c-key-fields", "label": "关键字段比对（海报/展架/电子日程 vs form）", "status": "done", "note": "场级 KEY_FIELD_MATCH + 资产 checks 回填 date/time/location/speakers_matches_form" },
-        { "id": "c-logo", "label": "拜耳 Logo", "status": "done", "note": "应检材料均需检出；模版对照+vision" },
+        { "id": "c-logo", "label": "拜耳品牌标识（Logo / 赞助方）", "status": "done", "note": "微型 EDM+EDMDisplay+ProjectIntro 查 Logo；大讲堂 EDM+Poster+Stand 查赞助方「拜耳医药保健有限公司」" },
         { "id": "c-duration", "label": "签到时长阈值", "status": "done", "note": "阈值进 options/thresholds" },
-        { "id": "c-watermark", "label": "水印一致性", "status": "done", "note": "WATERMARK_CONSISTENCY 已接线" },
+        { "id": "c-watermark", "label": "水印一致性", "status": "cancelled", "note": "已下线：时间/日期/地点水印均不审" },
         { "id": "c-dup", "label": "IMAGE_DUP 跨会盗用", "status": "done", "note": "pHash 跨会库；embedding 预留" },
         { "id": "c-topic", "label": "TOPIC_REUSE 主题查重", "status": "done", "note": "主题+讲者名联合比对历史库" }
       ]

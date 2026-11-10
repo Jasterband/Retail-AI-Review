@@ -6,7 +6,7 @@
 |------|------|------|
 | `clarity_threshold` | 0.60 | 本地 Laplacian 清晰度；低于则相关 OCR/模版规则偏 UNCERTAIN |
 | `human_confidence_threshold` | 0.75 | 类型等置信度灰区门槛 |
-| `watermark_time_skew_minutes` | 120 | 水印/图上时间相对会议时段容差 |
+| `watermark_time_skew_minutes` | 120 | 海报等材料上日程起止时间相对会议时段容差（**不做时间水印检测**） |
 | `name_match_mode` | fuzzy | 讲者/台卡姓名比对 |
 | `image_phash_max_distance` | 10 | IMAGE_DUP pHash 汉明距离 ≤ 判盗用（压缩/同图优先） |
 | `image_similarity_threshold` | 0.92 | IMAGE_DUP 轻量 embedding 余弦 ≥ 判近似盗用（轻度裁剪/调色兜底） |
@@ -23,4 +23,5 @@
 | `signin_duration_micro_dual` | 60 | 同上 |
 | `signin_audience_per_speaker` | 6 | 微型听众 ≥ 讲者×N |
 | `signin_min_store_kinds` | 2 | 微型听众门店种类 |
-| `logo_confidence_pass` | 0.55 | Logo vision 置信度 |
+| `logo_confidence_pass` | 0.55 | 微型 Logo vision 置信度 |
+| `sponsor_confidence_pass` | 0.55 | 大讲堂赞助方文案 vision 置信度 |

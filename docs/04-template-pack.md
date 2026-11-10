@@ -16,9 +16,9 @@ s3://pe-templates/2026Q2/
   lecture_hall/
     poster_full.jpg          # 从合格海报整图归档
     poster_header_crop.jpg
-    poster_footer_wave_crop.jpg
+    poster_key_fields_crop.jpg
     stand_full.jpg
-    name_card_border_crop.jpg
+    name_card_one_roi.jpg       # 台卡姓名定位，非版式规则
     handbook_cover_current.jpg
     handbook_cover_stale_neg.jpg   # 负样本旧封面（若有）
     signin_template.jpg
@@ -43,13 +43,12 @@ s3://pe-templates/2026Q2/
 
 | template_kind | 源文件 | Crop 目标 | crop_meta 建议 | 用途 |
 |---------------|--------|-----------|----------------|------|
-| Poster | `1权益-海报.jpg` | 整图归档 | source=full | 版式比对基线 |
-| Poster | 同上 | 顶部标题区（含「菁英药师大讲堂」字标） | 约上 20% | OCR 标题 + 版式 |
-| Poster | 同上 | 底部青粉波浪装饰条 | 约下 15% | 模版特征匹配 |
+| Poster | `1权益-海报.jpg` | 整图归档 | source=full | 归档基线 |
+| Poster | 同上 | 顶部标题区（含「菁英药师大讲堂」字标） | 约上 20% | OCR 标题 |
+| Poster | 同上 | 会议时间 / 地点 / 日程表区域 | 中部字段区 | 关键字段 OCR（`poster_key_fields`） |
 | Poster | 同上 | 主办/赞助红字区 | 底部文字带 | 辅助确认官方物料 |
-| Stand | `2权益-展架.jpg` | 整图 + 与海报同款 footer/header crops | — | 展架版式与 Logo |
-| TableCard | `3台卡.jpg` | 单张台卡 ROI（4 张分别 crop） | 每卡一张 | OCR 姓名训练/评测 |
-| TableCard | 同上 | 台卡底部蓝绿装饰条 | 单卡下缘 | `NAME_CARD_TEMPLATE` |
+| Stand | `2权益-展架.jpg` | 整图 + 与海报同款字段区 crop | — | 关键字段 + Logo（不做波浪模版匹配） |
+| TableCard | `3台卡.jpg` | （可选）单卡参考图 | — | 姓名改为**整图 OCR**，不依赖裁框 |
 | Manual | **缺失独立文件** | 需从 Teams/补拍：手册封面正面 | full cover | `HANDBOOK_DETECT` |
 | Manual | 台卡图桌面手册仅作弱参考 | 不建议作主 ref | — | 正式以封面照为准 |
 | LOGO_BAYER | 海报/展架角标 | Logo 外接矩形 | 紧裁 | `BAYER_LOGO` |
@@ -92,8 +91,8 @@ s3://pe-templates/2026Q2/
   "source_local_path": "药师大讲堂/2-2026-4-17-河南美锐大药房连锁有限公司/1权益-海报.jpg",
   "source_s3_uri": "s3://pe-templates/2026Q2/lecture_hall/poster_full.jpg",
   "coord_space": "normalized",
-  "box": { "x": 0.0, "y": 0.85, "w": 1.0, "h": 0.15 },
-  "note": "海报底部波浪装饰条",
+  "box": { "x": 0.05, "y": 0.25, "w": 0.9, "h": 0.45 },
+  "note": "海报会议时间/地点/日程字段区",
   "preprocess": ["perspective_optional"]
 }
 ```

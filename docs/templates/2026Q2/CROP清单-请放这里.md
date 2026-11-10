@@ -13,9 +13,7 @@
 | `micro/equity1_screen_full.jpg` | 权益一整页（对照） |
 | `micro/equity2_agenda_table_crop.jpg` | 权益二日程表 → `PPT_TEMPLATE_MATCH` |
 | `micro/equity2_screen_full.jpg` | 权益二整页（对照） |
-| `lecture_hall/poster_footer_wave_crop.jpg` | 海报底波浪 → 旁证 / `poster_wave_match` |
-| `lecture_hall/name_card_one_roi.jpg` | 单张台卡 → `NAME_CARD_TEMPLATE` |
-| `lecture_hall/name_card_border_crop.jpg` | 台卡底边装饰条（加强） |
+| `lecture_hall/name_card_one_roi.jpg` | （可选留存）台卡已改为**整图 OCR 姓名**，不再依赖此 crop 裁框 |
 | `lecture_hall/handbook_cover_current.jpg` | 当期手册封面 → `HANDBOOK_DETECT` / `HANDBOOK_NOT_STALE` |
 
 ---

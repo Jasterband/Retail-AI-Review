@@ -91,7 +91,6 @@
 | KEY_FIELD_MATCH | PASS | 海报日期地点讲者与表单一致 |
 | BAYER_LOGO | PASS | 海报/展架 |
 | NAME_CARD_SPEAKER_MATCH | PASS | 余艳红/刘亭/袁芳/高芳 |
-| NAME_CARD_TEMPLATE | PASS | 有模版后 |
 | PANORAMA_COUNT | PASS | ≥35 |
 | SIGNIN_DURATION | PASS | >120（结算 130 分钟） |
 | SPEAKER_SHOT_PAIR | PASS | 4 人各 2 张 |
@@ -177,7 +176,7 @@
 | ID | 类型 | 构造方式 | 期望 overall | 期望触发 rule |
 |----|------|----------|--------------|---------------|
 | N01 | 模糊图 | 高斯模糊合格海报 | NEED_HUMAN | CLARITY + KEY_FIELD_MATCH UNCERTAIN |
-| N02 | 错模版 | 非拜耳波浪/旧 VI 海报 | FAIL | PPT_TEMPLATE_MATCH / Poster 模版 |
+| N02 | 错模版 | 旧 VI / 非规定权益页（微型） | FAIL | `PPT_TEMPLATE_MATCH`（微型权益） |
 | N03 | 无 Logo | 遮挡或裁掉 Logo | FAIL | BAYER_LOGO |
 | N04 | 旧手册封面 | 往期手册标题/版式 | FAIL | HANDBOOK_NOT_STALE |
 | N05 | 非手册 | 普通笔记本特写当 Manual | FAIL | HANDBOOK_DETECT |

@@ -15,9 +15,7 @@ class TemplatePack:
     version: str
     root: Path
     logo: Optional[Path]
-    poster_wave: Optional[Path]
-    name_card: Optional[Path]
-    name_card_border: Optional[Path]
+    name_card: Optional[Path]  # 仅供台卡 ROI 定位抽姓名，非版式规则
     handbook_current: Optional[Path]
     handbook_stale: Optional[Path]
     equity1_ribbon: Optional[Path]
@@ -41,9 +39,7 @@ class TemplatePack:
         return {
             "version": self.version,
             "logo": rel(self.logo),
-            "poster_wave": rel(self.poster_wave),
             "name_card": rel(self.name_card),
-            "name_card_border": rel(self.name_card_border),
             "handbook_current": rel(self.handbook_current),
             "handbook_stale": rel(self.handbook_stale),
             "equity1_ribbon": rel(self.equity1_ribbon),
@@ -70,13 +66,7 @@ def get_template_pack(version: str = "2026Q2") -> TemplatePack:
         version=version,
         root=root,
         logo=_first_existing(root, "logo/bayer_logo.png", "logo/bayer_logo.jpg"),
-        poster_wave=_first_existing(
-            root, "lecture_hall/poster_footer_wave_crop.jpg"
-        ),
         name_card=_first_existing(root, "lecture_hall/name_card_one_roi.jpg"),
-        name_card_border=_first_existing(
-            root, "lecture_hall/name_card_border_crop.jpg"
-        ),
         handbook_current=_first_existing(
             root, "lecture_hall/handbook_cover_current.jpg"
         ),

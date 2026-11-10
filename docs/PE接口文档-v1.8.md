@@ -595,9 +595,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
         "speaker_names": ["余艳红", "袁芳", "高芳"]
       },
       "ocr_raw": "余艳红\n袁芳\n高芳",
-      "detections": {
-        "name_card_rois": [[120, 80, 400, 220], [420, 80, 700, 220], [720, 80, 1000, 220]]
-      },
+      "detections": null,
       "model_scores": { "name_ocr_avg": 0.91 }
     }
   ],

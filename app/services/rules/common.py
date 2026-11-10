@@ -14,7 +14,6 @@ from app.services.pipeline.asset_context import AssetContext
 from app.services.rules.base import RuleOutcome, fail, pass_, skip, uncertain
 from app.services.text_norm import (
     date_equal,
-    duration_minutes_from_times,
     fuzzy_contains,
     name_set_equal,
     normalize_name,
@@ -308,27 +307,15 @@ def rule_bayer_logo(
     evidence_rows = []
     for c in targets:
         tm = (c.template_match or {}).get("bayer_logo") or {}
-        wave = (c.template_match or {}).get("poster_wave") or {}
         # 模版 pack 对照优先
         if tm:
-            score = float(tm.get("score") or 0)
             if tm.get("hit"):
                 hits.append(c.photo_id)
             elif tm.get("uncertain"):
                 gray.append(c.photo_id)
             else:
-                # 海报波浪命中可作弱旁证，不单独过
-                if wave.get("hit") and score >= 0.45:
-                    gray.append(c.photo_id)
-                else:
-                    miss.append(c.photo_id)
-            evidence_rows.append(
-                {
-                    "photo_id": c.photo_id,
-                    "logo": tm,
-                    "poster_wave": wave or None,
-                }
-            )
+                miss.append(c.photo_id)
+            evidence_rows.append({"photo_id": c.photo_id, "logo": tm})
             continue
 
         flag = c.vision.get("has_bayer_logo")
@@ -430,28 +417,17 @@ def rule_panorama_count(
 def rule_signin_duration(
     contexts: List[AssetContext], snap: dict, options: dict
 ) -> RuleOutcome:
-    signs = [c for c in contexts if c.photo_type == "SignSheet" and c.ok]
-    if not signs:
+    from app.services.pipeline.aggregate import merge_signin_sheets
+
+    merged = merge_signin_sheets(contexts, options)
+    if not merged:
         return skip("SIGNIN_DURATION", "无签到")
     thr = merge_thresholds(options)
     project_type = snap["project_type"]
     subtype = snap.get("meeting_type")
     need = signin_duration_need(project_type, subtype, thr)
-
-    best = None
-    related = [c.photo_id for c in signs]
-    for c in signs:
-        if _is_blurry(c, options):
-            continue
-        signin = c.vision.get("signin") if isinstance(c.vision.get("signin"), dict) else {}
-        of = c.ocr_fields()
-        dur = duration_minutes_from_times(
-            signin.get("start_time") or of.get("start_time"),
-            signin.get("end_time") or of.get("end_time"),
-            signin.get("duration_minutes"),
-        )
-        if dur is not None:
-            best = max(best or 0, int(dur))
+    related = list(merged.get("photo_ids") or [])
+    best = merged.get("duration_minutes")
     if best is None:
         return uncertain(
             "SIGNIN_DURATION",
@@ -459,19 +435,92 @@ def rule_signin_duration(
             "签到表模糊或无法可靠读取起止时间",
             related=related,
         )
+    best = int(best)
+    page_n = int(merged.get("page_count") or len(related) or 1)
     if best <= need:
         return fail(
             "SIGNIN_DURATION",
             "DURATION_BELOW_THRESHOLD",
-            "签到时长{0}分钟，未超过{1}".format(best, need),
+            "签到时长{0}分钟，未超过{1}（{2}页合并）".format(best, need, page_n),
             related=related,
-            evidence={"duration": best, "need": need},
+            evidence={
+                "duration": best,
+                "need": need,
+                "page_count": page_n,
+                "pages": merged.get("pages"),
+            },
         )
     return pass_(
         "SIGNIN_DURATION",
-        "签到时长 {0} 分钟，满足 >{1}".format(best, need),
+        "签到时长 {0} 分钟，满足 >{1}（{2}页合并）".format(best, need, page_n),
         related=related,
-        evidence={"duration": best, "need": need},
+        evidence={
+            "duration": best,
+            "need": need,
+            "page_count": page_n,
+            "pages": merged.get("pages"),
+        },
+    )
+
+
+def rule_signin_complete(
+    contexts: List[AssetContext], options: dict
+) -> RuleOutcome:
+    """每张签到表独立做完整性：表头（若有）+ 已占用行四列齐。"""
+    from app.services.pipeline.aggregate import _signin_payload, merge_signin_sheets
+
+    merged = merge_signin_sheets(contexts, options)
+    if not merged:
+        return skip("SIGNIN_COMPLETE", "无签到")
+    related = list(merged.get("photo_ids") or [])
+    fails: List[str] = []
+    uncs: List[str] = []
+    page_ev: List[dict] = []
+    for c in contexts:
+        if c.photo_type != "SignSheet" or not c.ok:
+            continue
+        if _is_blurry(c, options):
+            uncs.append(c.photo_id)
+            page_ev.append({"photo_id": c.photo_id, "skipped": "blurry"})
+            continue
+        p = _signin_payload(c)
+        ok = p.get("complete_ok")
+        row = {
+            "photo_id": c.photo_id,
+            "complete_ok": ok,
+            "header_complete": p.get("header_complete"),
+            "rows_complete": p.get("rows_complete"),
+            "incomplete_row_count": p.get("incomplete_row_count"),
+        }
+        page_ev.append(row)
+        if ok is False:
+            fails.append(c.photo_id)
+        elif ok is None:
+            uncs.append(c.photo_id)
+
+    if fails:
+        return fail(
+            "SIGNIN_COMPLETE",
+            "SIGNIN_INCOMPLETE",
+            "签到表填写不完整（姓名/职称/连锁/签名或表头缺项），材料: {0}".format(
+                fails
+            ),
+            related=fails,
+            evidence={"pages": page_ev},
+        )
+    if uncs and not fails:
+        return uncertain(
+            "SIGNIN_COMPLETE",
+            "OCR_LOW_CONFIDENCE",
+            "签到表完整性无法可靠判定，材料: {0}".format(uncs),
+            related=uncs,
+            evidence={"pages": page_ev},
+        )
+    return pass_(
+        "SIGNIN_COMPLETE",
+        "签到表填写完整（{0}页各自通过）".format(len(related)),
+        related=related,
+        evidence={"pages": page_ev},
     )
 
 

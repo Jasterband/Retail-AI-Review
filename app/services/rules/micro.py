@@ -293,32 +293,23 @@ def rule_ppt_page_kind(
 def rule_signin_ratio_and_stores(
     contexts: List[AssetContext], form: dict, options: dict
 ) -> RuleOutcome:
+    from app.services.pipeline.aggregate import merge_signin_sheets
     from app.services.thresholds import merge_thresholds
 
-    signs = [c for c in contexts if c.photo_type == "SignSheet" and c.ok]
-    if not signs:
+    merged = merge_signin_sheets(contexts, options)
+    if not merged:
         return skip("SIGNIN_RATIO_AND_STORES", "无签到")
     thr = merge_thresholds(options)
     n_speakers = len(form.get("speakers") or [])
     need_audience = n_speakers * int(thr.get("signin_audience_per_speaker", 6))
     min_stores = int(thr.get("signin_min_store_kinds", 2))
-    related = [c.photo_id for c in signs]
+    related = list(merged.get("photo_ids") or [])
+    page_n = int(merged.get("page_count") or len(related) or 1)
 
-    audience = None
-    stores = []
-    for c in signs:
-        if _is_blurry(c, options):
-            continue
-        signin = c.vision.get("signin") or {}
-        ac = signin.get("audience_count")
-        if ac is not None:
-            try:
-                audience = max(audience or 0, int(ac))
-            except (TypeError, ValueError):
-                pass
-        stores.extend(signin.get("store_names") or [])
+    audience = merged.get("audience_count")
+    uniq_stores = set(merged.get("store_names") or [])
 
-    if audience is None and not stores:
+    if audience is None and not uniq_stores:
         return uncertain(
             "SIGNIN_RATIO_AND_STORES",
             "OCR_LOW_CONFIDENCE",
@@ -326,13 +317,14 @@ def rule_signin_ratio_and_stores(
             related=related,
         )
 
-    uniq_stores = {s.strip() for s in stores if s and str(s).strip()}
     problems = []
     if audience is not None and audience < need_audience:
         problems.append(
-            "听众数{0}<讲者数×6（{1}）".format(audience, need_audience)
+            "听众数{0}<讲者数×6（{1}）（{2}页合计）".format(
+                audience, need_audience, page_n
+            )
         )
-    if stores and len(uniq_stores) < min_stores:
+    if uniq_stores and len(uniq_stores) < min_stores:
         problems.append(
             "听众门店种类不足{0}（当前{1}）".format(min_stores, len(uniq_stores))
         )
@@ -346,15 +338,19 @@ def rule_signin_ratio_and_stores(
                 "audience": audience,
                 "need_audience": need_audience,
                 "stores": list(uniq_stores),
+                "page_count": page_n,
+                "pages": merged.get("pages"),
             },
         )
     return pass_(
         "SIGNIN_RATIO_AND_STORES",
-        "签到听众人数与门店种类满足要求",
+        "签到听众人数与门店种类满足要求（{0}页合计）".format(page_n),
         related=related,
         evidence={
             "audience": audience,
             "need_audience": need_audience,
             "stores": list(uniq_stores),
+            "page_count": page_n,
+            "pages": merged.get("pages"),
         },
     )

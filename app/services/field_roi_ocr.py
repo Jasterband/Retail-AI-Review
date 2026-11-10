@@ -1,4 +1,4 @@
-"""关键字段 / 台卡：模版 crop → NCC 定位 → ROI OCR。
+"""关键字段 / 台卡 OCR。
 
 流程（海报/展架/电子日程）：
 1. 用字段区参考 crop（综合块，或 时间/地点/日程 分块）在整图上做多尺度 NCC
@@ -8,9 +8,7 @@
 4. 写回 AssetContext.vision["ocr_fields"]（有值才覆盖）
 
 流程（台卡 TableCard）：
-1. 用单张台卡参考 crop（name_card_one_roi）在整图上多实例 NCC
-2. 每张命中卡裁 ROI
-3. 对 ROI 抽姓名 → 合并为 name_card_names
+整图 Vision 抽取 name_card_names，再与 form.speakers 比对；**不裁框**。
 """
 
 from __future__ import annotations
@@ -23,7 +21,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image
 
 from app.services.pipeline.asset_context import AssetContext
-from app.services.template_match import match_ncc_locate, match_ncc_locate_multi
+from app.services.template_match import match_ncc_locate
 from app.services.template_pack import TemplatePack
 from app.services.vision.client import VisionClient, VisionError
 
@@ -35,13 +33,6 @@ _FIELD_TYPES = {"Poster", "Stand", "EDM", "EDMDisplay"}
 _SCALES = (0.12, 0.18, 0.25, 0.35, 0.5, 0.7, 1.0, 1.3)
 _HIT = 0.58
 _UNC = 0.48
-
-# 单卡参考很小（~288px），4K 现场单卡常到 1500px+，尺度要拉大
-_NAME_CARD_SCALES = (2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0)
-_NAME_CARD_MIN_SCORE = 0.58
-_NAME_CARD_TOP_K = 4
-_NAME_CARD_ASPECT_MIN = 1.2
-_NAME_CARD_ASPECT_MAX = 3.2
 
 
 def _pick_crops(pack: TemplatePack, photo_type: str) -> List[Tuple[str, Path]]:
@@ -258,8 +249,8 @@ def enrich_contexts_with_field_roi_ocr(
             ctx.vision = {}
         ctx.vision["ocr_fields"] = merged
 
-    # 台卡：单卡 crop 多实例定位 → 逐卡 ROI OCR 姓名
-    _enrich_name_cards(contexts, pack, vision)
+    # 台卡：整图抽姓名（不裁框）
+    _enrich_name_cards(contexts, vision)
 
 
 def _normalize_name_token(value: Any) -> Optional[str]:
@@ -275,7 +266,7 @@ def _normalize_name_token(value: Any) -> Optional[str]:
     return s
 
 
-def _names_from_roi_payload(data: Dict[str, Any]) -> List[str]:
+def _names_from_payload(data: Dict[str, Any]) -> List[str]:
     out: List[str] = []
     primary = _normalize_name_token(data.get("name"))
     if primary:
@@ -291,45 +282,26 @@ def _names_from_roi_payload(data: Dict[str, Any]) -> List[str]:
     return out
 
 
-def _box_aspect_ok(box: Dict[str, float]) -> bool:
-    w = float(box.get("w") or 0.0)
-    h = float(box.get("h") or 0.0)
-    if w <= 0 or h <= 0:
-        return False
-    aspect = w / h
-    return _NAME_CARD_ASPECT_MIN <= aspect <= _NAME_CARD_ASPECT_MAX
-
-
-def _boxes_from_ncc(scene_bytes: bytes, crop_path: Path) -> List[Dict[str, Any]]:
-    located = match_ncc_locate_multi(
-        scene_bytes,
-        crop_path,
-        top_k=_NAME_CARD_TOP_K,
-        scales=_NAME_CARD_SCALES,
-        min_rel_w=0.15,
-        min_rel_h=0.12,
-        max_rel_w=0.5,
-        max_rel_h=0.55,
-        min_score=_NAME_CARD_MIN_SCORE,
-        suppress_pad=0.45,
-    )
-    out: List[Dict[str, Any]] = []
-    for loc in located:
-        box = loc.get("box_norm")
-        if not isinstance(box, dict) or not _box_aspect_ok(box):
-            continue
-        out.append(
-            {
-                "box_norm": box,
-                "score": float(loc.get("score") or 0.0),
-                "method": "ncc",
-                "name_hint": None,
-            }
-        )
+def _existing_vision_names(ctx: AssetContext) -> List[str]:
+    """首轮 analyze 若已抽出姓名，可作为兜底。"""
+    out: List[str] = []
+    raw = (ctx.vision or {}).get("name_card_names")
+    if isinstance(raw, str):
+        raw = [raw]
+    if isinstance(raw, list):
+        for item in raw:
+            n = _normalize_name_token(item)
+            if n and n not in out:
+                out.append(n)
+    of = ctx.ocr_fields()
+    for item in of.get("speaker_names") or []:
+        n = _normalize_name_token(item)
+        if n and n not in out:
+            out.append(n)
     return out
 
 
-def _downscale_jpeg(image_bytes: bytes, max_side: int = 1280) -> bytes:
+def _downscale_jpeg(image_bytes: bytes, max_side: int = 1600) -> bytes:
     try:
         im = Image.open(BytesIO(image_bytes)).convert("RGB")
     except Exception:
@@ -344,222 +316,61 @@ def _downscale_jpeg(image_bytes: bytes, max_side: int = 1280) -> bytes:
         Image.Resampling.BILINEAR,
     )
     buf = BytesIO()
-    im.save(buf, format="JPEG", quality=85)
+    im.save(buf, format="JPEG", quality=88)
     return buf.getvalue()
-
-
-def _boxes_from_vision(
-    vision: VisionClient,
-    scene_bytes: bytes,
-    ref_bytes: bytes,
-) -> List[Dict[str, Any]]:
-    # 缩小整图，布局更易被模型看全
-    scene_small = _downscale_jpeg(scene_bytes, 1280)
-    ref_small = _downscale_jpeg(ref_bytes, 512)
-    try:
-        data = vision.locate_name_cards(scene_small, ref_small)
-    except VisionError as e:
-        logger.warning("name card locate failed: %s", e)
-        return []
-    cards = data.get("cards") if isinstance(data, dict) else None
-    if not isinstance(cards, list):
-        # 模型偶发只回单个 name，视为定位失败
-        logger.warning("name card locate bad payload keys=%s", list(data.keys()) if isinstance(data, dict) else type(data))
-        return []
-    out: List[Dict[str, Any]] = []
-    for card in cards:
-        if not isinstance(card, dict):
-            continue
-        box = card.get("box_norm")
-        if not isinstance(box, dict):
-            continue
-        try:
-            norm = {
-                "x": float(box.get("x")),
-                "y": float(box.get("y")),
-                "w": float(box.get("w")),
-                "h": float(box.get("h")),
-            }
-        except (TypeError, ValueError):
-            continue
-        if norm["w"] <= 0.05 or norm["h"] <= 0.05:
-            continue
-        if norm["x"] < 0 or norm["y"] < 0 or norm["x"] + norm["w"] > 1.05:
-            continue
-        out.append(
-            {
-                "box_norm": {
-                    "x": round(max(0.0, norm["x"]), 4),
-                    "y": round(max(0.0, norm["y"]), 4),
-                    "w": round(min(1.0, norm["w"]), 4),
-                    "h": round(min(1.0, norm["h"]), 4),
-                },
-                "score": 0.9,
-                "method": "vision_ref",
-                "name_hint": _normalize_name_token(card.get("name")),
-            }
-        )
-    return _dedupe_boxes(out)
-
-
-def _box_iou(a: Dict[str, float], b: Dict[str, float]) -> float:
-    ax2 = a["x"] + a["w"]
-    ay2 = a["y"] + a["h"]
-    bx2 = b["x"] + b["w"]
-    by2 = b["y"] + b["h"]
-    ix1, iy1 = max(a["x"], b["x"]), max(a["y"], b["y"])
-    ix2, iy2 = min(ax2, bx2), min(ay2, by2)
-    iw, ih = max(0.0, ix2 - ix1), max(0.0, iy2 - iy1)
-    inter = iw * ih
-    if inter <= 0:
-        return 0.0
-    union = a["w"] * a["h"] + b["w"] * b["h"] - inter
-    return inter / union if union > 0 else 0.0
-
-
-def _dedupe_boxes(boxes: List[Dict[str, Any]], iou_thr: float = 0.45) -> List[Dict[str, Any]]:
-    kept: List[Dict[str, Any]] = []
-    for box in boxes:
-        bn = box.get("box_norm") or {}
-        if any(_box_iou(bn, k.get("box_norm") or {}) >= iou_thr for k in kept):
-            continue
-        kept.append(box)
-    return kept
-
-
-def _boxes_grid_fallback(n: int = 4) -> List[Dict[str, Any]]:
-    """桌面四宫格兜底：常见 2x2 摆放。"""
-    if n <= 0:
-        return []
-    # 略向中心收一点，避开桌边
-    cells = [
-        (0.04, 0.04, 0.46, 0.46),
-        (0.50, 0.04, 0.46, 0.46),
-        (0.04, 0.50, 0.46, 0.46),
-        (0.50, 0.50, 0.46, 0.46),
-    ]
-    out = []
-    for x, y, w, h in cells[: max(1, min(4, n))]:
-        out.append(
-            {
-                "box_norm": {"x": x, "y": y, "w": w, "h": h},
-                "score": 0.4,
-                "method": "grid_2x2",
-                "name_hint": None,
-            }
-        )
-    return out
 
 
 def _enrich_name_cards(
     contexts: List[AssetContext],
-    pack: TemplatePack,
     vision: VisionClient,
 ) -> None:
-    crop_path = pack.name_card
-    if crop_path is None or not crop_path.is_file():
-        return
-    ref_bytes = crop_path.read_bytes()
-
+    """台卡整图 OCR 姓名 → name_card_names；与 form 比对在规则层完成。"""
     for ctx in contexts:
         if not ctx.ok or not ctx.body or ctx.photo_type != "TableCard":
             continue
 
-        # 台卡姓名：参考 crop 对照定位各卡框 → 逐张 ROI OCR。
-        # 优先 Vision 标框；失败再 NCC；若最终姓名仍 <2，用 2x2 网格兜底重跑。
-        boxes = _boxes_from_vision(vision, ctx.body, ref_bytes)
-        locate_method = "vision_ref"
-        if len(boxes) < 2:
-            ncc_boxes = _boxes_from_ncc(ctx.body, crop_path)
-            if len(ncc_boxes) > len(boxes):
-                boxes = ncc_boxes
-                locate_method = "ncc"
-
-        names, cards_meta = _ocr_name_card_boxes(vision, ctx, boxes, crop_path.name)
-        # 大讲堂常见 4 张；姓名少于 3 时用 2x2 网格兜底，取更好的结果
-        if len(names) < 3:
-            grid_names, grid_meta = _ocr_name_card_boxes(
-                vision, ctx, _boxes_grid_fallback(4), crop_path.name
+        names: List[str] = []
+        raw_payload: Optional[Dict[str, Any]] = None
+        method = "full_image"
+        err: Optional[Dict[str, Any]] = None
+        try:
+            small = _downscale_jpeg(ctx.body, 1600)
+            raw_payload = vision.ocr_name_cards_full(small, "image/jpeg")
+            names = _names_from_payload(
+                raw_payload if isinstance(raw_payload, dict) else {}
             )
-            if len(grid_names) > len(names):
-                names, cards_meta = grid_names, grid_meta
-                locate_method = "grid_2x2"
+        except VisionError as e:
+            logger.warning(
+                "name card full OCR failed photo_id=%s: %s",
+                ctx.photo_id,
+                e,
+            )
+            err = {"code": e.code, "message": e.message}
+            method = "vision_error"
+
+        if not names:
+            fallback = _existing_vision_names(ctx)
+            if fallback:
+                names = fallback
+                method = "analyze_fallback"
 
         tm = dict(ctx.template_match or {})
-        tm["name_card_rois"] = {
-            "ref": crop_path.name,
-            "locate_method": locate_method,
-            "cards": cards_meta,
+        tm["name_card_ocr"] = {
+            "method": method,
             "names": names,
+            "raw": raw_payload if isinstance(raw_payload, dict) else None,
+            "error": err,
         }
         ctx.template_match = tm
+
         if not ctx.vision:
             ctx.vision = {}
         if names:
-            prev = ctx.vision.get("name_card_names")
-            prev_list: List[str] = []
-            if isinstance(prev, list):
-                prev_list = [x for x in (_normalize_name_token(n) for n in prev) if x]
-            elif isinstance(prev, str):
-                tok = _normalize_name_token(prev)
-                if tok:
-                    prev_list = [tok]
-            if not prev_list or len(names) >= len(prev_list):
-                ctx.vision["name_card_names"] = names
+            ctx.vision["name_card_names"] = names
             of = ctx.vision.get("ocr_fields")
             if not isinstance(of, dict):
                 of = {}
             else:
                 of = dict(of)
-            of["speaker_names"] = ctx.vision.get("name_card_names") or names
+            of["speaker_names"] = names
             ctx.vision["ocr_fields"] = of
-
-
-def _ocr_name_card_boxes(
-    vision: VisionClient,
-    ctx: AssetContext,
-    boxes: List[Dict[str, Any]],
-    ref_name: str,
-) -> Tuple[List[str], List[Dict[str, Any]]]:
-    names: List[str] = []
-    cards_meta: List[Dict[str, Any]] = []
-    for loc in boxes:
-        box = loc.get("box_norm") or {}
-        item: Dict[str, Any] = {
-            "score": loc.get("score"),
-            "hit": True,
-            "box_norm": box,
-            "ref": ref_name,
-            "method": loc.get("method"),
-        }
-        hint = loc.get("name_hint")
-        roi = _crop_roi_jpeg(ctx.body or b"", box, pad=0.06)
-        if not roi:
-            if hint and hint not in names:
-                names.append(hint)
-                item["ocr"] = {"names": [hint], "from": "locate_hint"}
-            cards_meta.append(item)
-            continue
-        try:
-            data = vision.ocr_name_card_roi(roi, "image/jpeg")
-        except VisionError as e:
-            logger.warning(
-                "name card ROI OCR failed photo_id=%s: %s",
-                ctx.photo_id,
-                e,
-            )
-            item["ocr_error"] = {"code": e.code, "message": e.message}
-            if hint and hint not in names:
-                names.append(hint)
-                item["ocr"] = {"names": [hint], "from": "locate_hint"}
-            cards_meta.append(item)
-            continue
-        got = _names_from_roi_payload(data if isinstance(data, dict) else {})
-        if not got and hint:
-            got = [hint]
-        item["ocr"] = {"names": got, "raw": data if isinstance(data, dict) else None}
-        for n in got:
-            if n not in names:
-                names.append(n)
-        cards_meta.append(item)
-    return names, cards_meta

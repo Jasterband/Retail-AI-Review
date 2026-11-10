@@ -38,6 +38,7 @@ def run_all_rules(
             contexts, snap, options
         ),
         "SIGNIN_DURATION": lambda: common.rule_signin_duration(contexts, snap, options),
+        "SIGNIN_COMPLETE": lambda: common.rule_signin_complete(contexts, options),
         "IMAGE_DUP": lambda: common.rule_image_dup(contexts, snap, refs, options, db),
         "TOPIC_REUSE": lambda: common.rule_topic_reuse(
             contexts, snap, form, refs, options, db
@@ -48,7 +49,6 @@ def run_all_rules(
         "NAME_CARD_SPEAKER_MATCH": lambda: hall.rule_name_card_speaker(
             contexts, form, options
         ),
-        "NAME_CARD_TEMPLATE": lambda: hall.rule_name_card_template(contexts, options),
         "HANDBOOK_DETECT": lambda: hall.rule_handbook_detect(contexts),
         "HANDBOOK_NOT_STALE": lambda: hall.rule_handbook_not_stale(contexts),
         "SPEAKER_TOPIC_OCR": lambda: hall.rule_speaker_topic_ocr(

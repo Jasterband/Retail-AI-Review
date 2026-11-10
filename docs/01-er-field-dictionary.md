@@ -398,7 +398,6 @@ erDiagram
 | TOPIC_REUSE | 两者（仅讲者照主题/标题文本） |
 | WATERMARK_CONSISTENCY | 两者（有水印时） |
 | NAME_CARD_SPEAKER_MATCH | 大讲堂 |
-| NAME_CARD_TEMPLATE | 大讲堂 |
 | HANDBOOK_DETECT | 大讲堂 |
 | HANDBOOK_NOT_STALE | 大讲堂 |
 | SPEAKER_TOPIC_OCR | 大讲堂 |

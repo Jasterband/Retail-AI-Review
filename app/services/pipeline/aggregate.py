@@ -58,17 +58,155 @@ def _as_name_list(value: Any) -> List[str]:
     return []
 
 
+def _signin_complete_from_vision(signin: dict, of: dict) -> Optional[bool]:
+    """本页完整性：表头（若有）+ 已占用行四列齐；说明/其他列不强制。"""
+    explicit = _coerce_bool(signin.get("signin_complete_ok"))
+    if explicit is not None:
+        return explicit
+    header = _coerce_bool(signin.get("header_complete"))
+    rows = _coerce_bool(signin.get("rows_complete"))
+    if rows is None and header is None:
+        # 回退：能读到起止时间 + 有人数/门店/手签 视为大致完整
+        start = signin.get("start_time") or of.get("start_time")
+        end = signin.get("end_time") or of.get("end_time")
+        has_people = signin.get("audience_count") is not None
+        hand = _coerce_bool(signin.get("has_handwritten_signatures"))
+        if start and end and (has_people or hand is True):
+            return True
+        if start is None and end is None and has_people is False and hand is False:
+            return False
+        return None
+    if header is False or rows is False:
+        return False
+    if rows is True and header is not False:
+        return True
+    return None
+
+
 def _signin_payload(ctx: AssetContext) -> dict:
     v = ctx.vision or {}
     of = ctx.ocr_fields()
     signin = v.get("signin") if isinstance(v.get("signin"), dict) else {}
+    raw_template = signin.get("signin_template_ok")
+    if raw_template is None:
+        raw_template = signin.get("is_printed_form")
+    if raw_template is None:
+        raw_template = v.get("signin_template_ok")
+    raw_hand = signin.get("has_handwritten_signatures")
+    if raw_hand is None:
+        raw_hand = v.get("has_handwritten_signatures")
     return {
         "start_time": signin.get("start_time") or of.get("start_time"),
         "end_time": signin.get("end_time") or of.get("end_time"),
         "duration_minutes": signin.get("duration_minutes"),
         "audience_count": signin.get("audience_count"),
         "store_names": signin.get("store_names") or [],
+        "template_ok": _coerce_bool(raw_template),
+        "has_handwritten_signatures": _coerce_bool(raw_hand),
+        "header_complete": _coerce_bool(signin.get("header_complete")),
+        "rows_complete": _coerce_bool(signin.get("rows_complete")),
+        "incomplete_row_count": signin.get("incomplete_row_count"),
+        "complete_ok": _signin_complete_from_vision(signin, of),
+        "photo_id": ctx.photo_id,
     }
+
+
+def merge_signin_sheets(
+    contexts: List[AssetContext],
+    options: Optional[dict] = None,
+) -> Optional[Dict[str, Any]]:
+    """多张 SignSheet 合并成一场签到检查（时长取可读最大值；听众人数按页累加；门店并集）。"""
+    sheets = [c for c in contexts if c.photo_type == "SignSheet" and c.ok]
+    if not sheets:
+        return None
+    thr = merge_thresholds(options)
+    related = [c.photo_id for c in sheets]
+    best_dur: Optional[int] = None
+    best_start = None
+    best_end = None
+    audience_sum = 0
+    audience_any = False
+    stores: List[str] = []
+    template_flags: List[Optional[bool]] = []
+    hand_flags: List[Optional[bool]] = []
+    page_rows: List[dict] = []
+
+    for c in sheets:
+        if _is_blurry_ctx(c, options):
+            page_rows.append({"photo_id": c.photo_id, "skipped": "blurry"})
+            continue
+        p = _signin_payload(c)
+        dur = duration_minutes_from_times(
+            p.get("start_time"),
+            p.get("end_time"),
+            p.get("duration_minutes"),
+        )
+        if dur is not None and (best_dur is None or dur > best_dur):
+            best_dur = int(dur)
+            best_start = p.get("start_time")
+            best_end = p.get("end_time")
+        ac = p.get("audience_count")
+        if ac is not None:
+            try:
+                audience_sum += int(ac)
+                audience_any = True
+            except (TypeError, ValueError):
+                pass
+        for s in p.get("store_names") or []:
+            if s and str(s).strip():
+                stores.append(str(s).strip())
+        template_flags.append(p.get("template_ok"))
+        hand_flags.append(p.get("has_handwritten_signatures"))
+        page_rows.append(
+            {
+                "photo_id": c.photo_id,
+                "duration_minutes": dur,
+                "audience_count": ac,
+                "template_ok": p.get("template_ok"),
+                "has_handwritten_signatures": p.get("has_handwritten_signatures"),
+                "header_complete": p.get("header_complete"),
+                "rows_complete": p.get("rows_complete"),
+                "incomplete_row_count": p.get("incomplete_row_count"),
+                "complete_ok": p.get("complete_ok"),
+            }
+        )
+
+    # 模版：任一页确认为「打印签到表」即 true；全否 false；否则 null
+    if any(x is True for x in template_flags):
+        template_ok: Optional[bool] = True
+    elif template_flags and all(x is False for x in template_flags):
+        template_ok = False
+    else:
+        template_ok = None
+    if any(x is True for x in hand_flags):
+        handwritten: Optional[bool] = True
+    elif hand_flags and all(x is False for x in hand_flags):
+        handwritten = False
+    else:
+        handwritten = None
+
+    return {
+        "photo_ids": related,
+        "page_count": len(sheets),
+        "start_time": best_start,
+        "end_time": best_end,
+        "duration_minutes": best_dur,
+        "audience_count": audience_sum if audience_any else None,
+        "store_names": sorted({s for s in stores}),
+        "template_ok": template_ok,
+        "has_handwritten_signatures": handwritten,
+        "pages": page_rows,
+        "clarity_threshold": float(thr.get("clarity_threshold", 0.6)),
+    }
+
+
+def _is_blurry_ctx(ctx: AssetContext, options: Optional[dict]) -> bool:
+    thr = merge_thresholds(options)
+    clarity_thr = float(thr.get("clarity_threshold", 0.6))
+    score = ctx.clarity_score()
+    if score is None:
+        return False
+    return score < clarity_thr
 
 
 def _photo_status_from_rules(
@@ -133,6 +271,7 @@ def _build_checks(
     topic_reuse_hit: bool = False,
     project_type: Optional[str] = None,
     meeting_type: Optional[str] = None,
+    signin_merged: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Optional[bool]]:
     """按 docs/检测点清单与photo_results.md 组装单张 checks（不适用则为 null）。"""
     v = ctx.vision or {}
@@ -210,30 +349,25 @@ def _build_checks(
             )
         else:
             checks["name_set_matches_speakers"] = None
-        checks["name_card_template_ok"] = None
-        checks["name_card_template_match"] = None
 
-    if pt in ("SpeakerTitle", "SpeakerLecture"):
+    if pt == "SpeakerTitle":
+        # 主题对表单 / 主题未复用：仅标题合影；授课照 SpeakerLecture 不产出这两项
         speakers = {s["speaker_id"]: s for s in form.get("speakers") or []}
         sp = speakers.get(ctx.speaker_id) or {}
         expected = normalize_topic(sp.get("topic") or "")
         got = normalize_topic(of.get("topic_title") or "")
-        if pt == "SpeakerTitle":
-            if expected and got:
-                checks["topic_matches_form"] = (
-                    expected == got or expected in got or got in expected
-                )
-            else:
-                checks["topic_matches_form"] = None
-            # 主题库空 / SKIP 时不算命中；命中 FAIL 才 false，能抽到标题则 true
-            if topic_reuse_hit:
-                checks["topic_not_reused_in_period"] = False
-            elif got:
-                checks["topic_not_reused_in_period"] = True
-            else:
-                checks["topic_not_reused_in_period"] = None
+        if expected and got:
+            checks["topic_matches_form"] = (
+                expected == got or expected in got or got in expected
+            )
         else:
             checks["topic_matches_form"] = None
+        # 主题库空 / SKIP 时不算命中；命中 FAIL 才 false，能抽到标题则 true
+        if topic_reuse_hit:
+            checks["topic_not_reused_in_period"] = False
+        elif got:
+            checks["topic_not_reused_in_period"] = True
+        else:
             checks["topic_not_reused_in_period"] = None
 
         visible = of.get("speaker_name_on_slide") or (
@@ -248,6 +382,7 @@ def _build_checks(
             checks["speaker_name_visible_ok"] = True
         else:
             checks["speaker_name_visible_ok"] = None
+    # SpeakerLecture（授课照）：不做主题比对 / 主题查重 / 讲者姓名检测点
 
     if pt == "Panorama":
         pc = v.get("people_count")
@@ -257,13 +392,11 @@ def _build_checks(
             checks["people_count_recorded"] = False
 
     if pt == "SignSheet":
-        signin = _signin_payload(ctx)
-        dur = duration_minutes_from_times(
-            signin.get("start_time"),
-            signin.get("end_time"),
-            signin.get("duration_minutes"),
-        )
-        checks["signin_template_ok"] = _coerce_bool(v.get("signin_template_ok"))
+        # 时长/模版：多张共用合并结果；完整性：每张独立
+        merged = signin_merged or {}
+        dur = merged.get("duration_minutes")
+        page = _signin_payload(ctx)
+        checks["signin_template_ok"] = merged.get("template_ok")
         checks["duration_readable"] = dur is not None
         if dur is None:
             checks["duration_meets_threshold"] = None
@@ -271,7 +404,8 @@ def _build_checks(
             need = signin_duration_need(
                 project_type or "LECTURE_HALL", meeting_type, thr
             )
-            checks["duration_meets_threshold"] = dur > need
+            checks["duration_meets_threshold"] = int(dur) > need
+        checks["signin_complete_ok"] = page.get("complete_ok")
 
     if pt == "ProjectIntro":
         ribbon = tm.get("colorful_ribbon") or {}
@@ -295,12 +429,6 @@ def _build_checks(
 
     if tm.get("bayer_logo"):
         checks["has_bayer_logo"] = tm["bayer_logo"].get("hit")
-    if tm.get("poster_wave") and pt in {"Poster", "Stand"}:
-        checks["poster_wave_match"] = tm["poster_wave"].get("hit")
-    if tm.get("name_card") and pt == "TableCard":
-        hit = tm["name_card"].get("hit")
-        checks["name_card_template_match"] = hit
-        checks["name_card_template_ok"] = hit
     if tm.get("handbook_current") and pt == "Manual":
         checks["handbook_detected"] = tm["handbook_current"].get("hit")
 
@@ -337,6 +465,7 @@ def build_photo_results(
 ) -> List[dict]:
     thr = merge_thresholds(options)
     clarity_thr = float(thr.get("clarity_threshold", 0.6))
+    signin_merged = merge_signin_sheets(contexts, options)
     out = []
     for ctx in contexts:
         st = _photo_status_from_rules(ctx.photo_id, ctx, rules)
@@ -366,26 +495,46 @@ def build_photo_results(
                 detections["people_count"] = pc
             if pcc is not None:
                 detections["people_count_confidence"] = pcc
-        if ctx.photo_type == "SignSheet":
-            signin = _signin_payload(ctx)
-            dur = duration_minutes_from_times(
-                signin.get("start_time"),
-                signin.get("end_time"),
-                signin.get("duration_minutes"),
+        if ctx.photo_type == "SignSheet" and signin_merged:
+            page = _signin_payload(ctx)
+            # 单页 OCR 仍回填本页可读字段；场级合并值写入 detections
+            if page.get("start_time"):
+                of.setdefault("start_time", page.get("start_time"))
+            if page.get("end_time"):
+                of.setdefault("end_time", page.get("end_time"))
+            if signin_merged.get("start_time"):
+                of["start_time"] = signin_merged.get("start_time")
+            if signin_merged.get("end_time"):
+                of["end_time"] = signin_merged.get("end_time")
+            if signin_merged.get("duration_minutes") is not None:
+                of["duration_minutes"] = signin_merged["duration_minutes"]
+                detections["duration_minutes"] = signin_merged["duration_minutes"]
+            if signin_merged.get("audience_count") is not None:
+                of["audience_count"] = signin_merged["audience_count"]
+                detections["audience_count"] = signin_merged["audience_count"]
+            if signin_merged.get("store_names"):
+                of["store_names"] = signin_merged["store_names"]
+                detections["store_names"] = signin_merged["store_names"]
+            detections["signin_page_count"] = signin_merged.get("page_count")
+            detections["signin_merged_photo_ids"] = list(
+                signin_merged.get("photo_ids") or []
             )
-            if signin.get("start_time"):
-                of.setdefault("start_time", signin.get("start_time"))
-            if signin.get("end_time"):
-                of.setdefault("end_time", signin.get("end_time"))
-            if dur is not None:
-                of["duration_minutes"] = dur
-                detections["duration_minutes"] = dur
-            if signin.get("audience_count") is not None:
-                of["audience_count"] = signin.get("audience_count")
-                detections["audience_count"] = signin.get("audience_count")
-            if signin.get("store_names"):
-                of["store_names"] = signin.get("store_names")
-                detections["store_names"] = signin.get("store_names")
+            if page.get("audience_count") is not None:
+                detections["audience_count_page"] = page.get("audience_count")
+            if page.get("template_ok") is not None:
+                detections["is_printed_form"] = page.get("template_ok")
+            if page.get("has_handwritten_signatures") is not None:
+                detections["has_handwritten_signatures"] = page.get(
+                    "has_handwritten_signatures"
+                )
+            if page.get("header_complete") is not None:
+                detections["header_complete"] = page.get("header_complete")
+            if page.get("rows_complete") is not None:
+                detections["rows_complete"] = page.get("rows_complete")
+            if page.get("incomplete_row_count") is not None:
+                detections["incomplete_row_count"] = page.get("incomplete_row_count")
+            if page.get("complete_ok") is not None:
+                detections["signin_complete_ok"] = page.get("complete_ok")
 
         item = {
             "photo_id": ctx.photo_id,
@@ -409,6 +558,7 @@ def build_photo_results(
                 topic_reuse_hit=topic_reuse_hit,
                 project_type=project_type,
                 meeting_type=meeting_type,
+                signin_merged=signin_merged if ctx.photo_type == "SignSheet" else None,
             ),
             "uncertain_checks": [],
             "ocr_fields": of or None,
@@ -421,6 +571,19 @@ def build_photo_results(
                 "type_confidence": ctx.vision.get("type_confidence"),
                 "logo_confidence": ctx.vision.get("logo_confidence"),
                 "template_match": ctx.template_match or None,
+                "signin_merged": (
+                    {
+                        "page_count": signin_merged.get("page_count"),
+                        "duration_minutes": signin_merged.get("duration_minutes"),
+                        "audience_count": signin_merged.get("audience_count"),
+                        "template_ok": signin_merged.get("template_ok"),
+                        "has_handwritten_signatures": signin_merged.get(
+                            "has_handwritten_signatures"
+                        ),
+                    }
+                    if ctx.photo_type == "SignSheet" and signin_merged
+                    else None
+                ),
             },
             "fetch_error": (
                 {

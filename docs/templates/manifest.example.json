@@ -13,26 +13,19 @@
     {
       "project_type": "LECTURE_HALL",
       "template_kind": "Poster",
-      "s3_uri": "s3://pe-templates/2026Q2/lecture_hall/poster_footer_wave_crop.jpg",
+      "s3_uri": "s3://pe-templates/2026Q2/lecture_hall/poster_key_fields_crop.jpg",
       "crop_meta": {
         "source_local_path": "药师大讲堂/2-2026-4-17-河南美锐大药房连锁有限公司/1权益-海报.jpg",
-        "coord_space": "normalized",
-        "box": {
-          "x": 0.0,
-          "y": 0.85,
-          "w": 1.0,
-          "h": 0.15
-        },
-        "note": "海报底部波浪装饰"
+        "note": "海报会议时间/地点/日程字段区（不做底部波浪模版匹配）"
       }
     },
     {
       "project_type": "LECTURE_HALL",
       "template_kind": "TableCard",
-      "s3_uri": "s3://pe-templates/2026Q2/lecture_hall/name_card_border_crop.jpg",
+      "s3_uri": "s3://pe-templates/2026Q2/lecture_hall/name_card_one_roi.jpg",
       "crop_meta": {
         "source_local_path": "药师大讲堂/2-2026-4-17-河南美锐大药房连锁有限公司/3台卡.jpg",
-        "note": "台卡底部蓝绿装饰条"
+        "note": "单张台卡参考，供姓名定位 OCR（非版式模版规则）"
       }
     },
     {

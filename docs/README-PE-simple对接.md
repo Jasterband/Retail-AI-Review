@@ -597,16 +597,17 @@ PE 用下表做 i18n / 埋点主键；simple **只下发码、不下发文案**�
 | `COUNT_BELOW_THRESHOLD` | 人数（或签到听众/门店）未达要求 |
 | `COUNT_UNCERTAIN` | 人数识别不可靠 |
 | `DURATION_BELOW_THRESHOLD` | 签到时长未达要求 |
+| `SIGNIN_INCOMPLETE` | 签到表填写不完整（表头或缺姓名/职称/连锁/签名） |
 
 **手册 / 盗图**
 
 | reason_code | 建议文案方向 |
 |-------------|--------------|
-| `Manual_NOT_FOUND` | 未识别为宣传手册 |
-| `Manual_STALE` | 手册疑似旧版 |
+| `HANDBOOK_NOT_FOUND` | 未识别为宣传手册 |
+| `HANDBOOK_STALE` | 手册疑似旧版 |
 | `IMAGE_DUP` | 与其他会议现场照重复或近似 |
 
-共 **21** 个。后续规则新增码时，AI 侧同步更新本表，PE 补映射行。
+共 **22** 个。后续规则新增码时，AI 侧同步更新本表，PE 补映射行。
 
 ---
 

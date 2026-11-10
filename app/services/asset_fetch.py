@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 from app.config import get_settings
+from app.services.image_orient import normalize_image_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,8 @@ class FetchedObject:
     error_code: Optional[str] = None
     error_message: Optional[str] = None
     local_path: Optional[str] = None
+    # 原始 EXIF Orientation（2~8 表示已扶正重编码；None=无需或未处理）
+    exif_orientation: Optional[int] = None
 
 
 def parse_file_url(file_url: str) -> Tuple[str, str]:
@@ -97,10 +100,12 @@ def _fetch_real_s3(file_url: str, content_type: str) -> FetchedObject:
                 error_code="S3_CORRUPT",
                 error_message="empty S3 object",
             )
+        body, out_type, exif_o = normalize_image_bytes(body, out_type)
         return FetchedObject(
             file_url=file_url,
             content_type=out_type,
             body=body,
+            exif_orientation=exif_o,
         )
     except ClientError as e:
         code = (e.response or {}).get("Error", {}).get("Code", "")
@@ -168,11 +173,13 @@ def fetch_object(file_url: str, content_type: str) -> FetchedObject:
             if content_type == "application/pdf" or path.suffix.lower() == ".pdf":
                 body = _pdf_first_page_jpeg(raw)
                 out_type = "image/jpeg"
+            body, out_type, exif_o = normalize_image_bytes(body, out_type)
             return FetchedObject(
                 file_url=file_url,
                 content_type=out_type,
                 body=body,
                 local_path=str(path),
+                exif_orientation=exif_o,
             )
         except Exception as e:
             logger.exception("fetch failed %s", file_url)

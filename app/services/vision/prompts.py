@@ -34,8 +34,6 @@ SCHEMA_HINT = """
   "people_count": number|null,
   "people_count_confidence": number|null,
   "name_card_names": string[]|null,
-  "is_standard_name_card_style": boolean|null,
-  "name_card_style_confidence": number|null,
   "ppt_page_kind": "PROJECT_INTRO"|"AGENDA"|"OTHER"|null,
   "ppt_template_match": boolean|null,
   "ppt_template_confidence": number|null,
@@ -48,7 +46,14 @@ SCHEMA_HINT = """
     "end_time": string|null,
     "duration_minutes": number|null,
     "audience_count": number|null,
-    "store_names": string[]|null
+    "store_names": string[]|null,
+    "is_printed_form": boolean|null,
+    "has_handwritten_signatures": boolean|null,
+    "signin_template_ok": boolean|null,
+    "header_complete": boolean|null,
+    "rows_complete": boolean|null,
+    "incomplete_row_count": number|null,
+    "signin_complete_ok": boolean|null
   }|null
 }
 """
@@ -66,30 +71,15 @@ KEY_FIELDS_ROI_PROMPT = """这是从会议材料（海报/展架/电子日程）
 规则：看不清填 null；不要编造；speaker_names 只要人名列表，去掉「全体」。
 """
 
-NAME_CARD_ROI_PROMPT = """这是从会议现场裁出的【单张台卡/席卡】区域。
-请只抽取台卡上印刷的中文姓名，返回严格 JSON（不要 markdown）：
+NAME_CARD_FULL_PROMPT = """这是会议现场的【台卡/席卡整图】，桌上通常有 2~4 张印刷姓名台卡。
+请直接读出画面中所有台卡上的中文姓名，返回严格 JSON（不要 markdown）：
 {
-  "name": string|null,
-  "name_card_names": string[]|null
+  "name_card_names": string[]
 }
 规则：
-- name 为一张台卡上的主姓名（通常 2~4 个汉字）；
-- name_card_names 与 name 一致时也可只填 [name]；
-- 看不清填 null；不要编造；不要把装饰图案、Logo、英文当成姓名。
-"""
-
-NAME_CARD_LOCATE_PROMPT = """第一张图：单张台卡参考（白底中央大字姓名 + 底部蓝绿波浪装饰条）。
-第二张图：现场桌面，上面通常有 2~4 张同类台卡。
-
-请根据【第二张真实照片】目测每张台卡位置，只返回 JSON（不要 markdown）：
-{"cards":[{"box_norm":{"x":number,"y":number,"w":number,"h":number},"name":string|null}]}
-
-要求：
-1) 必须有 cards 数组；禁止只返回单个 name
-2) box_norm 是相对第二张图的归一化坐标（0~1），一张卡一个框，尽量贴边
-3) 不同台卡的 box 不要重叠；常见是上排 2 张、下排 2 张
-4) name 填该卡印刷中文姓名，看不清填 null；不要编造
-5) 坐标必须来自第二张图实测，不要使用示例数字
+- 只收人名（通常 2~4 个汉字）；去掉空格；不要职称/门店/英文；
+- 尽量收齐全场可见台卡，常见 4 张；看不清的不要编造；
+- 不要返回框坐标；不要把装饰图案、Logo 当成姓名。
 """
 
 
@@ -113,15 +103,44 @@ def user_prompt(photo_type: str, project_type: str) -> str:
             "本页一般是大段项目介绍文字，通常没有会议日程表。"
             "同时看拜耳 Logo、水印。"
         ),
-        "TableCard": "识别桌上所有台卡上的中文姓名列表；是否像规定台卡样式（白底+装饰条）。",
-        "SpeakerTitle": "若有投影课件，抽取讲题标题、讲者姓名、日期；统计可见人数可选；水印。",
+        "TableCard": (
+            "这是台卡整图。请直接读出桌上所有台卡印刷的中文姓名，"
+            "写入 name_card_names（数组，常见 2~4 个）；不要编造；不做裁框。"
+        ),
+        "SpeakerTitle": (
+            "这是讲者与课件标题合影。请抽取投影上的讲题标题（topic_title）、"
+            "讲者姓名；日期/水印若有则抽。主题比对只在本类型做。"
+        ),
+        "SpeakerLecture": (
+            "这是讲者授课现场照。只需确认画面清晰、为授课场景；"
+            "不要抽取讲题标题、讲者姓名（topic_title / speaker_name_on_slide 填 null）；"
+            "不做主题查重；水印若有则抽 watermark_*。"
+        ),
         "Panorama": (
             "这是会场全景照片。请仔细数画面中【可见的人头/参会者】，"
             "含前排、侧排、后排，含讲者若在画面中；不要把椅子空位、投影人影、海报人像算进去。"
             "给出整数 people_count 与 people_count_confidence（0~1）。"
             "水印若有则抽 watermark_*。"
         ),
-        "SignSheet": "签到表：会议开始/结束时间、时长分钟、听众人数、听众所属门店名列表。",
+        "SignSheet": (
+            "这是【打印出来的签到表】扫描/照片（可多页之一）：纸质打印表格，"
+            "供参会者在姓名栏旁【手写签名】。"
+            "请抽取：会议开始/结束时间、时长分钟；"
+            "audience_count=本页可见听众签名行数（勿估全场总数；多页由上游累加）；"
+            "听众所属门店名列表（若有）。"
+            "模版判定：is_printed_form=是否为印刷签到表（含表头栏位+姓名/签名列）；"
+            "has_handwritten_signatures=是否可见手写签字笔迹；"
+            "signin_template_ok=是印刷签到表（有手签更好，空白表头也可 true）。"
+            "截屏电子表、纯打印无签名栏、白纸乱写 → signin_template_ok=false。"
+            "完整性核验（本页独立判，多页各自检）："
+            "header_complete=本页若有表头区，则会议时间/时长/地点须已填写；"
+            "纯续页无表头则 header_complete=null。"
+            "rows_complete=凡已占用行（讲者签到+参会人员签到），"
+            "姓名/职称/连锁名称/签名四列都须有内容；末尾空白模板行可不填。"
+            "说明栏、其他/备注列不纳入必填。"
+            "incomplete_row_count=缺列的已占用行数；"
+            "signin_complete_ok=header_complete不为false 且 rows_complete=true。"
+        ),
         "Manual": (
             "本图已声明为宣传手册。判断是否为「菁英药师大讲堂」宣传手册封面"
             "（handbook_ok）；务必读取封面上的年份数字写入 handbook_year 与"

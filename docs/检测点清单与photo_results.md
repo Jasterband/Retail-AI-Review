@@ -139,7 +139,6 @@
 |------------|-----------|
 | `name_card_count_ok` | 识别到的台卡人数与讲者人数一致（如 4） |
 | `name_set_matches_speakers` | OCR 姓名集合 = 系统讲者姓名集合 |
-| `name_card_template_ok` | 台卡版式与规定模版一致（可选） |
 
 ### 3.4 大讲堂 · 手册（Manual）
 
@@ -152,9 +151,9 @@
 
 | 检测点 key | true 表示 |
 |------------|-----------|
-| `topic_matches_form` | 标题合影时课件标题与该讲者 `topic` 一致（仅 SpeakerTitle；与表单比对） |
-| `topic_not_reused_in_period` | OCR 标题未与历史会议重复（**仅讲者照**；见 §4.B；SpeakerLecture 无标题则 null） |
-| `speaker_name_visible_ok` | 能关联到正确讲者（若可抽名） |
+| `topic_matches_form` | 课件标题与该讲者 `topic` 一致（**仅 SpeakerTitle**；`SpeakerLecture` 不产出） |
+| `topic_not_reused_in_period` | OCR 标题未与历史会议重复（**仅 SpeakerTitle**；见 §4.B；`SpeakerLecture` 不产出） |
+| `speaker_name_visible_ok` | 能关联到正确讲者（若可抽名；**仅 SpeakerTitle**；`SpeakerLecture` 不产出） |
 
 > 讲者照同时做：通用 **图片查重** + **主题不重复**（抽标题）。
 
@@ -168,13 +167,17 @@
 
 ### 3.7 签到表（SignSheet）
 
+> **多张合并**：一场若上传 ≥2 张 `SignSheet`，时长 / 模版 / 听众人数 / 门店视为**一场检查**（各页 `checks` 共用合并结果）。时长取可读页的最大值；听众人数按页累加；门店名取并集。  
+> **完整性**：每张签到表**各自**核验（`signin_complete_ok`），不合并。
+
 | 检测点 key | true 表示 |
 |------------|-----------|
-| `signin_template_ok` | 像标准签到模版（可选） |
-| `duration_readable` | 起止时间可读 |
-| `duration_meets_threshold` | 单张能算出时长且达标（若跨多页则场级再汇总） |
+| `signin_template_ok` | 印刷签到表（表头+姓名/签名栏，供手写签名）；任一页成立即 true |
+| `duration_readable` | 合并后能读出起止时间 / 时长 |
+| `duration_meets_threshold` | 合并时长达标（大讲堂 >120；微型单 >30 / 双 >60） |
+| `signin_complete_ok` | **本页**填写完整：表头（若有）时间/时长/地点已填；已占用行姓名/职称/连锁/签名四列齐；说明/其他列不强制；末尾空行可不填 |
 
-微型另有场级：`SIGNIN_RATIO_AND_STORES`（1:6、两门店）→ `rule_results`。
+场级：`SIGNIN_COMPLETE`（任一张不完整则 FAIL）。微型另有：`SIGNIN_RATIO_AND_STORES`（1:6、两门店；多页听众合计）→ `rule_results`。
 
 ### 3.8 微型 · 权益展示（EDMDisplay / ProjectIntro）
 

@@ -55,6 +55,16 @@
           "detail": "大讲堂 >120；微型单 >30 / 双 >60。"
         },
         {
+          "id": "signin_complete",
+          "label": "签到表填写完整",
+          "rule_code": "SIGNIN_COMPLETE",
+          "projects": [
+            "LECTURE_HALL",
+            "MICRO"
+          ],
+          "detail": "每张独立：表头时间/地点；行内姓名/职称/连锁/签名齐；说明/其他不强制。"
+        },
+        {
           "id": "watermark",
           "label": "水印一致性",
           "rule_code": "WATERMARK_CONSISTENCY",
@@ -108,15 +118,6 @@
             "LECTURE_HALL"
           ],
           "detail": "台卡姓名集合与讲者集合一致。"
-        },
-        {
-          "id": "name_card_template",
-          "label": "台卡模版",
-          "rule_code": "NAME_CARD_TEMPLATE",
-          "projects": [
-            "LECTURE_HALL"
-          ],
-          "detail": "需 crop 进 template pack。"
         },
         {
           "id": "handbook_detect",

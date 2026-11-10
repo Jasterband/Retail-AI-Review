@@ -61,7 +61,6 @@ def hall_contexts(snap: dict) -> list:
             "people_count": 36 if t == "Panorama" else None,
             "people_count_confidence": 0.85,
             "name_card_names": names if t == "TableCard" else None,
-            "is_standard_name_card_style": True if t == "TableCard" else None,
             "name_card_style_confidence": 0.9,
             "signin": {
                 "start_time": form.get("start_time") or "14:00",

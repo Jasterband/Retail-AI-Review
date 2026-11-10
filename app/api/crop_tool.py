@@ -49,11 +49,6 @@ SAVE_PRESETS = [
         "path": "logo/bayer_logo.png",
     },
     {
-        "id": "poster_wave",
-        "label": "大讲堂 · 海报底波浪",
-        "path": "lecture_hall/poster_footer_wave_crop.jpg",
-    },
-    {
         "id": "poster_key_fields",
         "label": "大讲堂 · 字段区(时间地点日程)",
         "path": "lecture_hall/poster_key_fields_crop.jpg",
@@ -69,13 +64,8 @@ SAVE_PRESETS = [
         "path": "micro/edm_key_fields_crop.jpg",
     },
     {
-        "id": "name_card_border",
-        "label": "大讲堂 · 台卡装饰条",
-        "path": "lecture_hall/name_card_border_crop.jpg",
-    },
-    {
         "id": "name_card_one",
-        "label": "大讲堂 · 单张台卡",
+        "label": "大讲堂 · 单张台卡（姓名定位用）",
         "path": "lecture_hall/name_card_one_roi.jpg",
     },
     {

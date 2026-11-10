@@ -336,33 +336,7 @@ def enrich_contexts_with_templates(
                     logger.warning("logo vision ref failed: %s", e)
             hits["bayer_logo"] = _prefer(cv, vis)
 
-        # 大讲堂海报波浪
-        if pack.poster_wave and ctx.photo_type in {"Poster", "Stand"}:
-            hits["poster_wave"] = match_ncc(ctx.body, pack.poster_wave)
-
-        # 台卡
-        if pack.name_card and ctx.photo_type == "TableCard":
-            cv = match_ncc(ctx.body, pack.name_card)
-            vis = None
-            if vision and vision.available():
-                try:
-                    vis = vision.compare_reference(
-                        ctx.body,
-                        ctx.content_type,
-                        pack.name_card.read_bytes(),
-                        "image/jpeg",
-                        question=(
-                            "第一张是规定台卡模版参考（单卡）。"
-                            "第二张是现场台卡照片。第二张中的台卡版式是否与参考同类"
-                            "（白底姓名卡+底部装饰）？"
-                            '返回 JSON: {"match": true|false, "confidence": 0~1}'
-                        ),
-                    )
-                except VisionError as e:
-                    logger.warning("name_card vision ref failed: %s", e)
-            hits["name_card"] = _prefer(cv, vis)
-            if pack.name_card_border:
-                hits["name_card_border"] = match_ncc(ctx.body, pack.name_card_border)
+        # 台卡参考 crop 仅用于 field_roi_ocr 定位姓名，不做版式模版规则
 
         # 手册封面：当期 / 旧版负样本
         if ctx.photo_type == "Manual":

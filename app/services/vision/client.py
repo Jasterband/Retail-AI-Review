@@ -13,8 +13,7 @@ import httpx
 from app.config import Settings, get_settings
 from app.services.vision.prompts import (
     KEY_FIELDS_ROI_PROMPT,
-    NAME_CARD_LOCATE_PROMPT,
-    NAME_CARD_ROI_PROMPT,
+    NAME_CARD_FULL_PROMPT,
     SYSTEM,
     user_prompt,
 )
@@ -207,44 +206,19 @@ class VisionClient:
         )
         return data if isinstance(data, dict) else {}
 
-    def ocr_name_card_roi(
+    def ocr_name_cards_full(
         self,
         image_bytes: bytes,
         content_type: str = "image/jpeg",
     ) -> Dict[str, Any]:
-        """对已裁好的单张台卡 ROI 抽取姓名。"""
+        """整图抽取台卡姓名列表（不裁框）。"""
         model = self.model_for("TableCard")
         data = self._chat(
             [
-                {"type": "text", "text": NAME_CARD_ROI_PROMPT},
+                {"type": "text", "text": NAME_CARD_FULL_PROMPT},
                 {
                     "type": "image_url",
                     "image_url": {"url": _data_url(image_bytes, content_type)},
-                },
-            ],
-            model=model,
-        )
-        return data if isinstance(data, dict) else {}
-
-    def locate_name_cards(
-        self,
-        scene_bytes: bytes,
-        ref_bytes: bytes,
-        scene_type: str = "image/jpeg",
-        ref_type: str = "image/jpeg",
-    ) -> Dict[str, Any]:
-        """对照单卡参考 crop，在现场图中定位各台卡框。"""
-        model = self.model_for("TableCard")
-        data = self._chat(
-            [
-                {"type": "text", "text": NAME_CARD_LOCATE_PROMPT},
-                {
-                    "type": "image_url",
-                    "image_url": {"url": _data_url(ref_bytes, ref_type)},
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {"url": _data_url(scene_bytes, scene_type)},
                 },
             ],
             model=model,

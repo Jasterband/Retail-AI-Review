@@ -206,47 +206,96 @@ def rule_handbook_not_stale(contexts: List[AssetContext]) -> RuleOutcome:
     )
 
 
+def _topic_ok(got: str, candidates: List[str]) -> bool:
+    from app.services.text_norm import fuzzy_contains
+
+    if not got:
+        return False
+    for exp in candidates:
+        if not exp:
+            continue
+        if exp == got or exp in got or got in exp:
+            return True
+        if fuzzy_contains(got, exp) or fuzzy_contains(exp, got):
+            return True
+    return False
+
+
 def rule_speaker_topic_ocr(
-    contexts: List[AssetContext], form: dict, options: dict
+    contexts: List[AssetContext],
+    form: dict,
+    options: dict,
+    project_type: str = "LECTURE_HALL",
 ) -> RuleOutcome:
+    """标题是否和表单一致（枚举检测点 ID6）。
+
+    SpeakerTitle → 该讲者 topic；
+    大讲堂 EDM/Poster/Stand、微型 EDM → 任一讲者 topic 或会议名。
+    """
     speakers = {s["speaker_id"]: s for s in form.get("speakers") or []}
+    all_topics = [
+        normalize_topic(s.get("topic") or "") for s in form.get("speakers") or []
+    ]
+    meeting_name = normalize_topic(form.get("meeting_name") or "")
+    poster_candidates = [t for t in all_topics if t] + (
+        [meeting_name] if meeting_name else []
+    )
+    poster_types = {"EDM"} if project_type == "MICRO" else {"EDM", "Poster", "Stand"}
+
     photos = [
         c
         for c in contexts
-        if c.photo_type == "SpeakerTitle" and c.ok
+        if c.ok and c.photo_type in ({"SpeakerTitle"} | poster_types)
     ]
     if not photos:
-        return skip("SPEAKER_TOPIC_OCR", "无标题合影")
+        return skip("SPEAKER_TOPIC_OCR", "无标题可检材料")
 
     fails = []
     uncs = []
     related = []
     for c in photos:
         related.append(c.photo_id)
-        sp = speakers.get(c.speaker_id)
-        if not sp:
-            continue
-        expected = normalize_topic(sp.get("topic") or "")
         of = c.ocr_fields()
-        got = normalize_topic(of.get("topic_title") or "")
-        if not got:
-            uncs.append(c.photo_id)
-            continue
-        if expected and got != expected:
-            # allow containment
-            if expected not in got and got not in expected:
+        got_raw = of.get("topic_title") or ""
+        got = normalize_topic(got_raw)
+
+        if c.photo_type == "SpeakerTitle":
+            sp = speakers.get(c.speaker_id)
+            if not sp:
+                continue
+            expected = normalize_topic(sp.get("topic") or "")
+            if not got:
+                uncs.append(c.photo_id)
+                continue
+            if expected and not _topic_ok(got, [expected]):
                 fails.append(
                     {
                         "photo_id": c.photo_id,
                         "expected": sp.get("topic"),
-                        "got": of.get("topic_title"),
+                        "got": got_raw,
                     }
                 )
+            continue
+
+        if not got:
+            uncs.append(c.photo_id)
+            continue
+        if poster_candidates and not _topic_ok(got, poster_candidates):
+            fails.append(
+                {
+                    "photo_id": c.photo_id,
+                    "expected": poster_candidates,
+                    "got": got_raw,
+                }
+            )
+
     if fails:
         return fail(
             "SPEAKER_TOPIC_OCR",
             "TOPIC_MISMATCH",
-            "课件标题与表单主题不一致",
+            "标题是否和表单一致：不一致材料 {0}".format(
+                [f["photo_id"] for f in fails]
+            ),
             related=[f["photo_id"] for f in fails],
             evidence={"fails": fails},
         )
@@ -254,12 +303,12 @@ def rule_speaker_topic_ocr(
         return uncertain(
             "SPEAKER_TOPIC_OCR",
             "OCR_LOW_CONFIDENCE",
-            "讲者照标题识别不清",
+            "标题识别不清",
             related=uncs,
         )
     return pass_(
         "SPEAKER_TOPIC_OCR",
-        "讲者课件标题与表单主题一致",
+        "标题与表单一致",
         related=related,
     )
 

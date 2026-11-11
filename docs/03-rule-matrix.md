@@ -27,11 +27,11 @@
 | KEY_FIELD_MATCH | 海报/展架/讲者照/签到 + form | 日期→`DATE_MISMATCH`；地点→`LOCATION_MISMATCH`；讲者姓名→`SPEAKER_NAME_MISMATCH`（时间另见 TIME_CONSISTENCY→`TIME_MISMATCH`） | 高置信不一致 | OCR conf 低 | 无对应材料 |
 | TIME_CONSISTENCY | 海报/展架/电子日程等 | 画面上的日程起止时间落在会议时段 ± skew；**不读时间水印** | 高置信明显偏离 | 部分图无日程时间可抽 | 无日程时间则 SKIP |
 | BAYER_LOGO | 大讲堂：EDM+Poster+Stand；微型：EDM+EDMDisplay+ProjectIntro | **微型**：检出拜耳十字 Logo（可与 logo_ref 匹配）；**大讲堂**：图片**最下方**页脚检出赞助方全称「拜耳医药保健有限公司」（不要求 Logo） | 应检材料均未检出 | 检出 conf 灰区 | 材料缺失时由 ASSET_MISSING 覆盖 |
-| PANORAMA_COUNT | Panorama（可多张合计） | 大讲堂 ≥35；微型 SINGLE≥6、DUAL≥12 | 高置信低于阈值 | 计数 conf < 0.7 | 无全景 |
+| PANORAMA_COUNT | Panorama（多张取**单张最大**，不累加） | 大讲堂 ≥35；微型 SINGLE≥6、DUAL≥12 | 高置信低于阈值 | 计数 conf < 0.7 | 无全景 |
 | SIGNIN_DURATION | SignSheet（多页合并） | 多张签到表合并后取可读最大时长：大讲堂 >120；微型 SINGLE>30、DUAL>60；**不检签到表模版** | 时长不足 | 读不出起止时间 | 无签到 |
 | SIGNIN_COMPLETE | SignSheet（每张独立） | 表头（若有）+ 已占用行除「其他」列外均须填齐 | 任一张缺项 | OCR 灰区 | 无签到 |
 | SIGNIN_AUDIENCE | SignSheet（多页合计） | 听众人数达标（大讲堂≥35；微型≥讲者×6） | 高置信低于阈值 | 人数读不出 | 无签到 |
-| IMAGE_DUP | 本场图 vs **其他会议**库（1×全库同组）；**有人物**（讲者/授课/全景）↔有人物；**无人物**（手册/海报/展架等）↔无人物 | 跨会不得盗用。有人物+手册：pHash/embedding 近似；**海报/电子海报/展架仅完全一致**（pHash=0）。**不查会内** | 命中其他 meeting | 指纹算不出 → 跳过该张 | 库空（首场）或无同组历史 |
+| IMAGE_DUP | 本场**全部照片** vs 其他会议同组库；有人物↔有人物；无人物（含台卡/签到）↔无人物 | 跨会不得盗用。有人物+手册等：pHash/embedding；**海报/电子海报/展架仅完全一致**。**不查会内** | 命中其他 meeting | 指纹算不出 → 跳过该张 | 库空或无同组历史 |
 | SPEAKER_COMPOSITION | SpeakerTitle / SpeakerLecture | **标题合影**须同时有讲者、标题、讲者姓名、日期；**授课照**须同时有讲者与 PPT/投影 | 缺要素 → `COMPOSITION_MISSING` | 识别不清 | 无讲者照 |
 
 ---
@@ -54,11 +54,9 @@
 
 | rule_code | 输入材料 | 判定 / 阈值 | FAIL | UNCERTAIN→人工 | 备注 |
 |-----------|----------|-------------|------|----------------|------|
-| PPT_TEMPLATE_MATCH | 权益一 `ProjectIntro`、权益二 `EDMDisplay` | **权益一**：模版有彩色丝带/波浪装饰；**权益二**：模版有日程表 | 对应特征高置信缺失 | 模糊/透视导致看不清 | 无展示材料 |
-| PPT_PAGE_KIND | 同上 | 一张项目介绍（权益一）+ 一张日程（权益二）；不得两张同类 | 页类错误/重复 → `TEMPLATE_MISMATCH` | 识别不清 → `TEMPLATE_UNCERTAIN` | |
-| SIGNIN_RATIO_AND_STORES | SignSheet（多页合计） | 门店种类并集 ≥2（人数改由 SIGNIN_AUDIENCE） | 门店种类不足 | 手写门店难识别 | 与 SIGNIN_AUDIENCE 互补 |
+| PPT_TEMPLATE_MATCH | 仅 `ProjectIntro` | 模版有彩色丝带/波浪装饰 → `TEMPLATE_MISMATCH` | 特征高置信缺失 | 识别不清 | 无项目介绍 |
 
-**微型讲者照：** 单讲者 1 张 `SpeakerTitle`；双讲者各 1 张。无强制 `SpeakerLecture`（与大讲堂不同）。
+**微型讲者照：** 单讲者 1 张 `SpeakerTitle`；双讲者各 1 张。无强制 `SpeakerLecture`（与大讲堂不同）。`EDMDisplay` 仅查重+Logo。
 
 ---
 
@@ -90,15 +88,13 @@
 | SIGNIN_COMPLETE | ✓ | ✓ |
 | SIGNIN_AUDIENCE | ✓ | ✓ |
 | IMAGE_DUP | ✓ | ✓ |
-| SPEAKER_COMPOSITION | ✓ | ✓（仅 SpeakerTitle 四要素；无授课照） |
+| SPEAKER_COMPOSITION | ✓ | ✓（仅 SpeakerTitle；无授课照） |
 | NAME_CARD_SPEAKER_MATCH | ✓ | SKIP |
 | HANDBOOK_DETECT | ✓ | SKIP |
 | HANDBOOK_NOT_STALE | ✓ | SKIP |
-| SPEAKER_TOPIC_OCR | ✓ | SKIP（微型主题比对可选二期） |
+| SPEAKER_TOPIC_OCR | ✓ | ✓（标题合影 + EDM） |
 | SPEAKER_SHOT_PAIR | ✓ | SKIP |
-| PPT_TEMPLATE_MATCH | SKIP | ✓ |
-| PPT_PAGE_KIND | SKIP | ✓ |
-| SIGNIN_RATIO_AND_STORES | SKIP | ✓ |
+| PPT_TEMPLATE_MATCH | SKIP | ✓（仅 ProjectIntro） |
 
 ---
 
@@ -109,10 +105,10 @@
 - `KEY_FIELD_MATCH`：海报/展架日期时间地点与表单一致
 - `NAME_CARD_SPEAKER_MATCH`：台卡姓名与系统讲者一致（列出姓名）
 - `BAYER_LOGO`：大讲堂海报/展架/电子日程检出赞助方「拜耳医药保健有限公司」；微型电子日程/展示/项目介绍检出拜耳 Logo
-- `PANORAMA_COUNT`：全景合计 N 人，满足阈值
+- `PANORAMA_COUNT`：全景单张最大人数满足阈值（不累加）
 - `HANDBOOK_DETECT`：识别到当期宣传手册
 - `PPT_TEMPLATE_MATCH`：现场公示 PPT 与规定模版一致
 - `IMAGE_DUP`：同组材料未盗用其他会议（有人/无人分组；海报类仅完全一致；不查会内）
-- `SPEAKER_COMPOSITION`：标题合影含讲者/标题/姓名/日期；授课照含讲者与 PPT
+- `SPEAKER_COMPOSITION`：标题合影含讲者与主题页PPT；授课照含讲者与过程PPT
 
 不合格时 `summary_failed` 使用 `reason_text` 聚合，避免只给「不通过」。

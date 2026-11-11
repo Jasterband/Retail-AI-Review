@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pe.local/schemas/retail-meeting-check-response.schema.json",
   "title": "RetailMeetingCheckResponse (full)",
-  "description": "AI 侧 full 响应（排障 / 落库完整形态）。PE 线上默认 simple 见 docs/README-PE-simple对接.md 与 app/services/projection.py：仅 task_id、meeting_id、overall_status、photo_results（仅非 PASS 图；整场 PASS 时 []；每项 photo_id/photo_status/fail_reasons[{reason_code,comments?}]; ERROR 图不附 comments）。本 schema 不要用来校验 PE simple 响应。业务 FAIL 与系统 ERROR 分离。",
+  "description": "AI 侧 full 响应（排障 / 落库完整形态）。PE 线上见 AI_接口文档v2 / docs/schemas/retail-meeting-check-pe-response.schema.json（flagged_photos）。本 schema 为内部 full 落库形态，不要用来校验 PE 响应。业务 FAIL 与系统 ERROR 分离。",
   "type": "object",
   "additionalProperties": false,
   "required": [

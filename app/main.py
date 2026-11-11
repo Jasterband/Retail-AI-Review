@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncIterator
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -78,6 +78,20 @@ def demo_config():
     }
 
 
+def _validation_message(exc: RequestValidationError) -> str:
+    msgs = []
+    for err in exc.errors():
+        msg = str(err.get("msg") or "")
+        if msg.startswith("Value error, "):
+            msg = msg[len("Value error, ") :]
+        loc = ".".join(str(x) for x in (err.get("loc") or ()) if x != "body")
+        if loc and msg and loc not in msg:
+            msgs.append("{0}: {1}".format(loc, msg))
+        elif msg:
+            msgs.append(msg)
+    return "; ".join(msgs) or "请求体不合法"
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_handler(_request: Request, exc: RequestValidationError):
     return JSONResponse(
@@ -85,10 +99,21 @@ async def validation_handler(_request: Request, exc: RequestValidationError):
         content={
             "error": {
                 "code": "SCHEMA_INVALID",
-                "message": str(exc.errors()),
+                "message": _validation_message(exc),
                 "retryable": False,
             }
         },
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_request: Request, exc: HTTPException):
+    # 鉴权等已包装为 {error:{...}} 时原样返回，匹配 AI_接口文档v2
+    if isinstance(exc.detail, dict) and "error" in exc.detail:
+        return JSONResponse(status_code=exc.status_code, content=exc.detail)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
     )
 
 

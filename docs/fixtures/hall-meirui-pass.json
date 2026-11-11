@@ -2,7 +2,7 @@
   "project": {
     "projectId": "1",
     "projectType": 1,
-    "projectName": null
+    "projectName": "药师大讲堂"
   },
   "meeting": {
     "meetingId": "1143",
@@ -16,7 +16,8 @@
     "pharmacyName": null,
     "meetingLocation": "广州东兴堂大药房连锁有限公司",
     "remark": null,
-    "totalAttendees": 35
+    "totalAttendees": 35,
+    "durationMinutes": 130
   },
   "speakers": [
     {
@@ -33,13 +34,15 @@
           "photoId": "210",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/143/renchi_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "211",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/143/renchi_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -57,13 +60,15 @@
           "photoId": "212",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/143/xieaihua_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "213",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/143/xieaihua_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -81,13 +86,15 @@
           "photoId": "214",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/143/chenqiuying_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "215",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/143/chenqiuying_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -105,13 +112,15 @@
           "photoId": "216",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/143/dengyongli_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "217",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/143/dengyongli_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     }
@@ -121,49 +130,57 @@
       "photoId": "199",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/hall/143/eposter.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "200",
       "photoType": "Manual",
       "fileUrl": "s3://pe-meetings/hall/143/handbook.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "手册"
     },
     {
       "photoId": "201",
       "photoType": "Poster",
       "fileUrl": "s3://pe-meetings/hall/143/poster.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程海报"
     },
     {
       "photoId": "202",
       "photoType": "Stand",
       "fileUrl": "s3://pe-meetings/hall/143/stand.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程展架"
     },
     {
       "photoId": "203",
       "photoType": "TableCard",
       "fileUrl": "s3://pe-meetings/hall/143/name_card.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "台卡"
     },
     {
       "photoId": "220",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/hall/143/panorama.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "230",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/hall/143/signin_1.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     },
     {
       "photoId": "231",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/hall/143/signin_2.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

@@ -11,7 +11,8 @@ from typing import Optional
 REASON_COMMENTS: dict[str, str] = {
     "ASSET_MISSING": "是否缺少必审材料或材料不可读",
     "OCR_LOW_CONFIDENCE": "文字/要素识别是否清晰可靠",
-    "COMPOSITION_MISSING": "讲者和主题页PPT是否同时出现（授课照：讲者与过程PPT是否同时出现）",
+    "COMPOSITION_MISSING": "讲者和主题页PPT是否同时出现",
+
     "TEMPLATE_MISMATCH": "PPT模板特征是否与要求一致",
     "TEMPLATE_UNCERTAIN": "模版特征识别是否清晰可靠",
     "LOGO_MISSING": "是否有拜耳 Logo",
@@ -49,12 +50,16 @@ ERROR_REASON_CODES = frozenset(
 def comments_for_reason_code(
     reason_code: Optional[str],
     photo_type_name: Optional[str] = None,
+    photo_type: Optional[str] = None,
 ) -> Optional[str]:
     if not reason_code:
         return None
     if reason_code in ERROR_REASON_CODES:
         return None
-    text = REASON_COMMENTS.get(reason_code) or f"审核未通过（{reason_code}）"
+    if reason_code == "COMPOSITION_MISSING" and photo_type == "SpeakerLecture":
+        text = "讲者与过程PPT是否同时出现"
+    else:
+        text = REASON_COMMENTS.get(reason_code) or f"审核未通过（{reason_code}）"
     name = (photo_type_name or "").strip()
     if name:
         return f"{name}：{text}"

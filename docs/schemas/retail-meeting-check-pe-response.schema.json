@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pe.local/schemas/retail-meeting-check-pe-response.schema.json",
+  "title": "RetailMeetingCheckPeResponse",
+  "description": "AI_接口文档v2 PE 轮询/终态：task_id / meeting_id / overall_status / flagged_photos；ERROR 时带 error 且 flagged_photos=[]。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "meeting_id", "overall_status", "flagged_photos"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "meeting_id": { "type": "string" },
+    "overall_status": {
+      "type": "string",
+      "enum": ["running", "PASS", "FAIL", "NEED_HUMAN", "ERROR"]
+    },
+    "error": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "type": "string", "enum": ["S3_NOT_FOUND", "INTERNAL_ERROR"] },
+        "message": { "type": "string" },
+        "retryable": { "type": "boolean" }
+      }
+    },
+    "flagged_photos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["photo_id", "photo_status", "fail_reasons"],
+        "properties": {
+          "photo_id": { "type": "string" },
+          "photo_status": { "type": "string", "enum": ["FAIL", "ERROR", "NEED_HUMAN"] },
+          "fail_reasons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["reason_code"],
+              "properties": {
+                "reason_code": { "type": "string" },
+                "comments": { "type": "string", "description": "{photoTypeName}：{原因}" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

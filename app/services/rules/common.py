@@ -462,12 +462,13 @@ def rule_bayer_logo(
 def rule_panorama_count(
     contexts: List[AssetContext], snap: dict, options: dict
 ) -> RuleOutcome:
+    """多张全景取单张人数最大值，不累加（枚举检测点注3）。"""
     pans = [c for c in contexts if c.photo_type == "Panorama" and c.ok]
     if not pans:
         return skip("PANORAMA_COUNT", "无全景")
-    total = 0
-    confs = []
-    related = []
+    counts: List[int] = []
+    confs: List[float] = []
+    related: List[str] = []
     for c in pans:
         related.append(c.photo_id)
         pc = c.vision.get("people_count")
@@ -475,11 +476,17 @@ def rule_panorama_count(
             n = int(pc) if pc is not None else 0
         except (TypeError, ValueError):
             n = 0
-        total += n
+        counts.append(n)
         try:
             confs.append(float(c.vision.get("people_count_confidence") or 0.5))
         except (TypeError, ValueError):
             confs.append(0.5)
+
+    peak = max(counts) if counts else 0
+    # 达到 peak 的张：置信度取其中最低（保守）
+    peak_confs = [confs[i] for i, n in enumerate(counts) if n == peak]
+    peak_conf = min(peak_confs) if peak_confs else (min(confs) if confs else 0.0)
+    peak_ids = [related[i] for i, n in enumerate(counts) if n == peak]
 
     thr = merge_thresholds(options)
     project_type = snap["project_type"]
@@ -487,28 +494,33 @@ def rule_panorama_count(
     need = panorama_need(project_type, subtype, thr)
     min_people_conf = float(thr.get("panorama_count_min_confidence", 0.7))
 
-    min_conf = min(confs) if confs else 0.0
-    if min_conf < min_people_conf:
+    evidence = {
+        "peak": peak,
+        "need": need,
+        "per_photo": [{"photo_id": related[i], "count": counts[i]} for i in range(len(related))],
+        "peak_photo_ids": peak_ids,
+    }
+    if peak_conf < min_people_conf:
         return uncertain(
             "PANORAMA_COUNT",
             "COUNT_UNCERTAIN",
-            "全景人数置信度低，合计约 {0}（阈值≥{1}）".format(total, need),
-            related=related,
-            evidence={"total": total, "need": need},
+            "全景人数置信度低，单张最大约 {0}（阈值≥{1}）".format(peak, need),
+            related=peak_ids or related,
+            evidence=evidence,
         )
-    if total < need:
+    if peak < need:
         return fail(
             "PANORAMA_COUNT",
             "COUNT_BELOW_THRESHOLD",
-            "全景合计人数{0}<{1}".format(total, need),
-            related=related,
-            evidence={"total": total, "need": need},
+            "全景单张最大人数{0}<{1}".format(peak, need),
+            related=peak_ids or related,
+            evidence=evidence,
         )
     return pass_(
         "PANORAMA_COUNT",
-        "全景合计 {0} 人，满足 ≥{1}".format(total, need),
+        "全景单张最大 {0} 人，满足 ≥{1}".format(peak, need),
         related=related,
-        evidence={"total": total, "need": need},
+        evidence=evidence,
     )
 
 
@@ -793,39 +805,33 @@ def _truthy_flag(vision: dict, key: str) -> Optional[bool]:
 
 
 def _speaker_title_composition(c: AssetContext) -> Dict[str, Any]:
-    """标题合影须同时有：讲者、标题、讲者姓名、日期。"""
+    """标题合影：讲者与主题页 PPT 同时出现（枚举检测点 ID5）。
+
+    姓名/日期/标题文字另由 SPEAKER_NAME / DATE / TOPIC 检测点判定。
+    """
     v = c.vision or {}
     of = c.ocr_fields()
     person = _truthy_flag(v, "has_speaker_person")
+    ppt = _truthy_flag(v, "has_ppt_screen")
     title = of.get("topic_title") or v.get("topic_title")
-    name = of.get("speaker_name_on_slide")
-    if not name:
-        names = of.get("speaker_names")
-        if isinstance(names, list) and names:
-            name = names[0]
-        elif isinstance(names, str) and names.strip():
-            name = names.strip()
-    date = of.get("meeting_date") or v.get("meeting_date")
+    # 有主题页文案也视为主题页 PPT 在场
+    has_topic_ppt = ppt is True or bool(title and str(title).strip())
     parts = {
         "has_speaker_person": person,
+        "has_ppt_screen": ppt,
         "has_topic_title": bool(title and str(title).strip()),
-        "has_speaker_name": bool(name and str(name).strip()),
-        "has_date": bool(date and str(date).strip()),
     }
     missing: List[str] = []
     if person is False:
         missing.append("讲者")
-    if not parts["has_topic_title"]:
-        missing.append("标题")
-    if not parts["has_speaker_name"]:
-        missing.append("讲者姓名")
-    if not parts["has_date"]:
-        missing.append("日期")
-    person_unc = person is None
+    if ppt is False and not parts["has_topic_title"]:
+        missing.append("主题页PPT")
+    uncertain = (person is None or (ppt is None and not parts["has_topic_title"])) and not missing
+    ok = person is True and has_topic_ppt
     return {
-        "ok": not missing and not person_unc,
-        "uncertain": person_unc and not missing,
-        "missing": missing,
+        "ok": ok,
+        "uncertain": uncertain and not ok,
+        "missing": missing if not ok else [],
         "parts": parts,
     }
 
@@ -853,7 +859,7 @@ def _speaker_lecture_composition(c: AssetContext) -> Dict[str, Any]:
 def rule_speaker_composition(
     contexts: List[AssetContext], options: Optional[dict] = None
 ) -> RuleOutcome:
-    """讲者照构图：标题合影=人+标题+姓名+日期；授课照=人+PPT。"""
+    """讲者照构图：标题合影=讲者+主题页PPT；授课照=讲者+过程PPT。"""
     titles = [c for c in contexts if c.photo_type == "SpeakerTitle" and c.ok]
     lectures = [c for c in contexts if c.photo_type == "SpeakerLecture" and c.ok]
     if not titles and not lectures:
@@ -901,9 +907,9 @@ def rule_speaker_composition(
         bits = []
         for f in fails:
             need = (
-                "讲者+标题+讲者姓名+日期"
+                "讲者+主题页PPT"
                 if f["kind"] == "SpeakerTitle"
-                else "讲者+PPT"
+                else "讲者+过程PPT"
             )
             bits.append(
                 "{0}缺{1}（须同时有{2}）".format(
@@ -927,7 +933,7 @@ def rule_speaker_composition(
         )
     return pass_(
         "SPEAKER_COMPOSITION",
-        "标题合影含讲者/标题/姓名/日期；授课照含讲者与PPT",
+        "标题合影含讲者与主题页PPT；授课照含讲者与过程PPT",
         related=related,
         evidence={"rows": evidence_rows},
     )

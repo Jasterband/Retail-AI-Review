@@ -172,6 +172,40 @@ def run_check_sync(job_id: int) -> None:
             }
         )
 
+        # v2：S3 取图失败 → 整场 ERROR（flagged_photos 为空，看顶层 error）
+        s3_bad = [
+            c
+            for c in contexts
+            if c.fetch_error_code in ("S3_NOT_FOUND", "S3_CORRUPT", "ASSET_MISSING")
+        ]
+        if s3_bad:
+            c0 = s3_bad[0]
+            raw_code = c0.fetch_error_code or "S3_NOT_FOUND"
+            err = {
+                "code": "S3_NOT_FOUND" if raw_code == "S3_NOT_FOUND" else raw_code,
+                "message": c0.fetch_error_message
+                or "对象不存在或无法下载: {0}".format(c0.file_url),
+                "retryable": False,
+            }
+            full = build_full_response(
+                snap,
+                job.id,
+                job.attempt_no,
+                contexts,
+                [],
+                pipeline_steps,
+                error=err,
+            )
+            job.processing_status = "DONE"
+            job.overall_status = "ERROR"
+            job.error_code = err["code"]
+            job.error_message = err["message"]
+            job.final_response_json = full
+            job.finished_at = _utcnow()
+            db.commit()
+            _maybe_callback(job, full)
+            return
+
         t_tpl = time.time()
         pack = enrich_contexts_with_templates(
             contexts,
@@ -331,9 +365,10 @@ def run_check_sync(job_id: int) -> None:
 def _maybe_callback(job: AiCheckJob, full: dict) -> None:
     if not job.callback_url:
         return
-    mode = ((job.pe_snapshot or {}).get("options") or {}).get(
-        "response_mode", "simple"
-    )
+    # 对外回调固定 AI_接口文档v2（flagged_photos）；full 仅内部调试
+    mode = ((job.pe_snapshot or {}).get("options") or {}).get("response_mode", "pe")
+    if mode == "simple":
+        mode = "pe"
     post_callback(job.callback_url, job.task_id, full, mode)
 
 

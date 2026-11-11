@@ -320,6 +320,23 @@ def _build_checks(
         else:
             checks["time_matches_form"] = None
 
+        # 海报类标题 vs 讲者 topic / 会议名
+        got_topic = normalize_topic(of.get("topic_title") or "")
+        topic_cands = [
+            normalize_topic(s.get("topic") or "")
+            for s in form.get("speakers") or []
+        ]
+        meet_name = normalize_topic(form.get("meeting_name") or "")
+        if meet_name:
+            topic_cands.append(meet_name)
+        topic_cands = [t for t in topic_cands if t]
+        if got_topic and topic_cands:
+            checks["topic_matches_form"] = any(
+                got_topic == t or t in got_topic or got_topic in t for t in topic_cands
+            )
+        else:
+            checks["topic_matches_form"] = None
+
     if pt == "TableCard":
         form_names = [s["speaker_name"] for s in form.get("speakers") or []]
         ocr_names = _as_name_list(
@@ -361,19 +378,20 @@ def _build_checks(
             checks["speaker_name_visible_ok"] = None
 
         person = _coerce_bool(v.get("has_speaker_person"))
+        ppt = _coerce_bool(v.get("has_ppt_screen"))
         date_v = of.get("meeting_date")
         checks["has_speaker_person"] = person
+        checks["has_ppt_screen"] = ppt
         checks["has_topic_title"] = bool(of.get("topic_title"))
         checks["has_speaker_name"] = bool(visible)
         checks["has_date"] = bool(date_v)
-        if person is None:
+        # 枚举检测点：讲者 + 主题页PPT 同时出现
+        has_topic_ppt = ppt is True or checks["has_topic_title"]
+        if person is None and ppt is None and not checks["has_topic_title"]:
             checks["speaker_title_composition_ok"] = None
         else:
             checks["speaker_title_composition_ok"] = bool(
-                person
-                and checks["has_topic_title"]
-                and checks["has_speaker_name"]
-                and checks["has_date"]
+                person is True and has_topic_ppt
             )
 
     if pt == "SpeakerLecture":
@@ -425,17 +443,8 @@ def _build_checks(
             ribbon.get("hit") if ribbon else _coerce_bool(v.get("has_colorful_ribbon"))
         )
         checks["ppt_template_match"] = checks["has_colorful_ribbon"]
-        kind = v.get("ppt_page_kind")
-        checks["ppt_page_kind_ok"] = kind == "PROJECT_INTRO" if kind else None
 
-    if pt == "EDMDisplay":
-        agenda = tm.get("agenda_table") or {}
-        checks["has_agenda_table"] = (
-            agenda.get("hit") if agenda else _coerce_bool(v.get("has_agenda_table"))
-        )
-        checks["ppt_template_match"] = checks["has_agenda_table"]
-        kind = v.get("ppt_page_kind")
-        checks["ppt_page_kind_ok"] = kind == "AGENDA" if kind else None
+    # EDMDisplay：枚举表仅 IMAGE_DUP + LOGO（logo 由下方 bayer_logo / has_bayer_logo 覆盖）
 
     if tm.get("bayer_logo") and project_type == "MICRO" and pt in micro_logo_types:
         checks["has_bayer_logo"] = tm["bayer_logo"].get("hit")

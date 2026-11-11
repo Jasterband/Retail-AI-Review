@@ -25,7 +25,6 @@ DEFAULTS: Dict[str, Any] = {
     "signin_duration_micro_single": 30,
     "signin_duration_micro_dual": 60,
     "signin_audience_per_speaker": 6,
-    "signin_min_store_kinds": 2,
     "logo_confidence_pass": 0.55,
     "sponsor_confidence_pass": 0.55,
 }

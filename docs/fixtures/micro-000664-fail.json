@@ -2,7 +2,7 @@
   "project": {
     "projectId": "2",
     "projectType": 2,
-    "projectName": null
+    "projectName": "微型药师"
   },
   "meeting": {
     "meetingId": "100664",
@@ -16,7 +16,8 @@
     "pharmacyName": "江苏万泽大药房连锁有限公司",
     "meetingLocation": "江苏万泽大药房连锁有限公司总部",
     "remark": null,
-    "totalAttendees": 7
+    "totalAttendees": 7,
+    "durationMinutes": 50
   },
   "speakers": [
     {
@@ -33,7 +34,8 @@
           "photoId": "6644",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/micro/000664/speaker.jpeg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         }
       ]
     }
@@ -43,31 +45,36 @@
       "photoId": "6641",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/micro/000664/agenda.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "6642",
       "photoType": "ProjectIntro",
       "fileUrl": "s3://pe-meetings/micro/000664/intro.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "项目介绍展示"
     },
     {
       "photoId": "6643",
       "photoType": "EDMDisplay",
       "fileUrl": "s3://pe-meetings/micro/000664/display.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报展示"
     },
     {
       "photoId": "6645",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/micro/000664/panorama.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "6646",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/micro/000664/signin.pdf",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

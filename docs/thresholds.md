@@ -21,6 +21,5 @@
 | `signin_duration_micro_single` | 30 | 同上 |
 | `signin_duration_micro_dual` | 60 | 同上 |
 | `signin_audience_per_speaker` | 6 | 微型听众 ≥ 讲者×N |
-| `signin_min_store_kinds` | 2 | 微型听众门店种类 |
 | `logo_confidence_pass` | 0.55 | 微型 Logo vision 置信度 |
 | `sponsor_confidence_pass` | 0.55 | 大讲堂赞助方文案 vision 置信度 |

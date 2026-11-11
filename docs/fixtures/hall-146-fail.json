@@ -2,7 +2,7 @@
   "project": {
     "projectId": "1",
     "projectType": 1,
-    "projectName": null
+    "projectName": "药师大讲堂"
   },
   "meeting": {
     "meetingId": "1146",
@@ -16,7 +16,8 @@
     "pharmacyName": null,
     "meetingLocation": "湖北省昌盛大药房连锁总部",
     "remark": null,
-    "totalAttendees": 35
+    "totalAttendees": 35,
+    "durationMinutes": 130
   },
   "speakers": [
     {
@@ -33,13 +34,15 @@
           "photoId": "14611",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/146/s1_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "14612",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/146/s1_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -57,13 +60,15 @@
           "photoId": "14621",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/146/s2_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "14622",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/146/s2_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -81,13 +86,15 @@
           "photoId": "14631",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/146/s3_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "14632",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/146/s3_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -105,13 +112,15 @@
           "photoId": "14641",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/146/s4_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "14642",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/146/s4_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     }
@@ -121,43 +130,50 @@
       "photoId": "14601",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/hall/146/eposter.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "14602",
       "photoType": "Manual",
       "fileUrl": "s3://pe-meetings/hall/146/handbook.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "手册"
     },
     {
       "photoId": "14603",
       "photoType": "Poster",
       "fileUrl": "s3://pe-meetings/hall/146/poster.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程海报"
     },
     {
       "photoId": "14604",
       "photoType": "Stand",
       "fileUrl": "s3://pe-meetings/hall/146/stand.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程展架"
     },
     {
       "photoId": "14605",
       "photoType": "TableCard",
       "fileUrl": "s3://pe-meetings/hall/146/name_card.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "台卡"
     },
     {
       "photoId": "14650",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/hall/146/panorama.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "14660",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/hall/146/signin.pdf",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

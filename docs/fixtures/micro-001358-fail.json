@@ -2,7 +2,7 @@
   "project": {
     "projectId": "2",
     "projectType": 2,
-    "projectName": null
+    "projectName": "微型药师"
   },
   "meeting": {
     "meetingId": "101358",
@@ -16,7 +16,8 @@
     "pharmacyName": "国药控股国大药房沈阳连锁有限公司黄河大街店",
     "meetingLocation": "沈阳市国药控股国大药房沈阳连锁有限公司黄河大街店",
     "remark": null,
-    "totalAttendees": 6
+    "totalAttendees": 6,
+    "durationMinutes": 45
   },
   "speakers": [
     {
@@ -33,7 +34,8 @@
           "photoId": "13584",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/micro/001358/speaker.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         }
       ]
     }
@@ -43,25 +45,29 @@
       "photoId": "13581",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/micro/001358/agenda.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "13583",
       "photoType": "EDMDisplay",
       "fileUrl": "s3://pe-meetings/micro/001358/display.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报展示"
     },
     {
       "photoId": "13585",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/micro/001358/panorama.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "13586",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/micro/001358/signin.pdf",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

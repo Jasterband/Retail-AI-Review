@@ -149,24 +149,6 @@
             "MICRO"
           ],
           "detail": "项目介绍 / 电子日程展示与规定模版一致。"
-        },
-        {
-          "id": "ppt_page_kind",
-          "label": "页类不重复",
-          "rule_code": "PPT_PAGE_KIND",
-          "projects": [
-            "MICRO"
-          ],
-          "detail": "介绍页与日程页各一，不可两张同为介绍。"
-        },
-        {
-          "id": "signin_ratio",
-          "label": "签到听众门店种类",
-          "rule_code": "SIGNIN_RATIO_AND_STORES",
-          "projects": [
-            "MICRO"
-          ],
-          "detail": "门店种类 ≥ 2（人数见 SIGNIN_AUDIENCE）。"
         }
       ]
     }

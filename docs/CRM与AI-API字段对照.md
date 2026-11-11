@@ -13,7 +13,7 @@
 |----|------|------|
 | CRM | PascalCase 库字段 | 持久化 |
 | AI API（请求） | 药师会交互 JSON：`project` / `meeting` / `speakers` / `meetingPhotos` | 审核入参 |
-| AI API（响应） | snake_case（`task_id` / `overall_status` / `photo_results`…） | 审核出参 |
+| AI API（响应） | snake_case（`task_id` / `overall_status` / `flagged_photos`…） | 审核出参 |
 
 - 请求侧语义能对上即可；**枚举可直传数字**（`projectType` 1|2，`meetingType` 0|1|2）。
 - `task_id` **不在请求体**，由 AI 在 `202` 生成；PE 用 `Idempotency-Key` 做重试幂等。
@@ -132,7 +132,7 @@
 |------|------|
 | 响应 `task_id` | AI 生成 |
 | 可选 `refs` / `options` | 联调常省略 |
-| 响应 `photo_results` 等 | 审核明细 |
+| 响应 `flagged_photos` 等 | 审核明细 |
 
 ---
 

@@ -69,7 +69,7 @@ s3://pe-templates/2026Q2/
 
 | template_kind | 推荐源文件 | Crop 目标 | 用途 |
 |---------------|------------|-----------|------|
-| PPT_INTRO | `000090/.../权益照片1.jpg`（或权益照片-1） | 投影画面「项目介绍」整页（透视矫正后） | `PPT_TEMPLATE_MATCH` + `PPT_PAGE_KIND` |
+| PPT_INTRO | `000090/.../权益照片1.jpg`（或权益照片-1） | 投影画面「项目介绍」整页（透视矫正后） | `PPT_TEMPLATE_MATCH` |
 | PPT_INTRO | 同上 | 顶栏标题「项目介绍」 | 页类判定 |
 | PPT_INTRO | 同上 | 底部彩色波浪装饰 | 模版特征 |
 | PPT_INTRO | 同上 | 右上角圆形 Logo | `BAYER_LOGO` |

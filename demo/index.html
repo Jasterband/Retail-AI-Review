@@ -910,7 +910,7 @@
       while (Date.now() - started < 10 * 60 * 1000) {
         await new Promise((r) => setTimeout(r, 2500));
         const get = await fetch(
-          "/v1/retail_meeting_checks/" + encodeURIComponent(requestId) + "?mode=full",
+          "/v1/retail_meeting_checks/" + encodeURIComponent(requestId) + "/results?mode=full",
           { headers: authHeaders() }
         );
         const data = await get.json();

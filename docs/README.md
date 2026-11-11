@@ -6,7 +6,7 @@
 
 | 文档 | 说明 |
 |------|------|
-| [README-PE-simple对接.md](README-PE-simple对接.md) | **PE 对接权威契约**：simple 提交 / 轮询 / 回调 / 状态 / `reason_code`（冲突以本文为准） |
+| [README-PE-simple对接.md](README-PE-simple对接.md) | **PE 对接权威契约**（同根目录 `AI_接口文档v2.md`）：`/results`、`flagged_photos`、受理拒绝 `ASSET_MISSING` |
 | [fixtures/](fixtures/) | 黄金场 Request JSON + `s3_local_map.json`（本地读图） |
 | [PE接口文档-v1.8.md](PE接口文档-v1.8.md) | **历史全文 / full 排障参考**（simple 段落可能滞后，勿当 PE 对接主文档） |
 | [PPT字段名对照-第5-6页.md](PPT字段名对照-第5-6页.md) | **对接变量名**：PPT 第 5/6 页中文列 ↔ API 字段（改 PPT 先改这里） |
@@ -20,7 +20,8 @@
 | [01-er-field-dictionary.md](01-er-field-dictionary.md) | ER 图、表字段字典、枚举 |
 | [sql/schema.sql](sql/schema.sql) | 参考 DDL |
 | [schemas/retail-meeting-check-request.schema.json](schemas/retail-meeting-check-request.schema.json) | 请求 JSON Schema |
-| [schemas/retail-meeting-check-response.schema.json](schemas/retail-meeting-check-response.schema.json) | **full** 响应 JSON Schema（simple 形状见对接文档） |
+| [schemas/retail-meeting-check-pe-response.schema.json](schemas/retail-meeting-check-pe-response.schema.json) | **PE v2** 响应 JSON Schema（`flagged_photos`） |
+| [schemas/retail-meeting-check-response.schema.json](schemas/retail-meeting-check-response.schema.json) | **full** 内部落库 JSON Schema（勿校验 PE 响应） |
 | [03-rule-matrix.md](03-rule-matrix.md) | 规则矩阵（阈值 / UNCERTAIN / 人工） |
 | [04-template-pack.md](04-template-pack.md) | 模版 pack 与 crop 清单 |
 | [05-golden-set.md](05-golden-set.md) | 黄金集期望输出与负样本清单 |

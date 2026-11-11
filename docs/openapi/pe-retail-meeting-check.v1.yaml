@@ -104,14 +104,14 @@ paths:
         '503':
           $ref: '#/components/responses/ServiceUnavailable'
 
-  /v1/retail_meeting_checks/{task_id}:
+  /v1/retail_meeting_checks/{task_id}/results:
     get:
       tags: [RetailMeetingChecks]
-      operationId: getRetailMeetingCheck
-      summary: 查询材料检查结果
+      operationId: getRetailMeetingCheckResults
+      summary: 查询材料检查结果（AI_接口文档v2）
       description: |
-        返回进行中状态或终态结果（PASS / FAIL / NEED_HUMAN / ERROR）。
-        用 query `mode=simple|full` 选择返回详略：simple 给 PE 展示，full 给 AI debug。
+        返回进行中 `overall_status=running` 或终态（PASS / FAIL / NEED_HUMAN / ERROR）。
+        PE 默认返回 `flagged_photos`；`mode=full` 仅内部排障。
       parameters:
         - name: task_id
           in: path
@@ -123,11 +123,11 @@ paths:
         - name: mode
           in: query
           required: false
-          description: 响应模式；默认 simple
+          description: pe（默认，v2）| full（内部）
           schema:
             type: string
-            enum: [simple, full]
-            default: simple
+            enum: [pe, simple, full]
+            default: pe
       responses:
         '200':
           description: 查询成功（进行中或已完成）
@@ -135,7 +135,7 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/RetailMeetingCheckResponse'
+                  - $ref: '#/components/schemas/PeResultResponse'
                   - $ref: '#/components/schemas/RetailMeetingCheckRunning'
               examples:
                 running:
@@ -143,7 +143,7 @@ paths:
                   value:
                     task_id: req-a1b2c3d4e5f64789a0b1c2d3e4f56789
                     meeting_id: "1090"
-                    overall_status: null
+                    overall_status: running
                 pass:
                   summary: 通过
                   $ref: '#/components/examples/PassResponse'
@@ -295,7 +295,7 @@ components:
           - 日程海报日期/时间/地点与表单一致
           - 台卡四名与讲者名单一致
         summary_failed: []
-        photo_results: []
+        flagged_photos: []
 
   schemas:
     ErrorBody:
@@ -637,6 +637,45 @@ components:
         fetch_error:
           $ref: '#/components/schemas/ErrorBody'
           nullable: true
+
+
+    PeResultResponse:
+      type: object
+      description: AI_接口文档v2 终态 / 轮询（PE）
+      required: [task_id, meeting_id, overall_status, flagged_photos]
+      properties:
+        task_id:
+          type: string
+        meeting_id:
+          type: string
+        overall_status:
+          type: string
+          enum: [running, PASS, FAIL, NEED_HUMAN, ERROR]
+        error:
+          $ref: '#/components/schemas/ErrorBody'
+        flagged_photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlaggedPhoto'
+    FlaggedPhoto:
+      type: object
+      required: [photo_id, photo_status, fail_reasons]
+      properties:
+        photo_id:
+          type: string
+        photo_status:
+          type: string
+          enum: [FAIL, ERROR, NEED_HUMAN]
+        fail_reasons:
+          type: array
+          items:
+            type: object
+            properties:
+              reason_code:
+                type: string
+              comments:
+                type: string
+                description: '{photoTypeName}：{原因}'
 
     RetailMeetingCheckResponse:
       type: object

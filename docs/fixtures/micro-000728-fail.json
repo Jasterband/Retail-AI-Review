@@ -2,7 +2,7 @@
   "project": {
     "projectId": "2",
     "projectType": 2,
-    "projectName": null
+    "projectName": "微型药师"
   },
   "meeting": {
     "meetingId": "100728",
@@ -16,7 +16,8 @@
     "pharmacyName": "上海益丰益伟大药房有限公司",
     "meetingLocation": "上海市上海益丰益伟大药房有限公司",
     "remark": null,
-    "totalAttendees": 6
+    "totalAttendees": 6,
+    "durationMinutes": 45
   },
   "speakers": [
     {
@@ -33,7 +34,8 @@
           "photoId": "7284",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/micro/000728/speaker.jpeg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         }
       ]
     }
@@ -43,31 +45,36 @@
       "photoId": "7281",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/micro/000728/agenda.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "7282",
       "photoType": "ProjectIntro",
       "fileUrl": "s3://pe-meetings/micro/000728/intro.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "项目介绍展示"
     },
     {
       "photoId": "7283",
       "photoType": "EDMDisplay",
       "fileUrl": "s3://pe-meetings/micro/000728/display.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报展示"
     },
     {
       "photoId": "7285",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/micro/000728/panorama.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "7286",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/micro/000728/signin.pdf",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

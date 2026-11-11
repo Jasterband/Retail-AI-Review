@@ -382,7 +382,6 @@ erDiagram
 | SIGNIN_DURATION | 两者 |
 | SIGNIN_COMPLETE | 两者 |
 | SIGNIN_AUDIENCE | 两者 |
-| SIGNIN_RATIO_AND_STORES | 微型（门店种类） |
 | IMAGE_DUP | 两者（盗用他场照：pHash/embedding，仅跨会议，不查会内） |
 | ~~TOPIC_REUSE~~ | 已下线（主题跨会复用不再审） |
 | ~~WATERMARK_CONSISTENCY~~ | 已下线（时间/日期/地点水印均不审） |
@@ -393,7 +392,6 @@ erDiagram
 | SPEAKER_SHOT_PAIR | 大讲堂 |
 | SPEAKER_COMPOSITION | 两者（标题合影四要素；授课照人+PPT） |
 | PPT_TEMPLATE_MATCH | 微型 |
-| PPT_PAGE_KIND | 微型 |
 
 ### reason_code（常用）
 

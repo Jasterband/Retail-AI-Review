@@ -7,7 +7,8 @@ from typing import Optional
 # 有人物：讲者照 / 授课照 / 全景 → 只与同类比（pHash 近似 + embedding）
 DUP_CATEGORY_PEOPLE = frozenset({"SpeakerTitle", "SpeakerLecture", "Panorama"})
 
-# 无人物材料：手册 / 海报 / 展架 / 介绍等 → 只与同类比
+# 无人物材料：手册 / 海报 / 展架 / 介绍 / 台卡 / 签到表 → 只与同类比
+# Excel：所有照片均做 IMAGE_DUP
 DUP_CATEGORY_MATERIAL = frozenset(
     {
         "Manual",
@@ -16,6 +17,8 @@ DUP_CATEGORY_MATERIAL = frozenset(
         "EDM",
         "EDMDisplay",
         "ProjectIntro",
+        "TableCard",
+        "SignSheet",
     }
 )
 

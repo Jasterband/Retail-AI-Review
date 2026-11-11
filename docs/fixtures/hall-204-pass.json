@@ -2,7 +2,7 @@
   "project": {
     "projectId": "1",
     "projectType": 1,
-    "projectName": null
+    "projectName": "药师大讲堂"
   },
   "meeting": {
     "meetingId": "1204",
@@ -16,7 +16,8 @@
     "pharmacyName": null,
     "meetingLocation": "新疆济康大药房医药连锁有限责任公司",
     "remark": null,
-    "totalAttendees": 62
+    "totalAttendees": 62,
+    "durationMinutes": 130
   },
   "speakers": [
     {
@@ -33,13 +34,15 @@
           "photoId": "20453",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/204/speaker1_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "20454",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/204/speaker1_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -57,13 +60,15 @@
           "photoId": "20455",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/204/speaker2_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "20456",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/204/speaker2_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -81,13 +86,15 @@
           "photoId": "20457",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/204/speaker3_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "20458",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/204/speaker3_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     },
@@ -105,13 +112,15 @@
           "photoId": "20459",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/204/speaker4_1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         },
         {
           "photoId": "20460",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/204/speaker4_2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         }
       ]
     }
@@ -121,55 +130,64 @@
       "photoId": "20401",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/hall/204/eposter.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "20411",
       "photoType": "Manual",
       "fileUrl": "s3://pe-meetings/hall/204/handbook.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "手册"
     },
     {
       "photoId": "20412",
       "photoType": "Poster",
       "fileUrl": "s3://pe-meetings/hall/204/poster.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程海报"
     },
     {
       "photoId": "20413",
       "photoType": "Stand",
       "fileUrl": "s3://pe-meetings/hall/204/stand.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程展架"
     },
     {
       "photoId": "20414",
       "photoType": "TableCard",
       "fileUrl": "s3://pe-meetings/hall/204/name_card.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "台卡"
     },
     {
       "photoId": "20480",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/hall/204/panorama.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "20491",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/hall/204/signin_1.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     },
     {
       "photoId": "20492",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/hall/204/signin_2.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     },
     {
       "photoId": "20493",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/hall/204/signin_3.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

@@ -122,7 +122,7 @@
 | Panorama | `参会人员.jpg` |
 | SignSheet | `会议签到表.pdf` |
 
-**期望规则：** `PPT_TEMPLATE_MATCH` PASS、`PPT_PAGE_KIND` PASS、`BAYER_LOGO` PASS、`PANORAMA_COUNT` PASS（≥6）、`SIGNIN_DURATION` PASS（>30）、`SIGNIN_RATIO_AND_STORES` PASS。（水印 / 主题跨会复用规则已下线）
+**期望规则：** `PPT_TEMPLATE_MATCH` PASS、`BAYER_LOGO` PASS、`PANORAMA_COUNT` PASS（≥6，单张最大）、`SIGNIN_DURATION` PASS（>30）。
 
 ### B2. session_no=`000089` — 淮安广济 单讲者
 
@@ -184,12 +184,10 @@
 | N09c | 跨会议图片近似重复 | 本场上传与**另一会议**近似相似的图（压缩/裁剪） | FAIL | IMAGE_DUP |
 | N10 | 投影严重倾斜 | 微型权益照极端角度 | NEED_HUMAN 或 FAIL | PPT_TEMPLATE_MATCH |
 | N11 | 签到时长不足 | 伪造短时长表头 | FAIL | SIGNIN_DURATION |
-| N12 | 签到门店单一 | 微型听众均同一门店 | FAIL | SIGNIN_RATIO_AND_STORES |
 | N13 | ~~水印日期错误~~ | 水印规则已下线 | — | — |
 | N15 | S3 404 | 错误 file_url | ERROR | S3_NOT_FOUND |
 | N16 | 讲者缺过程照 | 大讲堂仅 SpeakerTitle | FAIL | SPEAKER_SHOT_PAIR |
 | N17 | 主题不一致 | 标题合影课件≠表单 topic | FAIL | SPEAKER_TOPIC_OCR |
-| N18 | 两张同为项目介绍 | 微型缺日程页 | FAIL | PPT_PAGE_KIND |
 
 ---
 

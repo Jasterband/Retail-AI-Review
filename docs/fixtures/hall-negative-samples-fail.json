@@ -2,7 +2,7 @@
   "project": {
     "projectId": "1",
     "projectType": 1,
-    "projectName": null
+    "projectName": "药师大讲堂"
   },
   "meeting": {
     "meetingId": "999001",
@@ -16,7 +16,8 @@
     "pharmacyName": null,
     "meetingLocation": "负样本合成地点",
     "remark": null,
-    "totalAttendees": 35
+    "totalAttendees": 35,
+    "durationMinutes": 130
   },
   "speakers": [
     {
@@ -33,13 +34,15 @@
           "photoId": "9003",
           "photoType": "SpeakerLecture",
           "fileUrl": "s3://pe-meetings/hall/fail/speaker_blur.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "讲课照片"
         },
         {
           "photoId": "9004",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/hall/fail/speaker_no_face.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         }
       ]
     }
@@ -49,19 +52,22 @@
       "photoId": "9000",
       "photoType": "Stand",
       "fileUrl": "s3://pe-meetings/hall/fail/stand_no_time.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程展架"
     },
     {
       "photoId": "9001",
       "photoType": "Stand",
       "fileUrl": "s3://pe-meetings/hall/fail/stand_incomplete.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程展架"
     },
     {
       "photoId": "9002",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/hall/fail/panorama_few.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     }
   ],
   "refs": {

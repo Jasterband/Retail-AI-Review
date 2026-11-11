@@ -2,7 +2,7 @@
   "project": {
     "projectId": "1",
     "projectType": 1,
-    "projectName": null
+    "projectName": "药师大讲堂"
   },
   "meeting": {
     "meetingId": "9999",
@@ -16,7 +16,8 @@
     "pharmacyName": null,
     "meetingLocation": "测试酒店",
     "remark": null,
-    "totalAttendees": 35
+    "totalAttendees": 35,
+    "durationMinutes": 120
   },
   "speakers": [
     {
@@ -36,7 +37,8 @@
       "photoId": "901",
       "photoType": "Poster",
       "fileUrl": "s3://pe-meetings/dup-test/poster.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "日程海报"
     }
   ],
   "refs": {

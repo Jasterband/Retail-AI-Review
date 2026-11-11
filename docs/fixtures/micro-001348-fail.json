@@ -2,7 +2,7 @@
   "project": {
     "projectId": "2",
     "projectType": 2,
-    "projectName": null
+    "projectName": "微型药师"
   },
   "meeting": {
     "meetingId": "101348",
@@ -16,7 +16,8 @@
     "pharmacyName": "瑞人堂医药集团股份有限公司台州路桥路北药店",
     "meetingLocation": "台州市瑞人堂医药集团股份有限公司台州路桥路北药店",
     "remark": null,
-    "totalAttendees": 6
+    "totalAttendees": 6,
+    "durationMinutes": 45
   },
   "speakers": [
     {
@@ -33,7 +34,8 @@
           "photoId": "13484",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/micro/001348/speaker.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         }
       ]
     }
@@ -43,25 +45,29 @@
       "photoId": "13482",
       "photoType": "ProjectIntro",
       "fileUrl": "s3://pe-meetings/micro/001348/intro.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "项目介绍展示"
     },
     {
       "photoId": "13483",
       "photoType": "EDMDisplay",
       "fileUrl": "s3://pe-meetings/micro/001348/display.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报展示"
     },
     {
       "photoId": "13485",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/micro/001348/panorama.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "13486",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/micro/001348/signin.pdf",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

@@ -2,7 +2,7 @@
   "project": {
     "projectId": "2",
     "projectType": 2,
-    "projectName": null
+    "projectName": "微型药师"
   },
   "meeting": {
     "meetingId": "1938",
@@ -16,7 +16,8 @@
     "pharmacyName": "洛阳德心堂药业有限公司",
     "meetingLocation": "洛阳市洛阳德心堂药业有限公司红山二店",
     "remark": null,
-    "totalAttendees": 14
+    "totalAttendees": 14,
+    "durationMinutes": 70
   },
   "speakers": [
     {
@@ -33,7 +34,8 @@
           "photoId": "93804",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/micro/000938/speaker1.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         }
       ]
     },
@@ -51,7 +53,8 @@
           "photoId": "93805",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/micro/000938/speaker2.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         }
       ]
     }
@@ -61,37 +64,43 @@
       "photoId": "93801",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/micro/000938/agenda.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "93802",
       "photoType": "ProjectIntro",
       "fileUrl": "s3://pe-meetings/micro/000938/intro.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "项目介绍展示"
     },
     {
       "photoId": "93803",
       "photoType": "EDMDisplay",
       "fileUrl": "s3://pe-meetings/micro/000938/display.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报展示"
     },
     {
       "photoId": "93806",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/micro/000938/panorama1.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "93807",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/micro/000938/panorama2.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "93808",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/micro/000938/signin.pdf",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

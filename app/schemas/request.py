@@ -56,6 +56,26 @@ ProjectType = Literal["LECTURE_HALL", "MICRO"]
 MeetingType = Literal["SINGLE", "DUAL"]
 
 
+# 缺省中文名（夹具补全 / comments 前缀兜底）
+PHOTO_TYPE_NAME_DEFAULTS: Dict[str, str] = {
+    "EDM": "电子日程海报",
+    "Poster": "日程海报",
+    "Stand": "日程展架",
+    "TableCard": "台卡",
+    "Manual": "手册",
+    "EDMDisplay": "电子日程海报展示",
+    "ProjectIntro": "项目介绍展示",
+    "Panorama": "参会人员全景",
+    "SignSheet": "签到表",
+    "SpeakerTitle": "标题合影",
+    "SpeakerLecture": "讲课照片",
+}
+
+# 必审类型（缺一类 → 受理拒绝 ASSET_MISSING，不创建 task_id）
+HALL_REQUIRED_TYPES: Set[str] = set(HALL_PHOTO_TYPES)
+MICRO_REQUIRED_TYPES: Set[str] = set(MICRO_PHOTO_TYPES)
+
+
 class PePhoto(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -75,7 +95,7 @@ class Speaker(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     speakerId: str = Field(min_length=1, max_length=36)
-    identityName: str = Field(max_length=10)
+    identityName: Optional[str] = Field(default=None, max_length=10)
     storeName: str = Field(max_length=50)
     speakerName: str = Field(max_length=20)
     topic: str = Field(max_length=50)
@@ -90,7 +110,7 @@ class Project(BaseModel):
 
     projectId: str = Field(min_length=1, max_length=36)
     projectType: int = Field(ge=1, le=2)  # 1 大讲堂；2 微型
-    projectName: Optional[str] = None
+    projectName: str = Field(min_length=1, max_length=100)
     startDate: Optional[str] = None
     endDate: Optional[str] = None
 
@@ -99,14 +119,14 @@ class Meeting(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     meetingId: str = Field(min_length=1, max_length=36)
-    meetingNo: str = Field(max_length=20)
-    meetingName: str = Field(max_length=50)
+    meetingNo: str = Field(min_length=1, max_length=20)
+    meetingName: str = Field(min_length=1, max_length=50)
     meetingType: int = Field(ge=0, le=2)  # 0 大讲堂；1 单讲；2 双讲
     meetingTypeName: Optional[str] = None
     meetingDate: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
     startTime: str = Field(max_length=5, pattern=r"^\d{2}:\d{2}$")
     endTime: str = Field(max_length=5, pattern=r"^\d{2}:\d{2}$")
-    durationMinutes: Optional[int] = None
+    durationMinutes: int
     chainName: Optional[str] = Field(default=None, max_length=50)
     pharmacyName: Optional[str] = Field(default=None, max_length=50)
     meetingLocation: str = Field(max_length=200)
@@ -143,7 +163,6 @@ class Options(BaseModel):
     signin_duration_micro_single: int = 30
     signin_duration_micro_dual: int = 60
     signin_audience_per_speaker: int = 6
-    signin_min_store_kinds: int = 2
 
 
 class RetailMeetingCheckRequest(BaseModel):
@@ -154,7 +173,7 @@ class RetailMeetingCheckRequest(BaseModel):
     project: Project
     meeting: Meeting
     speakers: List[Speaker] = Field(min_length=1)
-    meetingPhotos: List[PePhoto] = Field(default_factory=list)
+    meetingPhotos: List[PePhoto]  # v2 必填（可为空数组，但键须存在）
     refs: Optional[Refs] = None
     options: Optional[Options] = None
 
@@ -199,6 +218,16 @@ class RetailMeetingCheckRequest(BaseModel):
             if p["photo_type"] in SPEAKER_PHOTO_TYPES and not p.get("speaker_id"):
                 raise ValueError("{0} 须挂在对应 speakers[].photos 下".format(p["photo_type"]))
         return self
+
+    def missing_required_photo_types(self) -> List[str]:
+        """必审类型缺失列表（受理前校验）。"""
+        present = {p["photo_type"] for p in self.pipeline_photos()}
+        required = (
+            HALL_REQUIRED_TYPES
+            if self.project.projectType == 1
+            else MICRO_REQUIRED_TYPES
+        )
+        return sorted(required - present)
 
     def pipeline_photos(self) -> List[Dict[str, Any]]:
         out: List[Dict[str, Any]] = []

@@ -4,6 +4,7 @@ import uuid
 from typing import Literal, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Query, status
+from fastapi.responses import JSONResponse
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
@@ -40,7 +41,21 @@ def create_check(
     _: str = Depends(require_token),
     x_callback_url: Optional[str] = Header(default=None, alias="X-Callback-URL"),
     idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
-) -> AcceptedResponse:
+):
+    # v2：缺必审材料 → 受理拒绝，无 task_id
+    missing = body.missing_required_photo_types()
+    if missing:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "ASSET_MISSING",
+                    "message": "缺少必审材料: {0}".format(", ".join(missing)),
+                    "retryable": False,
+                }
+            },
+        )
+
     if idempotency_key:
         existing = db.scalar(
             select(AiCheckJob).where(
@@ -83,12 +98,10 @@ def create_check(
     return AcceptedResponse(task_id=job.task_id)
 
 
-@router.get("/v1/retail_meeting_checks/{task_id}")
-def get_check(
+def _get_check_result(
     task_id: str,
-    mode: Literal["simple", "full"] = Query(default="simple"),
-    db: Session = Depends(get_db),
-    _: str = Depends(require_token),
+    mode: Literal["pe", "simple", "full"],
+    db: Session,
 ):
     job = db.scalar(select(AiCheckJob).where(AiCheckJob.task_id == task_id))
     if not job:
@@ -107,3 +120,25 @@ def get_check(
         return RunningResponse(task_id=job.task_id, meeting_id=job.meeting_id)
 
     return project_response(job.final_response_json, mode)
+
+
+@router.get("/v1/retail_meeting_checks/{task_id}/results")
+def get_check_results(
+    task_id: str,
+    mode: Literal["pe", "simple", "full"] = Query(default="pe"),
+    db: Session = Depends(get_db),
+    _: str = Depends(require_token),
+):
+    """AI_接口文档v2 轮询路径。"""
+    return _get_check_result(task_id, mode, db)
+
+
+@router.get("/v1/retail_meeting_checks/{task_id}")
+def get_check_legacy(
+    task_id: str,
+    mode: Literal["pe", "simple", "full"] = Query(default="pe"),
+    db: Session = Depends(get_db),
+    _: str = Depends(require_token),
+):
+    """兼容旧轮询路径；行为同 `/results`。"""
+    return _get_check_result(task_id, mode, db)

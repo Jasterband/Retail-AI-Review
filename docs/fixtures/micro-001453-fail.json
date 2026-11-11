@@ -2,7 +2,7 @@
   "project": {
     "projectId": "2",
     "projectType": 2,
-    "projectName": null
+    "projectName": "微型药师"
   },
   "meeting": {
     "meetingId": "101453",
@@ -16,7 +16,8 @@
     "pharmacyName": "河南美锐大药房连锁有限公司平桥平西街分店",
     "meetingLocation": "信阳市河南美锐大药房连锁有限公司平桥平西街分店",
     "remark": null,
-    "totalAttendees": 6
+    "totalAttendees": 6,
+    "durationMinutes": 45
   },
   "speakers": [
     {
@@ -36,31 +37,36 @@
       "photoId": "14531",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/micro/001453/agenda.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "14532",
       "photoType": "ProjectIntro",
       "fileUrl": "s3://pe-meetings/micro/001453/intro.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "项目介绍展示"
     },
     {
       "photoId": "14533",
       "photoType": "EDMDisplay",
       "fileUrl": "s3://pe-meetings/micro/001453/display.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报展示"
     },
     {
       "photoId": "14535",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/micro/001453/panorama.jpeg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "14536",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/micro/001453/signin.pdf",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

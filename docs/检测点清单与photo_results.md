@@ -22,7 +22,7 @@
 
 | 模式 | 给谁 | PE/系统要什么 | 里面有什么 |
 |------|------|---------------|------------|
-| **simple**（默认） | PE 系统 | 整场结论 + 仅不合格图 + 原因码与中文 | 仅 `task_id` / `meeting_id` / `overall_status` / `photo_results[{photo_id, photo_status∈FAIL\|UNCERTAIN\|ERROR, fail_reasons[{reason_code, comments?}]}]`；**PASS 图不下发**；整场 PASS 时 `photo_results=[]`；ERROR 时加 `error` 且不附 `comments` |
+| **simple**（默认） | PE 系统 | 整场结论 + 仅不合格图 + 原因码与中文 | 见 `AI_接口文档v2.md`：`flagged_photos`（`FAIL`/`ERROR`/`NEED_HUMAN`）；PASS 不下发；ERROR 时 `flagged_photos=[]` |
 | **full** | AI 开发 debug | 尽量全，方便纠错 | 落库完整形态：`checks`、OCR、detections、evidence、`rule_results`、`debug` 等 |
 
 - 查询：`GET .../retail_meeting_checks/{task_id}?mode=simple|full`  
@@ -37,7 +37,7 @@
 
 | 模式 | 怎么拉清单 |
 |------|------------|
-| **simple** | 遍历 `photo_results`（仅非 PASS 图）：看 `photo_status`；读 `fail_reasons[].reason_code` + `comments`；未列出的材料视为通过 |
+| **simple** | 遍历 `flagged_photos`：看 `photo_status`；读 `fail_reasons[].reason_code` + `comments`；未列出的材料视为通过 |
 | **full** | 另加：摊开每张 `checks` true/false；场级看 `rule_results`（含 `evidence`）；`fail_reasons` 可含 `reason_text` / `check` |
 
 | 层级 | 字段 | 作用 |
@@ -167,7 +167,7 @@
 | `signin_complete_ok` | **本页**填写完整：表头（若有）时间/时长/地点已填；已占用行除「其他」列外均已填；末尾空行可不填 |
 | `signin_audience_ok` | **场级合并**听众人数达标（大讲堂 ≥35；微型 ≥ 讲者×6）；各页共用合并结果 |
 
-场级：`SIGNIN_COMPLETE` → `SIGNIN_INCOMPLETE`；`SIGNIN_AUDIENCE` → `SIGNIN_COUNT_BELOW`。微型另有：`SIGNIN_RATIO_AND_STORES`（门店种类≥2）→ `rule_results`。
+场级：`SIGNIN_COMPLETE` → `SIGNIN_INCOMPLETE`；`SIGNIN_AUDIENCE` → `SIGNIN_COUNT_BELOW`。
 
 ### 3.8 微型 · 权益展示（EDMDisplay / ProjectIntro）
 
@@ -200,8 +200,6 @@
 | `SPEAKER_SHOT_PAIR` | 每位讲者是否两类照齐全 |
 | `SIGNIN_COMPLETE` | 签到表填写完整 |
 | `SIGNIN_AUDIENCE` | 签到表听众人数 |
-| `SIGNIN_RATIO_AND_STORES` | 微型签到门店种类 |
-| `PPT_PAGE_KIND`（场级） | 两张展示是否互补为介绍+日程 |
 
 `rule_results` 里建议增加与 checks 对齐的布尔可读法：
 

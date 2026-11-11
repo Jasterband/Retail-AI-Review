@@ -56,14 +56,11 @@ def run_all_rules(
         "HANDBOOK_DETECT": lambda: hall.rule_handbook_detect(contexts),
         "HANDBOOK_NOT_STALE": lambda: hall.rule_handbook_not_stale(contexts),
         "SPEAKER_TOPIC_OCR": lambda: hall.rule_speaker_topic_ocr(
-            contexts, form, options
+            contexts, form, options, project_type
         ),
         "SPEAKER_SHOT_PAIR": lambda: hall.rule_speaker_shot_pair(contexts, form),
+        # Excel：仅项目介绍展示做 TEMPLATE_MISMATCH
         "PPT_TEMPLATE_MATCH": lambda: micro.rule_ppt_template_match(contexts, options),
-        "PPT_PAGE_KIND": lambda: micro.rule_ppt_page_kind(contexts, options),
-        "SIGNIN_RATIO_AND_STORES": lambda: micro.rule_signin_ratio_and_stores(
-            contexts, form, options
-        ),
     }
 
     results: List[RuleOutcome] = []

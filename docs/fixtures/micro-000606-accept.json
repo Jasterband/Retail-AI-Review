@@ -2,7 +2,7 @@
   "project": {
     "projectId": "2",
     "projectType": 2,
-    "projectName": null
+    "projectName": "微型药师"
   },
   "meeting": {
     "meetingId": "1606",
@@ -16,7 +16,8 @@
     "pharmacyName": "四川太极大药房连锁有限公司",
     "meetingLocation": "锦江区上东大街232号",
     "remark": null,
-    "totalAttendees": 7
+    "totalAttendees": 7,
+    "durationMinutes": 50
   },
   "speakers": [
     {
@@ -33,7 +34,8 @@
           "photoId": "304",
           "photoType": "SpeakerTitle",
           "fileUrl": "s3://pe-meetings/micro/000606/speaker.jpg",
-          "fileName": null
+          "fileName": null,
+          "photoTypeName": "标题合影"
         }
       ]
     }
@@ -43,31 +45,36 @@
       "photoId": "301",
       "photoType": "EDM",
       "fileUrl": "s3://pe-meetings/micro/000606/agenda.png",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报"
     },
     {
       "photoId": "302",
       "photoType": "ProjectIntro",
       "fileUrl": "s3://pe-meetings/micro/000606/intro.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "项目介绍展示"
     },
     {
       "photoId": "303",
       "photoType": "EDMDisplay",
       "fileUrl": "s3://pe-meetings/micro/000606/display.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "电子日程海报展示"
     },
     {
       "photoId": "305",
       "photoType": "Panorama",
       "fileUrl": "s3://pe-meetings/micro/000606/panorama.jpg",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "参会人员全景"
     },
     {
       "photoId": "306",
       "photoType": "SignSheet",
       "fileUrl": "s3://pe-meetings/micro/000606/signin.pdf",
-      "fileName": null
+      "fileName": null,
+      "photoTypeName": "签到表"
     }
   ],
   "refs": {

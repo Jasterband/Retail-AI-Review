@@ -24,10 +24,11 @@ def post_callback(
     callback_url: str,
     task_id: str,
     full_response: Dict[str, Any],
-    response_mode: str = "simple",
+    response_mode: str = "pe",
 ) -> None:
     settings = get_settings()
-    payload = project_response(full_response, response_mode if response_mode in ("simple", "full") else "simple")
+    mode = response_mode if response_mode in ("pe", "simple", "full") else "pe"
+    payload = project_response(full_response, mode)  # noqa: type — pe/simple→v2
     import json
 
     raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")

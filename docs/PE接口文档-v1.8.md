@@ -319,7 +319,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | reason_code / reason_text | 原因 |
 | related_photo_ids | 关联材料（方便点到具体照片） |
 
-> simple **不返回**：完整 `checks` 字典、OCR 原文、检测框、`evidence`、清晰度分数、`debug` 等。
+> simple **不返回**：完整 `checks` 字典、OCR 原文、检测框、`evidence`、`debug` 等。
 
 **simple · FAIL 示例（PE 最常用）**
 
@@ -443,8 +443,6 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | （含 simple 的 photo_status / fail_reasons） | | 方便同一套解析 |
-| detected_type / type_match | | 类型识别 |
-| clarity_score / is_clear | | 清晰度 |
 | checks | object | **全部检测点** true/false/null |
 | uncertain_checks | string[] | 拿不准的点 |
 | ocr_fields | object/null | 结构化抽取（日期/地点/姓名等） |
@@ -454,20 +452,17 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
 | image_dup_kind | string/null | `exact` \| `similar` |
 | image_dup_score | float/null | 近似相似度 |
 | image_dup_ref_meeting_no / image_dup_ref_meeting_id | | 撞到的历史场次/会议 |
-| topic_reuse_hit | bool | **讲者照**标题是否撞历史 |
-| topic_reuse_ref_meeting_no | string/null | 撞到的历史场次 |
 | topic_text_ocr | string/null | 讲者照 OCR 标题 |
 | model_scores | object/null | 各子模型分数 |
 | fetch_error | object/null | 下载失败详情 |
 
 **`checks` 命名：** 正向语义。`has_bayer_logo: true` = 有 Logo。不适用 → `null`。  
-常用：`type_match` · `is_clear` · `image_not_duplicated` · `has_bayer_logo` · `date_matches_form` · `topic_matches_form` · `topic_not_reused_in_period` · `name_set_matches_speakers` · `handbook_detected` · `ppt_template_match` …
+常用：`image_not_duplicated` · `has_bayer_logo` · `date_matches_form` · `topic_matches_form` · `name_set_matches_speakers` · `handbook_detected` · `ppt_template_match` …
 
 **rule_results[]（full）** 在 simple 基础上增加：`confidence` · `trigger_human` · `evidence`（比对明细、阈值、中间计数等）。
 
-**两类查重（勿混）：**  
-- **主题/标题重复**（`TOPIC_REUSE`）：OCR 标题 → 归一化 → 历史字符串比（**仅讲者照**）。  
-- **照片重复/盗用他场**（`IMAGE_DUP`）：pHash/embedding 与**其他会议**比（本场全部照片；**不查会内**相似）。
+**照片查重：**  
+- **照片重复/盗用他场**（`IMAGE_DUP`）：pHash/embedding 与**其他会议**比（本场全部照片；**不查会内**相似）。主题跨会复用（`TOPIC_REUSE`）已下线。
 
 **full · FAIL 示例（节选一张台卡）**
 
@@ -497,13 +492,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
           "reason_text": "台卡缺少讲者「刘亭」"
         }
       ],
-      "detected_type": "TableCard",
-      "type_match": true,
-      "clarity_score": 0.86,
-      "is_clear": true,
       "checks": {
-        "type_match": true,
-        "is_clear": true,
         "name_card_count_ok": false,
         "name_set_matches_speakers": false
       },
@@ -537,7 +526,6 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
   "debug": {
     "pipeline_steps": [
       { "step": "download", "ms": 180, "ok": true },
-      { "step": "clarity", "ms": 40, "ok": true },
       { "step": "name_card_ocr", "ms": 620, "ok": true }
     ],
     "artifact_refs": { "job_id": 9002, "tables": ["ai_step_log", "ai_artifact"] }
@@ -569,7 +557,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
       "fail_reasons": [
         {
           "check": "duration_readable",
-          "reason_code": "BLURRY",
+          "reason_code": "OCR_LOW_CONFIDENCE",
           "reason_text": "签到表模糊，无法可靠读取起止时间"
         }
       ]
@@ -580,7 +568,7 @@ curl -X GET 'https://retail-meeting-check-test.example.com/v1/retail_meeting_che
       "rule_code": "SIGNIN_DURATION",
       "passed": null,
       "status": "UNCERTAIN",
-      "reason_code": "BLURRY",
+      "reason_code": "OCR_LOW_CONFIDENCE",
       "reason_text": "签到表模糊，无法可靠读取起止时间",
       "related_photo_ids": [401]
     }
@@ -729,16 +717,18 @@ curl -X GET 'https://retail-meeting-check-test.example.com/health' \
 
 | reason_code | 说明 |
 |-------------|------|
-| BLURRY | 清晰度不足 |
-| TYPE_MISMATCH | 类别不符 |
-| FIELD_MISMATCH | 与表单不一致 |
+| COMPOSITION_MISSING | 讲者照构图不完整 |
+| TEMPLATE_MISMATCH | 模版/权益页类组合不符 |
+| DATE_MISMATCH | 日期是否和表单一致 |
+| TIME_MISMATCH | 时间是否和表单一致 |
+| LOCATION_MISMATCH | 地点是否和表单一致 |
+| SPEAKER_NAME_MISMATCH | 讲者姓名是否与表单一致 |
 | LOGO_MISSING | 无拜耳 Logo（微型：电子日程海报/展示/项目介绍） |
 | SPONSOR_MISSING | 无赞助方「拜耳医药保健有限公司」（大讲堂：电子日程海报/日程海报/日程展架） |
 | SPONSOR_UNCERTAIN | 赞助方文案检出灰区 |
 | COUNT_BELOW_THRESHOLD | 人数不足 |
 | DURATION_BELOW_THRESHOLD | 时长不足 |
 | IMAGE_DUP | 盗用/混用其他会议现场照（pHash/embedding，跨会议） |
-| TOPIC_REUSED | 讲者照主题/标题与历史会议重复 |
 | NAME_SET_MISMATCH | 台卡姓名不匹配 |
 | HANDBOOK_NOT_FOUND / HANDBOOK_STALE | 手册未识别 / 旧版 |
 | TEMPLATE_MISMATCH | 模版不一致 |

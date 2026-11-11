@@ -72,10 +72,10 @@
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `photoId` | `string` | ≤36 |
-| `photoType` | `string` | 见下表 |
+| `photoType` | `string` | 见下表；必填 |
+| `photoTypeName` | `string` | 材料中文名；**必填**（写入失败 `comments` 前缀） |
 | `fileUrl` | `string` | `s3://` 或 `https://` |
 | `fileName` | `string` | 建议带；用于推断类型 |
-| `photoTypeName` | `string` | 否 |
 
 **必审 `photoType`（缺一类 → `FAIL` + `ASSET_MISSING`）**
 
@@ -125,11 +125,11 @@ curl -X POST 'https://retail-meeting-check-test.example.com/v1/retail_meeting_ch
       }
     ],
     "meetingPhotos": [
-      {"photoId": "PH0003", "photoType": "EDM", "fileName": "电子海报.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/edm.jpg"},
-      {"photoId": "PH0004", "photoType": "Poster", "fileName": "海报.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/poster.jpg"},
-      {"photoId": "PH0005", "photoType": "Stand", "fileName": "展架.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/stand.jpg"},
-      {"photoId": "PH0006", "photoType": "TableCard", "fileName": "台卡.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/tablecard.jpg"},
-      {"photoId": "PH0007", "photoType": "Manual", "fileName": "手册.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/manual.jpg"},
+      {"photoId": "PH0003", "photoType": "EDM", "photoTypeName": "电子日程海报", "fileName": "电子海报.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/edm.jpg"},
+      {"photoId": "PH0004", "photoType": "Poster", "photoTypeName": "日程海报", "fileName": "海报.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/poster.jpg"},
+      {"photoId": "PH0005", "photoType": "Stand", "photoTypeName": "日程展架", "fileName": "展架.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/stand.jpg"},
+      {"photoId": "PH0006", "photoType": "TableCard", "photoTypeName": "台卡", "fileName": "台卡.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/tablecard.jpg"},
+      {"photoId": "PH0007", "photoType": "Manual", "photoTypeName": "手册", "fileName": "手册.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/manual.jpg"},
       {"photoId": "PH0010", "photoType": "Panorama", "photoTypeName": "参会人员全景", "fileName": "参会人员全景.jpg", "fileUrl": "s3://pe-meetings/hall/M0001/panorama.jpg"},
       {"photoId": "PH0011", "photoType": "SignSheet", "photoTypeName": "签到表", "fileName": "签到表.pdf", "fileUrl": "s3://pe-meetings/hall/M0001/signin.pdf"}
     ]
@@ -186,27 +186,34 @@ curl -X POST 'https://retail-meeting-check-test.example.com/v1/retail_meeting_ch
 | `meeting_id` | `string` | 会议 ID ≤36 |
 | `overall_status` | `string` enum | `PASS` \| `FAIL` \| `NEED_HUMAN` \| `ERROR` |
 | `error` | `object` | **仅** `ERROR` 时出现：`code` / `message` / `retryable` |
-| `photo_results` | `object[]` | 按图主结构 |
+| `photo_results` | `object[]` | **仅**不合格 / 待人工 / 系统错误图；整场 `PASS` 时为 `[]` |
 
-**`photo_results[]`**
+**`photo_results[]`**（**不下发** `photo_status=PASS` 的图）
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `photo_id` | `string` | 与提交一致 ≤36 |
-| `photo_status` | `string` enum | `PASS` \| `FAIL` \| `UNCERTAIN` \| `ERROR` |
-| `fail_reasons` | `object[]` | 通过时 `[]`；每项仅 `{ "reason_code": "..." }` |
+| `photo_status` | `string` enum | `FAIL` \| `UNCERTAIN` \| `ERROR`（无 `PASS`） |
+| `fail_reasons` | `object[]` | 见下 |
+
+**`fail_reasons[]`**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `reason_code` | `string` | 机器原因码，全集见 §7 |
+| `comments` | `string` | **中文说明**（后处理）：`{photoTypeName}：{原因文案}`。`photo_status=ERROR` 或系统错误码（`S3_*` / `MODEL_*` / `INTERNAL_ERROR`）**不附**此字段，看顶层 `error.message` |
 
 | `overall_status` | PE 建议 |
 |------------------|---------|
-| `PASS` | 标记通过 |
+| `PASS` | 标记通过；`photo_results` 为空 |
 | `FAIL` | 业务不通过；改材料后 **重新 POST**（AI 发新 `task_id`） |
 | `NEED_HUMAN` | **待人工**，勿当 FAIL；人工结论不回传 AI |
 | `ERROR` | **系统错误**，告警重试；**不记**业务不合格 |
 
 约定：
 
-- simple **不下发** `photo_type`；用 PE 本地 `photo_id` 映射类型/缩略图
-- 同一图可有多个 `reason_code`；映射见 §7；未知码走兜底文案
+- simple **不下发** `photo_type`，也 **不下发** 通过图；用 PE 本地 `photo_id` 映射类型/缩略图；未出现在 `photo_results` 的材料视为通过
+- 同一图可有多个 `reason_code`；每项（除 ERROR）带 `comments`（格式 `photoTypeName：原因`）；未知码 AI 兜底为「`photoTypeName`：审核未通过（CODE）」
 - `UNCERTAIN` 标黄；整场是否 `NEED_HUMAN` 由 AI 聚合，PE 勿自行改成 FAIL
 
 ---
@@ -215,7 +222,7 @@ curl -X POST 'https://retail-meeting-check-test.example.com/v1/retail_meeting_ch
 
 以下与 §2.3 / §2.4 同一场：`meeting_id=M0001`，`task_id` 为受理返回值；`photo_id` 与请求材料一致。
 
-**FAIL**
+**FAIL**（仅列不合格图；通过图不下发）
 
 ```json
 {
@@ -223,36 +230,38 @@ curl -X POST 'https://retail-meeting-check-test.example.com/v1/retail_meeting_ch
   "meeting_id": "M0001",
   "overall_status": "FAIL",
   "photo_results": [
-    { "photo_id": "PH0001", "photo_status": "PASS", "fail_reasons": [] },
-    { "photo_id": "PH0002", "photo_status": "PASS", "fail_reasons": [] },
     {
       "photo_id": "PH0006",
       "photo_status": "FAIL",
-      "fail_reasons": [{ "reason_code": "NAME_SET_MISMATCH" }]
+      "fail_reasons": [
+        {
+          "reason_code": "NAME_SET_MISMATCH",
+          "comments": "台卡：姓名集合是否和表单一致"
+        }
+      ]
     },
     {
       "photo_id": "PH0010",
       "photo_status": "FAIL",
-      "fail_reasons": [{ "reason_code": "COUNT_BELOW_THRESHOLD" }]
+      "fail_reasons": [
+        {
+          "reason_code": "COUNT_BELOW_THRESHOLD",
+          "comments": "参会人员全景：全景人数是否满足要求"
+        }
+      ]
     }
   ]
 }
 ```
 
-**PASS**
+**PASS**（`photo_results` 为空）
 
 ```json
 {
   "task_id": "req-a1b2c3d4e5f64789a0b1c2d3e4f56789",
   "meeting_id": "M0001",
   "overall_status": "PASS",
-  "photo_results": [
-    { "photo_id": "PH0001", "photo_status": "PASS", "fail_reasons": [] },
-    { "photo_id": "PH0002", "photo_status": "PASS", "fail_reasons": [] },
-    { "photo_id": "PH0006", "photo_status": "PASS", "fail_reasons": [] },
-    { "photo_id": "PH0010", "photo_status": "PASS", "fail_reasons": [] },
-    { "photo_id": "PH0011", "photo_status": "PASS", "fail_reasons": [] }
-  ]
+  "photo_results": []
 }
 ```
 
@@ -267,13 +276,18 @@ curl -X POST 'https://retail-meeting-check-test.example.com/v1/retail_meeting_ch
     {
       "photo_id": "PH0010",
       "photo_status": "UNCERTAIN",
-      "fail_reasons": [{ "reason_code": "BLURRY" }]
+      "fail_reasons": [
+        {
+          "reason_code": "COUNT_UNCERTAIN",
+          "comments": "参会人员全景：人数识别是否清晰可靠"
+        }
+      ]
     }
   ]
 }
 ```
 
-**ERROR**
+**ERROR**（系统错误：`fail_reasons` **不附** `comments`，看 `error.message`）
 
 ```json
 {
@@ -343,33 +357,37 @@ PE：5s 内回 `2xx`；同 `task_id` 幂等；非 2xx 时 AI 最多重试 3 次�
 
 `S3_*` / `ASSET_MISSING` 也可能出现在对应图的 `fail_reasons[].reason_code`。
 
-### `reason_code`（全集 24）
+### `reason_code`（全集 25）
 
-simple **只下发码**；未知码走本地兜底。
+simple 下发 `reason_code` + `comments`（中文）。  
+**例外：** `photo_status=ERROR` 或系统错误码（`S3_NOT_FOUND` / `S3_CORRUPT` / `MODEL_*` / `INTERNAL_ERROR`）**不附** `comments`，用顶层 `error.message`。未知业务码 AI 兜底「审核未通过（CODE）」。
 
-| reason_code | 建议文案方向 |
-|-------------|--------------|
-| `ASSET_MISSING` | 缺少必审材料，或材料不可读 |
-| `S3_NOT_FOUND` | 对象不存在 / 无法下载 |
-| `S3_CORRUPT` | 文件损坏或无法解析 |
-| `BLURRY` | 图片不清晰，请重新上传 |
-| `OCR_LOW_CONFIDENCE` | 文字识别不清，请换更清晰材料 |
-| `TYPE_MISMATCH` | 材料类型不符（含微型权益页介绍/日程组合错误） |
-| `TYPE_UNCERTAIN` | 材料类型无法可靠判定 |
-| `TEMPLATE_MISMATCH` | 版式 / 模版与规定不符 |
-| `TEMPLATE_UNCERTAIN` | 模版特征识别不清 |
-| `LOGO_MISSING` | 未检出拜耳 Logo（微型：电子日程海报/展示/项目介绍） |
-| `LOGO_UNCERTAIN` | Logo 检出处于灰区 |
-| `SPONSOR_MISSING` | 图片最下方未检出赞助方「拜耳医药保健有限公司」（大讲堂：电子日程海报/日程海报/日程展架） |
-| `SPONSOR_UNCERTAIN` | 赞助方文案检出处于灰区 |
-| `FIELD_MISMATCH` | 关键字段与表单不一致 |
-| `TOPIC_MISMATCH` | 讲者照标题与表单主题不一致 |
-| `TOPIC_REUSED` | 讲者照主题与历史会议重复 |
-| `NAME_SET_MISMATCH` | 台卡姓名与讲者不符 |
-| `COUNT_BELOW_THRESHOLD` | 人数（或签到听众/门店）未达要求 |
-| `COUNT_UNCERTAIN` | 人数识别不可靠 |
-| `DURATION_BELOW_THRESHOLD` | 签到时长未达要求 |
-| `SIGNIN_INCOMPLETE` | 签到表填写不完整（表头或缺姓名/职称/连锁/签名） |
-| `HANDBOOK_NOT_FOUND` | 未识别为宣传手册 |
-| `HANDBOOK_STALE` | 手册疑似旧版 |
-| `IMAGE_DUP` | 与其他会议现场照重复或近似 |
+检测点文案对齐《按材料类型-图像检测清单_枚举检测点》检测点定义表（日期/时间/地点/讲者姓名已拆码）。
+
+| reason_code | `comments`（中文） |
+|-------------|-------------------|
+| `ASSET_MISSING` | 是否缺少必审材料或材料不可读 |
+| `S3_NOT_FOUND` | （ERROR，无 comments；见 `error.message`）对象不存在 / 无法下载 |
+| `S3_CORRUPT` | （ERROR，无 comments；见 `error.message`）文件损坏或无法解析 |
+| `OCR_LOW_CONFIDENCE` | 文字/要素识别是否清晰可靠 |
+| `COMPOSITION_MISSING` | 讲者和主题页PPT是否同时出现（授课照：讲者与过程PPT是否同时出现） |
+| `TEMPLATE_MISMATCH` | PPT模板特征是否与要求一致 |
+| `TEMPLATE_UNCERTAIN` | 模版特征识别是否清晰可靠 |
+| `LOGO_MISSING` | 是否有拜耳 Logo |
+| `LOGO_UNCERTAIN` | 拜耳 Logo 检出是否清晰可靠 |
+| `SPONSOR_MISSING` | 图最下方是否出现赞助方「拜耳医药保健有限公司」 |
+| `SPONSOR_UNCERTAIN` | 赞助方文案检出是否清晰可靠 |
+| `DATE_MISMATCH` | 日期是否和表单一致 |
+| `TIME_MISMATCH` | 时间是否和表单一致 |
+| `LOCATION_MISMATCH` | 地点是否和表单一致 |
+| `SPEAKER_NAME_MISMATCH` | 讲者姓名是否与表单一致 |
+| `TOPIC_MISMATCH` | 标题是否和表单一致 |
+| `NAME_SET_MISMATCH` | 姓名集合是否和表单一致 |
+| `COUNT_BELOW_THRESHOLD` | 全景人数是否满足要求（大讲堂35人，微型药师单讲者6人，双讲者12人） |
+| `COUNT_UNCERTAIN` | 人数识别是否清晰可靠 |
+| `DURATION_BELOW_THRESHOLD` | 会议时长是否满足条件（大讲堂120min，微型药师单讲者30min，双讲者60min） |
+| `SIGNIN_INCOMPLETE` | 签到表是否填写完整 |
+| `SIGNIN_COUNT_BELOW` | 签到人数是否满足要求（大讲堂35人，微型药师单讲者6人，双讲者12人） |
+| `HANDBOOK_NOT_FOUND` | 是否存在菁英药师大讲堂宣传手册封面 |
+| `HANDBOOK_STALE` | 手册是否为当期版本 |
+| `IMAGE_DUP` | 本照片是否和其他场次照片重复 |

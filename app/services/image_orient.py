@@ -1,4 +1,4 @@
-"""取图后按 EXIF Orientation 扶正像素，再送给 Vision / OCR / 清晰度。
+"""取图后按 EXIF Orientation 扶正像素，再送给 Vision / OCR。
 
 手机竖拍常把展架/海报存成横像素 + Orientation=6/8；看图软件会自动转，
 但把 JPEG 原字节直接 base64 给模型时多数会忽略 EXIF，模型看到的是侧放/倒放。

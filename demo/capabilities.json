@@ -15,16 +15,6 @@
           "detail": "大讲堂 ≥35；微型单 ≥6 / 双 ≥12。应用通用多模态（非纯 OCR）。"
         },
         {
-          "id": "photo_type",
-          "label": "材料类型（PE 声明）",
-          "rule_code": "ASSET_TYPE_CHECK",
-          "projects": [
-            "LECTURE_HALL",
-            "MICRO"
-          ],
-          "detail": "类型由 PE 传入 photo_type，AI 不做视觉分类；规则固定 PASS。"
-        },
-        {
           "id": "key_fields",
           "label": "关键字段比对",
           "rule_code": "KEY_FIELD_MATCH",
@@ -62,7 +52,17 @@
             "LECTURE_HALL",
             "MICRO"
           ],
-          "detail": "每张独立：表头时间/地点；行内姓名/职称/连锁/签名齐；说明/其他不强制。"
+          "detail": "每页除「其他」列外均须填齐；缺项 → SIGNIN_INCOMPLETE。"
+        },
+        {
+          "id": "signin_audience",
+          "label": "签到表听众人数",
+          "rule_code": "SIGNIN_AUDIENCE",
+          "projects": [
+            "LECTURE_HALL",
+            "MICRO"
+          ],
+          "detail": "多页合计：大讲堂≥35，微型≥讲者×6；不足 → SIGNIN_COUNT_BELOW。"
         },
         {
           "id": "image_dup",
@@ -73,26 +73,6 @@
             "MICRO"
           ],
           "detail": "两场同海报应命中 IMAGE_DUP。"
-        },
-        {
-          "id": "topic_reuse",
-          "label": "主题查重",
-          "rule_code": "TOPIC_REUSE",
-          "projects": [
-            "LECTURE_HALL",
-            "MICRO"
-          ],
-          "detail": "讲者标题合影 OCR vs 历史主题库。"
-        },
-        {
-          "id": "clarity",
-          "label": "清晰度",
-          "rule_code": "CLARITY",
-          "projects": [
-            "LECTURE_HALL",
-            "MICRO"
-          ],
-          "detail": "材料清晰度阈值（写入配置）。"
         }
       ]
     },
@@ -181,12 +161,12 @@
         },
         {
           "id": "signin_ratio",
-          "label": "签到听众比例与门店种类",
+          "label": "签到听众门店种类",
           "rule_code": "SIGNIN_RATIO_AND_STORES",
           "projects": [
             "MICRO"
           ],
-          "detail": "听众 ≥ 讲者×6；门店种类 ≥ 2。"
+          "detail": "门店种类 ≥ 2（人数见 SIGNIN_AUDIENCE）。"
         }
       ]
     }

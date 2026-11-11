@@ -137,8 +137,6 @@ CREATE TABLE ai.ai_asset_result (
   is_blurry                BOOLEAN,
   ocr_fields               JSONB,
   detections               JSONB,
-  topic_reuse_hit            BOOLEAN      DEFAULT FALSE,
-  topic_reuse_ref_session_no VARCHAR(20),
   topic_text_ocr             TEXT
 );
 
@@ -178,25 +176,6 @@ CREATE INDEX idx_image_dup_phash
 
 CREATE INDEX idx_image_dup_meeting
   ON ai.image_dup_history(meeting_id);
-
--- 主题不重复：仅讲者照 OCR 出的讲题/标题（文字，非图像）
-CREATE TABLE ai.topic_history (
-  id                 BIGSERIAL PRIMARY KEY,
-  meeting_id         VARCHAR(36),
-  session_no         VARCHAR(20),
-  period_id          VARCHAR(36),
-  photo_id           VARCHAR(36),
-  speaker_name       VARCHAR(20)  NOT NULL,
-  topic_raw          VARCHAR(200) NOT NULL,
-  topic_normalized   VARCHAR(200) NOT NULL,
-  created_at         TIMESTAMPTZ  NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_topic_history_period_speaker
-  ON ai.topic_history(period_id, speaker_name, topic_normalized);
-
-CREATE INDEX idx_topic_history_period_norm
-  ON ai.topic_history(period_id, topic_normalized);
 
 -- 回填 meeting.latest_job_id 外键（可选）
 ALTER TABLE pe.meeting

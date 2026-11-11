@@ -8,7 +8,7 @@
 | 需求 | 比什么 | 做法 |
 |------|--------|------|
 | **主题/标题重复** | 文字：课件标题 / 讲题 | OCR 出标题 → 归一化 → 和历史主题**字符串**比（仅讲者照） |
-| **照片重复（盗用他场现场照）** | 图像本身 | **pHash / embedding** 与**其他会议**历史图比（本场全部照片）；一致或近似都算 |
+| **照片重复（盗用他场现场照）** | 图像本身 | 与**其他会议**库比（1×同组）：有人物↔有人物，无人物↔无人物；有人物/手册用 pHash+embedding；**海报/电子海报/展架仅完全一致** |
 
 > **不做**会议内部「两张图是否相似」的比对；照片查重只查**跨会议**混用/盗用。
 
@@ -22,14 +22,14 @@
 
 | 模式 | 给谁 | PE/系统要什么 | 里面有什么 |
 |------|------|---------------|------------|
-| **simple**（默认） | PE 系统 | 整场结论 + 哪张不合格 + 机器原因码 | 仅 `task_id` / `meeting_id` / `overall_status` / `photo_results[{photo_id, photo_status, fail_reasons[{reason_code}]}]`（ERROR 时加 `error`） |
+| **simple**（默认） | PE 系统 | 整场结论 + 仅不合格图 + 原因码与中文 | 仅 `task_id` / `meeting_id` / `overall_status` / `photo_results[{photo_id, photo_status∈FAIL\|UNCERTAIN\|ERROR, fail_reasons[{reason_code, comments?}]}]`；**PASS 图不下发**；整场 PASS 时 `photo_results=[]`；ERROR 时加 `error` 且不附 `comments` |
 | **full** | AI 开发 debug | 尽量全，方便纠错 | 落库完整形态：`checks`、OCR、detections、evidence、`rule_results`、`debug` 等 |
 
 - 查询：`GET .../retail_meeting_checks/{task_id}?mode=simple|full`  
 - 回调：默认 simple；提交时可 `options.response_mode`  
 - 服务端始终算全量并落库；mode 只裁剪返回（见 `app/services/projection.py`）  
 
-下文 §1～§3 的 `checks` 清单，主要出现在 **full**；simple 只带 `reason_code`，中文文案由 PE 本地映射。
+下文 §1～§3 的 `checks` 清单，主要出现在 **full**；simple 带 `reason_code` + `comments`（中文后处理；ERROR 除外）。
 
 ---
 
@@ -37,12 +37,12 @@
 
 | 模式 | 怎么拉清单 |
 |------|------------|
-| **simple** | 遍历 `photo_results`：看 `photo_status`；`FAIL`/`UNCERTAIN` 时读 `fail_reasons[].reason_code` → PE 映射文案 |
+| **simple** | 遍历 `photo_results`（仅非 PASS 图）：看 `photo_status`；读 `fail_reasons[].reason_code` + `comments`；未列出的材料视为通过 |
 | **full** | 另加：摊开每张 `checks` true/false；场级看 `rule_results`（含 `evidence`）；`fail_reasons` 可含 `reason_text` / `check` |
 
 | 层级 | 字段 | 作用 |
 |------|------|------|
-| **按张（simple）** | `photo_status` + `fail_reasons[].reason_code` | PE 展示必须 |
+| **按张（simple）** | 仅非 PASS：`photo_status` + `fail_reasons[].reason_code` + `comments` | PE 展示必须 |
 | **按张（full）** | `checks` | 每个检测点 true/false/null |
 | **按规则/场次（full）** | `rule_results[]` | 跨多张汇总（如全景人数、**跨会议主题是否重复**）；simple **不返回** |
 
@@ -60,10 +60,6 @@
 | `photo_type` | string | PE 声明的材料类型（CRM `PhotoType`） |
 | `photo_status` | string | `PASS` / `FAIL` / `UNCERTAIN` / `ERROR` |
 | `fail_reasons` | array | 不合格/待人工原因；通过时为空 |
-| `detected_type` | string/null | AI 识别的类别（full） |
-| `type_match` | bool/null | 声明与识别是否一致 |
-| `clarity_score` | float/null | 清晰度 0~1 |
-| `is_clear` | bool/null | 是否够清晰（达标为 true） |
 | `checks` | object | **检测点清单**：key=检测点名，value=`true`/`false`/`null` |
 | `uncertain_checks` | string[] | 值为 null 或拿不准、建议人工的检测点名 |
 | `ocr_fields` | object/null | 抽出的日期/时间/地点/姓名等（给人看/比对） |
@@ -71,8 +67,6 @@
 | `image_dup_kind` | string/null | `exact` \| `similar`（命中时标明） |
 | `image_dup_score` | float/null | 相似度 0~1（近似命中时） |
 | `image_dup_ref_session_no` / `image_dup_ref_meeting_id` | | 撞到的**历史场次/会议**（跨会议混用） |
-| `topic_reuse_hit` | bool | **讲者照**抽出的标题是否与历史主题重复 |
-| `topic_reuse_ref_session_no` | string/null | 撞到的历史场次 |
 | `topic_text_ocr` | string/null | 讲者照 OCR 标题（非讲者照一般为 null） |
 | `fetch_error` | object/null | 下载失败时才有 |
 
@@ -84,13 +78,7 @@
   "photo_type": "Poster",
   "photo_status": "PASS",
   "fail_reasons": [],
-  "detected_type": "Poster",
-  "type_match": true,
-  "clarity_score": 0.91,
-  "is_clear": true,
   "checks": {
-    "type_match": true,
-    "is_clear": true,
     "has_bayer_logo": true,
     "date_matches_form": true,
     "time_matches_form": true,
@@ -115,10 +103,9 @@
 
 ### 3.1 通用（几乎每张图）
 
+
 | 检测点 key | true 表示 | false 表示 |
 |------------|-----------|------------|
-| `type_match` | 类别与声明一致 | 不一致 |
-| `is_clear` | 清晰度达标 | 模糊 |
 | `image_not_duplicated` | 未盗用其他会议现场照（见 §4.A） | pHash/embedding 命中其他会议（跨会；不查会内） |
 
 ### 3.2 大讲堂 · 海报 / 展架（Poster / Stand / EDM）
@@ -156,10 +143,9 @@
 | `speaker_lecture_composition_ok` | **SpeakerLecture**：同时有讲者与 PPT/投影 |
 | `has_ppt_screen` | 授课照可见 PPT/投影 |
 | `topic_matches_form` | 课件标题与该讲者 `topic` 一致（**仅 SpeakerTitle**） |
-| `topic_not_reused_in_period` | OCR 标题未与历史会议重复（**仅 SpeakerTitle**；见 §4.B） |
 | `speaker_name_visible_ok` | 能关联到正确讲者（**仅 SpeakerTitle**） |
 
-> 讲者照同时做：通用 **图片查重** + 构图完整（`SPEAKER_COMPOSITION`）+ **主题不重复**（仅标题合影抽标题）。
+> 讲者照同时做：通用 **图片查重** + 构图完整（`SPEAKER_COMPOSITION`）+ 标题合影主题对台账。
 
 ### 3.6 全景（Panorama）
 
@@ -171,17 +157,17 @@
 
 ### 3.7 签到表（SignSheet）
 
-> **多张合并**：一场若上传 ≥2 张 `SignSheet`，时长 / 模版 / 听众人数 / 门店视为**一场检查**（各页 `checks` 共用合并结果）。时长取可读页的最大值；听众人数按页累加；门店名取并集。  
-> **完整性**：每张签到表**各自**核验（`signin_complete_ok`），不合并。
+> **多张合并**：一场若上传 ≥2 张 `SignSheet`，时长 / 听众人数 / 门店视为**一场检查**（各页 `checks` 共用合并结果）。时长取可读页的最大值；听众人数按页累加；门店名取并集。读不出时长 → `OCR_LOW_CONFIDENCE`。  
+> **填写与人数拆开**：① **填写**（`signin_complete_ok` / `SIGNIN_COMPLETE`）每页各自核验；② **人数**（`signin_audience_ok` / `SIGNIN_AUDIENCE`）多页合计。不做签到表模版/是否印刷表判定。
 
 | 检测点 key | true 表示 |
 |------------|-----------|
-| `signin_template_ok` | 印刷签到表（表头+姓名/签名栏，供手写签名）；任一页成立即 true |
 | `duration_readable` | 合并后能读出起止时间 / 时长 |
 | `duration_meets_threshold` | 合并时长达标（大讲堂 >120；微型单 >30 / 双 >60） |
-| `signin_complete_ok` | **本页**填写完整：表头（若有）时间/时长/地点已填；已占用行姓名/职称/连锁/签名四列齐；说明/其他列不强制；末尾空行可不填 |
+| `signin_complete_ok` | **本页**填写完整：表头（若有）时间/时长/地点已填；已占用行除「其他」列外均已填；末尾空行可不填 |
+| `signin_audience_ok` | **场级合并**听众人数达标（大讲堂 ≥35；微型 ≥ 讲者×6）；各页共用合并结果 |
 
-场级：`SIGNIN_COMPLETE`（任一张不完整则 FAIL）。微型另有：`SIGNIN_RATIO_AND_STORES`（1:6、两门店；多页听众合计）→ `rule_results`。
+场级：`SIGNIN_COMPLETE` → `SIGNIN_INCOMPLETE`；`SIGNIN_AUDIENCE` → `SIGNIN_COUNT_BELOW`。微型另有：`SIGNIN_RATIO_AND_STORES`（门店种类≥2）→ `rule_results`。
 
 ### 3.8 微型 · 权益展示（EDMDisplay / ProjectIntro）
 
@@ -200,7 +186,7 @@
 | `ppt_template_match` | 对应该页特征成立（一=丝带，二=日程表） |
 | `ppt_page_kind_ok` | 页类正确（介绍页 / 日程页） |
 
-> 展示照做 **图片查重**；主题文字查重仍只在讲者照上做。
+> 展示照做 **图片查重**。
 
 ### 3.9 场级规则（不在单张 checks 里，在 rule_results）
 
@@ -208,12 +194,13 @@
 |-----------|------|
 | `PANORAMA_COUNT` | 多张全景人数合计是否达标 |
 | `IMAGE_DUP` | 是否盗用他场现场照（pHash/embedding，仅跨会，见 §4.A） |
-| `TOPIC_REUSE` | **讲者照** OCR 标题是否与历史会议主题重复（见 §4.B） |
 | `TIME_CONSISTENCY` | 海报等材料日程时间是否落在会议时段（不做时间水印） |
 | ~~`WATERMARK_CONSISTENCY`~~ | 已下线（时间/日期/地点水印均不审） |
 | `KEY_FIELD_MATCH` | 跨材料交叉比对汇总 |
 | `SPEAKER_SHOT_PAIR` | 每位讲者是否两类照齐全 |
-| `SIGNIN_RATIO_AND_STORES` | 微型签到人数与门店 |
+| `SIGNIN_COMPLETE` | 签到表填写完整 |
+| `SIGNIN_AUDIENCE` | 签到表听众人数 |
+| `SIGNIN_RATIO_AND_STORES` | 微型签到门店种类 |
 | `PPT_PAGE_KIND`（场级） | 两张展示是否互补为介绍+日程 |
 
 `rule_results` 里建议增加与 checks 对齐的布尔可读法：
@@ -233,53 +220,27 @@
 
 ## 4. 两类查重（分开做）
 
-### 4.A 照片重复（盗用他场现场照 · 跨会议 · pHash/embedding）
+### 4.A 照片重复（盗用他场现场照 · 跨会议 · 分组查重）
 
 | 项 | 说明 |
 |----|------|
-| 需求 | 不同会议之间是否**混用/盗用**了现场照 |
-| 比什么 | **图像本身** |
-| 做法 | 算 **pHash** 和/或 **embedding** → 与 `image_dup_history` 里**其他会议**比 |
-| 对本场哪些图 | **全部照片** |
-| 和谁比 | 仅**其他 `meeting_id`**；范围 `refs.image_dup_search_scope`：`period`（默认）| `all` |
-| 判定 | pHash 距离 ≤ 阈值，或 embedding 相似度 ≥ 阈值 → 重复（含近似） |
+| 需求 | 不同会议之间是否**混用/盗用**了现场照 / 材料图 |
+| 比什么 | **图像本身**（本场每张 vs 库内**同组全部**历史图，非会内两两） |
+| 分组 | **有人物**：`SpeakerTitle` / `SpeakerLecture` / `Panorama`；**无人物**：`Manual` / `Poster` / `Stand` / `EDM` / `EDMDisplay` / `ProjectIntro`。两组互不交叉 |
+| 做法 | 有人物 + 手册/介绍：`pHash`（距离阈值）和/或 **embedding 余弦**；**海报 / 电子海报 / 展架**（`Poster`/`EDM`/`EDMDisplay`/`Stand`）：**仅 pHash 完全一致**（distance=0），不算余弦 |
+| 对本场哪些图 | 上表分组内材料（台卡/签到表不参与） |
+| 和谁比 | 仅**其他 `meeting_id`** 且**同组**；范围 `refs.image_dup_search_scope`：`period`（默认）| `all` |
+| 判定 | 见「做法」；命中则重复 |
 | 命中 | `image_not_duplicated=false`；场级 `IMAGE_DUP` FAIL；记下历史场次 |
-| 入库 | 本场结束后写入指纹 |
-| **不做** | **不查会议内部**两张图是否相似 |
+| 入库 | 本场结束后写入同组指纹 |
+| **不做** | **不查会议内部**两张图是否相似；海报类不做 embedding |
 
 ```text
-本场每张图 → phash / embedding
-  → 只查其他会议历史指纹 → 越阈则盗用 FAIL
+本场每张图（按有人/无人分组）→ phash（海报类）/ phash+embedding（其余）
+  → 只查其他会议、同组历史指纹 → 命中则盗用 FAIL
   → 本场指纹入库
 ```
 
-### 4.B 主题/标题重复（仅讲者照 · 文字）
-
-| 项 | 说明 |
-|----|------|
-| 需求 | 讲课主题 / 课件标题是否与历史重复 |
-| 比什么 | **文字**（课件标题 / 讲题） |
-| 做法 | OCR 出标题 → **归一化** → 和历史主题**字符串**比 |
-| 对哪些图 | **仅 `SpeakerTitle`** |
-| 和谁比 | `topic_history`（排除当前会议；`refs.topic_search_scope`） |
-| 命中 | `topic_not_reused_in_period=false`；场级 `TOPIC_REUSE` FAIL |
-| 入库 | 讲者照标题写入 `topic_history` |
-
-```text
-讲者 `SpeakerTitle` → OCR → 归一化 → 与 topic_history 字符串比 → 命中则主题重复
-```
-
-### 4.C 对照
-
-| | 主题/标题重复 | 照片重复（盗用他场） |
-|--|----------------|----------------------|
-| 比什么 | 文字 | 图像本身 |
-| 做法 | OCR → 归一化 → 字符串 | pHash / embedding |
-| 范围 | 讲者照 | 全部照片 vs **其他会议** |
-| 不做 | — | **不查会内相似图** |
-| 规则码 | `TOPIC_REUSE` | `IMAGE_DUP` |
-| 检测点 | `topic_not_reused_in_period` | `image_not_duplicated` |
-
-手册「旧版」仍用 `handbook_not_stale`（封面模版），与上述两类无关。
+~~主题/标题跨会复用（原 §4.B / `TOPIC_REUSE`）已下线。~~ 手册「旧版」仍用 `handbook_not_stale`（封面模版），与照片查重无关。
 
 ---

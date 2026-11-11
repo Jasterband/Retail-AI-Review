@@ -4,16 +4,14 @@ from __future__ import annotations
 
 COMMON = [
     "ASSET_MISSING",
-    "ASSET_TYPE_CHECK",
-    "CLARITY",
     "KEY_FIELD_MATCH",
     "TIME_CONSISTENCY",
     "BAYER_LOGO",
     "PANORAMA_COUNT",
     "SIGNIN_DURATION",
     "SIGNIN_COMPLETE",
+    "SIGNIN_AUDIENCE",
     "IMAGE_DUP",
-    "TOPIC_REUSE",
     "SPEAKER_COMPOSITION",
 ]
 

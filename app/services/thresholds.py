@@ -7,7 +7,6 @@ from typing import Any, Dict, Optional
 
 # 与 docs/03-rule-matrix.md / docs/thresholds.md 对齐
 DEFAULTS: Dict[str, Any] = {
-    "clarity_threshold": 0.60,
     "human_confidence_threshold": 0.75,
     # 海报等日程起止时间容差；不做时间水印检测
     "watermark_time_skew_minutes": 120,
@@ -58,3 +57,20 @@ def signin_duration_need(
     if meeting_type == "DUAL":
         return int(thr["signin_duration_micro_dual"])
     return int(thr["signin_duration_micro_single"])
+
+
+def signin_audience_need(
+    project_type: str,
+    meeting_type: Optional[str],
+    form: Optional[dict],
+    thr: dict,
+) -> int:
+    """签到表听众人数下限：大讲堂 ≥35；微型 ≥ 讲者数×6（与门店规则一致）。"""
+    if project_type == "LECTURE_HALL":
+        return int(thr["panorama_need_lecture_hall"])
+    form = form or {}
+    n_speakers = len(form.get("speakers") or [])
+    per = int(thr.get("signin_audience_per_speaker", 6))
+    if n_speakers > 0:
+        return n_speakers * per
+    return panorama_need(project_type, meeting_type, thr)

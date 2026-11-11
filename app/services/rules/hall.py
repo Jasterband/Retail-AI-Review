@@ -8,7 +8,6 @@ from typing import List, Optional
 from app.config import get_settings
 from app.services.pipeline.asset_context import AssetContext
 from app.services.rules.base import RuleOutcome, fail, pass_, skip, uncertain
-from app.services.rules.common import _is_blurry
 from app.services.text_norm import name_set_equal, normalize_topic
 
 
@@ -25,13 +24,6 @@ def rule_name_card_speaker(
     related = []
     for c in cards:
         related.append(c.photo_id)
-        if _is_blurry(c, options):
-            return uncertain(
-                "NAME_CARD_SPEAKER_MATCH",
-                "OCR_LOW_CONFIDENCE",
-                "台卡模糊，姓名 OCR 不可靠",
-                related=related,
-            )
         names = c.vision.get("name_card_names") or c.ocr_fields().get("speaker_names") or []
         ocr_names.extend(names)
 
@@ -183,10 +175,7 @@ def rule_handbook_not_stale(contexts: List[AssetContext]) -> RuleOutcome:
             continue
 
         if year is None:
-            if _is_blurry(c, {}):
-                uncs.append(c.photo_id)
-            else:
-                uncs.append(c.photo_id)
+            uncs.append(c.photo_id)
             continue
         if year == need_year:
             ok_ids.append(c.photo_id)
@@ -241,10 +230,7 @@ def rule_speaker_topic_ocr(
         of = c.ocr_fields()
         got = normalize_topic(of.get("topic_title") or "")
         if not got:
-            if _is_blurry(c, options):
-                uncs.append(c.photo_id)
-            else:
-                uncs.append(c.photo_id)
+            uncs.append(c.photo_id)
             continue
         if expected and got != expected:
             # allow containment
@@ -268,7 +254,7 @@ def rule_speaker_topic_ocr(
         return uncertain(
             "SPEAKER_TOPIC_OCR",
             "OCR_LOW_CONFIDENCE",
-            "讲者照标题 OCR 不清",
+            "讲者照标题识别不清",
             related=uncs,
         )
     return pass_(

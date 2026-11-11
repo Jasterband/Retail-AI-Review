@@ -8,7 +8,9 @@ from pydantic import BaseModel, Field
 class FailReason(BaseModel):
     check: Optional[str] = None
     reason_code: Optional[str] = None
-    reason_text: str
+    reason_text: Optional[str] = None
+    # simple 后处理：非 ERROR 的 reason_code 中文说明
+    comments: Optional[str] = None
 
 
 class ErrorBody(BaseModel):
@@ -22,10 +24,6 @@ class PhotoResult(BaseModel):
     photo_type: str  # 声明类型（原 photo_type）
     photo_status: Literal["PASS", "FAIL", "UNCERTAIN", "ERROR"]
     fail_reasons: List[FailReason] = Field(default_factory=list)
-    detected_type: Optional[str] = None
-    type_match: Optional[bool] = None
-    clarity_score: Optional[float] = None
-    is_clear: Optional[bool] = None
     checks: Optional[Dict[str, Optional[bool]]] = None
     uncertain_checks: Optional[List[str]] = None
     ocr_fields: Optional[Dict[str, Any]] = None
@@ -37,8 +35,6 @@ class PhotoResult(BaseModel):
     image_dup_score: Optional[float] = None
     image_dup_ref_meeting_id: Optional[str] = None
     image_dup_ref_meeting_no: Optional[str] = None
-    topic_reuse_hit: Optional[bool] = None
-    topic_reuse_ref_meeting_no: Optional[str] = None
     topic_text_ocr: Optional[str] = None
     fetch_error: Optional[ErrorBody] = None
 

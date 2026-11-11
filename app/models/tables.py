@@ -82,7 +82,6 @@ class AiAssetResult(Base):
     ocr_fields: Mapped[Optional[dict]] = mapped_column(JSON)
     detections: Mapped[Optional[dict]] = mapped_column(JSON)
     image_dup_hit: Mapped[bool] = mapped_column(Boolean, default=False)
-    topic_reuse_hit: Mapped[bool] = mapped_column(Boolean, default=False)
     topic_text_ocr: Mapped[Optional[str]] = mapped_column(Text)
 
     job: Mapped["AiCheckJob"] = relationship(back_populates="photo_results")
@@ -160,18 +159,3 @@ class ImageDupHistory(Base):
         DateTime(timezone=True), server_default=func.now()
     )
 
-
-class TopicHistory(Base):
-    __tablename__ = "topic_history"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    meeting_id: Mapped[Optional[str]] = mapped_column(String(36), index=True)
-    meeting_no: Mapped[Optional[str]] = mapped_column(String(20))
-    project_id: Mapped[Optional[str]] = mapped_column(String(36), index=True)
-    photo_id: Mapped[Optional[str]] = mapped_column(String(36))
-    speaker_name: Mapped[str] = mapped_column(String(20), nullable=False)
-    topic_raw: Mapped[str] = mapped_column(String(200), nullable=False)
-    topic_normalized: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )

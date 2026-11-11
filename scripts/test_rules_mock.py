@@ -43,7 +43,6 @@ def hall_contexts(snap: dict) -> list:
     for a in snap["photos"]:
         t = a["photo_type"]
         v = {
-            "clarity_score": 0.92,
             "detected_type": t,
             "type_confidence": 0.95,
             "has_bayer_logo": None,
@@ -140,7 +139,6 @@ def main() -> int:
             _ctx(
                 snap2["photos"][0],
                 {
-                    "clarity_score": 0.9,
                     "detected_type": "Poster",
                     "type_confidence": 0.9,
                     "has_bayer_sponsor": True,

@@ -5,6 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Dict, Literal
 
+from app.services.reason_comments import comments_for_reason_code
+
 
 def project_response(
     full: Dict[str, Any],
@@ -15,18 +17,31 @@ def project_response(
         out["response_mode"] = "full"
         return out
 
-    # PE simple 最瘦：对齐 + 整场结论 + 按图 status/reason_code
+    # PE simple：整场结论 + 仅下发不合格/待人工/系统错误图；PASS 图不下发
     photos = []
     for a in full.get("photo_results") or []:
-        reasons = [
-            {"reason_code": fr.get("reason_code")}
-            for fr in (a.get("fail_reasons") or [])
-            if isinstance(fr, dict)
-        ]
+        photo_status = a.get("photo_status")
+        if photo_status == "PASS":
+            continue
+        reasons = []
+        for fr in a.get("fail_reasons") or []:
+            if not isinstance(fr, dict):
+                continue
+            code = fr.get("reason_code")
+            item: Dict[str, Any] = {"reason_code": code}
+            # ERROR 图 / 系统错误码：不写 comments（用顶层 error）
+            if photo_status != "ERROR":
+                comments = comments_for_reason_code(
+                    code,
+                    photo_type_name=a.get("photo_type_name") or a.get("photoTypeName"),
+                )
+                if comments:
+                    item["comments"] = comments
+            reasons.append(item)
         photos.append(
             {
                 "photo_id": a["photo_id"],
-                "photo_status": a["photo_status"],
+                "photo_status": photo_status,
                 "fail_reasons": reasons,
             }
         )

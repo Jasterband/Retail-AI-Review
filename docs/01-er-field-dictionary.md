@@ -90,14 +90,9 @@ erDiagram
     bigint job_id FK
     string photo_id
     string photo_type
-    string detected_type
-    bool type_match
-    float clarity_score
     bool is_blurry
     jsonb ocr_fields
     jsonb detections
-    bool topic_reuse_hit
-    string topic_reuse_ref_session_no
   }
 
   ai_rule_result {
@@ -228,14 +223,8 @@ erDiagram
 | job_id | BIGINT FK | Y | |
 | photo_id | VARCHAR(36) | Y | 对齐 CRM PhotoID / 请求 `photos[].photo_id` |
 | photo_type | VARCHAR(32) | N | PE 声明类型（响应 `photo_type`） |
-| detected_type | VARCHAR(32) | N | 模型判定的类别（full） |
-| type_match | BOOLEAN | N | 是否与声明 `photo_type` 一致 |
-| clarity_score | REAL | N | 0~1 |
-| is_blurry | BOOLEAN | N | clarity < 阈值 |
 | ocr_fields | JSONB | N | 抽取字段，见下方结构 |
 | detections | JSONB | N | 检测框/物体（台卡 ROI、Logo、人数等） |
-| topic_reuse_hit | BOOLEAN | N | 讲者照标题是否命中历史 |
-| topic_reuse_ref_session_no | VARCHAR(20) | N | 命中的历史场次编号 |
 | topic_text_ocr | TEXT | N | 讲者照 OCR 标题 |
 
 **ocr_fields 建议结构：**
@@ -385,17 +374,17 @@ erDiagram
 
 | rule_code | 适用 |
 |-----------|------|
-| ASSET_TYPE_CHECK | 两者 |
-| CLARITY | 两者 |
 | ASSET_MISSING | 两者 |
 | KEY_FIELD_MATCH | 两者 |
 | TIME_CONSISTENCY | 两者（海报等日程时间；不做时间水印） |
 | BAYER_LOGO | 两者 |
 | PANORAMA_COUNT | 两者 |
 | SIGNIN_DURATION | 两者 |
-| SIGNIN_RATIO_AND_STORES | 微型 |
+| SIGNIN_COMPLETE | 两者 |
+| SIGNIN_AUDIENCE | 两者 |
+| SIGNIN_RATIO_AND_STORES | 微型（门店种类） |
 | IMAGE_DUP | 两者（盗用他场照：pHash/embedding，仅跨会议，不查会内） |
-| TOPIC_REUSE | 两者（仅讲者照主题/标题文本） |
+| ~~TOPIC_REUSE~~ | 已下线（主题跨会复用不再审） |
 | ~~WATERMARK_CONSISTENCY~~ | 已下线（时间/日期/地点水印均不审） |
 | NAME_CARD_SPEAKER_MATCH | 大讲堂 |
 | HANDBOOK_DETECT | 大讲堂 |
@@ -408,26 +397,32 @@ erDiagram
 
 ### reason_code（常用）
 
+检测点文案对齐《按材料类型-图像检测清单_枚举检测点》；台账字段已拆码。
+
 | 码 | 说明 |
 |----|------|
-| BLURRY | 清晰度不足 |
-| TYPE_MISMATCH | 照片类别与声明不符 |
-| FIELD_MISMATCH | 关键字段与表单不一致 |
-| LOGO_MISSING | 未检出拜耳 Logo（微型） |
-| SPONSOR_MISSING | 未检出赞助方「拜耳医药保健有限公司」（大讲堂） |
-| SPONSOR_UNCERTAIN | 赞助方文案检出灰区 |
-| COUNT_BELOW_THRESHOLD | 人数不足 |
-| DURATION_BELOW_THRESHOLD | 时长不足 |
-| IMAGE_DUP | 与其他会议混用照片（完全一致或近似相似） |
-| TOPIC_REUSED | 讲者照主题/标题与历史会议重复 |
-| NAME_SET_MISMATCH | 台卡姓名集合不匹配 |
-| HANDBOOK_NOT_FOUND | 未识别到规定手册 |
-| HANDBOOK_STALE | 疑似旧版手册 |
-| TEMPLATE_MISMATCH | 模版不一致 |
-| TOPIC_MISMATCH | 课件标题与主题不一致 |
+| COMPOSITION_MISSING | 讲者和主题页PPT是否同时出现（授课照：讲者与过程PPT） |
+| DATE_MISMATCH | 日期是否和表单一致 |
+| TIME_MISMATCH | 时间是否和表单一致 |
+| LOCATION_MISMATCH | 地点是否和表单一致 |
+| SPEAKER_NAME_MISMATCH | 讲者姓名是否与表单一致 |
+| LOGO_MISSING | 是否有拜耳 Logo（微型） |
+| SPONSOR_MISSING | 图最下方是否出现赞助方「拜耳医药保健有限公司」（大讲堂） |
+| SPONSOR_UNCERTAIN | 赞助方文案检出是否清晰可靠 |
+| COUNT_BELOW_THRESHOLD | 全景人数是否满足要求 |
+| COUNT_UNCERTAIN | 人数识别是否清晰可靠 |
+| DURATION_BELOW_THRESHOLD | 会议时长是否满足条件 |
+| SIGNIN_INCOMPLETE | 签到表是否填写完整 |
+| SIGNIN_COUNT_BELOW | 签到人数是否满足要求 |
+| IMAGE_DUP | 本照片是否和其他场次照片重复 |
+| NAME_SET_MISMATCH | 姓名集合是否和表单一致 |
+| HANDBOOK_NOT_FOUND | 是否存在菁英药师大讲堂宣传手册封面 |
+| HANDBOOK_STALE | 手册是否为当期版本 |
+| TEMPLATE_MISMATCH | PPT模板特征是否与要求一致 |
+| TOPIC_MISMATCH | 标题是否和表单一致 |
 | S3_NOT_FOUND | 对象不存在 |
 | S3_TIMEOUT | 拉取超时 |
-| OCR_LOW_CONFIDENCE | OCR 置信度低 |
+| OCR_LOW_CONFIDENCE | 文字/要素识别是否清晰可靠 |
 
 ---
 

@@ -14,8 +14,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
-        "CLARITY": "PASS",
         "KEY_FIELD_MATCH": "PASS",
         "BAYER_LOGO": "PASS",
         "NAME_CARD_SPEAKER_MATCH": "PASS",
@@ -130,8 +128,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
-        "CLARITY": "PASS",
         "KEY_FIELD_MATCH": "PASS",
         "BAYER_LOGO": "PASS",
         "NAME_CARD_SPEAKER_MATCH": "PASS",
@@ -251,8 +247,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
-        "CLARITY": "PASS",
         "KEY_FIELD_MATCH": "PASS",
         "BAYER_LOGO": "PASS",
         "NAME_CARD_SPEAKER_MATCH": "PASS",
@@ -367,8 +361,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
-        "CLARITY": "PASS",
         "KEY_FIELD_MATCH": "PASS",
         "BAYER_LOGO": "PASS",
         "NAME_CARD_SPEAKER_MATCH": "PASS",
@@ -479,8 +471,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
-        "CLARITY": "PASS",
         "KEY_FIELD_MATCH": "PASS",
         "BAYER_LOGO": "PASS",
         "NAME_CARD_SPEAKER_MATCH": "PASS",
@@ -697,7 +687,6 @@
     "expect": {
       "overall_status": "FAIL",
       "rules": {
-        "CLARITY": "FAIL",
         "PANORAMA_COUNT": "FAIL",
         "KEY_FIELD_MATCH": "FAIL"
       },
@@ -1277,7 +1266,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
         "BAYER_LOGO": "PASS",
         "PANORAMA_COUNT": "PASS",
         "SIGNIN_DURATION": "PASS",
@@ -1337,7 +1325,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
         "BAYER_LOGO": "PASS",
         "PANORAMA_COUNT": "PASS",
         "SIGNIN_DURATION": "PASS",
@@ -1397,7 +1384,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
         "BAYER_LOGO": "PASS",
         "PANORAMA_COUNT": "PASS",
         "SIGNIN_DURATION": "PASS",
@@ -1469,7 +1455,6 @@
     "expect": {
       "overall_status": "PASS",
       "rules": {
-        "ASSET_TYPE_CHECK": "PASS",
         "BAYER_LOGO": "PASS",
         "PANORAMA_COUNT": "PASS",
         "SIGNIN_DURATION": "PASS",

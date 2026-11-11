@@ -4,12 +4,11 @@
 
 | 参数 | 默认 | 用途 |
 |------|------|------|
-| `clarity_threshold` | 0.60 | 本地 Laplacian 清晰度；低于则相关 OCR/模版规则偏 UNCERTAIN |
 | `human_confidence_threshold` | 0.75 | 类型等置信度灰区门槛 |
 | `watermark_time_skew_minutes` | 120 | 海报等材料上日程起止时间相对会议时段容差（**不做时间水印检测**） |
 | `name_match_mode` | fuzzy | 讲者/台卡姓名比对 |
-| `image_phash_max_distance` | 10 | IMAGE_DUP pHash 汉明距离 ≤ 判盗用（压缩/同图优先） |
-| `image_similarity_threshold` | 0.92 | IMAGE_DUP 轻量 embedding 余弦 ≥ 判近似盗用（轻度裁剪/调色兜底） |
+| `image_phash_max_distance` | 10 | IMAGE_DUP：有人物 / 手册等 pHash 汉明距离 ≤ 判盗用；**海报/电子海报/展架不适用**（仅 distance=0） |
+| `image_similarity_threshold` | 0.92 | IMAGE_DUP：有人物 / 手册等 embedding 余弦 ≥ 判近似；**海报/电子海报/展架不做余弦** |
 | `template_similarity_pass` | 0.85 | 台卡/权益模版 PASS |
 | `template_similarity_fail` | 0.65 | 低于则 FAIL；中间灰区 UNCERTAIN |
 | `ncc_hit_threshold` | 0.62 | 模版 NCC hit |

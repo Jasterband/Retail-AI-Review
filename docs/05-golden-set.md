@@ -86,8 +86,6 @@
 
 | rule_code | 期望 status | 备注 |
 |-----------|-------------|------|
-| ASSET_TYPE_CHECK | PASS | |
-| CLARITY | PASS | 样例清晰 |
 | KEY_FIELD_MATCH | PASS | 海报日期地点讲者与表单一致 |
 | BAYER_LOGO | PASS | 海报/展架/电子日程含赞助方「拜耳医药保健有限公司」 |
 | NAME_CARD_SPEAKER_MATCH | PASS | 余艳红/刘亭/袁芳/高芳 |
@@ -95,7 +93,6 @@
 | SIGNIN_DURATION | PASS | >120（结算 130 分钟） |
 | SPEAKER_SHOT_PAIR | PASS | 4 人各 2 张 |
 | SPEAKER_TOPIC_OCR | PASS | 标题页主题与表单一致（需正确填 topic） |
-| TOPIC_REUSE | PASS | 主题库无同讲者同标题 |
 | HANDBOOK_DETECT | PASS 或 SKIP | **无独立手册图时 SKIP/缺口** |
 | HANDBOOK_NOT_STALE | PASS 或 SKIP | 同上 |
 
@@ -125,7 +122,7 @@
 | Panorama | `参会人员.jpg` |
 | SignSheet | `会议签到表.pdf` |
 
-**期望规则：** `PPT_TEMPLATE_MATCH` PASS、`PPT_PAGE_KIND` PASS、`BAYER_LOGO` PASS、`PANORAMA_COUNT` PASS（≥6）、`SIGNIN_DURATION` PASS（>30）、`SIGNIN_RATIO_AND_STORES` PASS、`TOPIC_REUSE` PASS（若有标题合影）。（水印规则已下线）
+**期望规则：** `PPT_TEMPLATE_MATCH` PASS、`PPT_PAGE_KIND` PASS、`BAYER_LOGO` PASS、`PANORAMA_COUNT` PASS（≥6）、`SIGNIN_DURATION` PASS（>30）、`SIGNIN_RATIO_AND_STORES` PASS。（水印 / 主题跨会复用规则已下线）
 
 ### B2. session_no=`000089` — 淮安广济 单讲者
 
@@ -175,7 +172,6 @@
 
 | ID | 类型 | 构造方式 | 期望 overall | 期望触发 rule |
 |----|------|----------|--------------|---------------|
-| N01 | 模糊图 | 高斯模糊合格海报 | NEED_HUMAN | CLARITY + KEY_FIELD_MATCH UNCERTAIN |
 | N02 | 错模版 | 旧 VI / 非规定权益页（微型） | FAIL | `PPT_TEMPLATE_MATCH`（微型权益） |
 | N03 | 无 Logo / 无赞助方 | 微型遮挡 Logo；大讲堂遮挡/抹掉「拜耳医药保健有限公司」 | FAIL | BAYER_LOGO |
 | N04 | 旧手册封面 | 往期手册标题/版式 | FAIL | HANDBOOK_NOT_STALE |
@@ -183,14 +179,13 @@
 | N06 | 台卡缺人 | 仅 3 个台卡入镜 | FAIL | NAME_CARD_SPEAKER_MATCH |
 | N07 | 台卡错名 | 姓名与表单不符 | FAIL | NAME_CARD_SPEAKER_MATCH |
 | N08 | 人数不足 | 全景明显 <35 / 微型 <6 | FAIL | PANORAMA_COUNT |
-| N09 | 主题重复 | 另一场同讲者使用相同课件标题（讲者照） | FAIL | TOPIC_REUSE |
+| N09 | ~~主题重复~~ | 主题跨会复用已下线 | — | — |
 | N09b | 跨会议图片完全重复 | 本场上传与**另一会议**完全相同的文件 | FAIL | IMAGE_DUP |
 | N09c | 跨会议图片近似重复 | 本场上传与**另一会议**近似相似的图（压缩/裁剪） | FAIL | IMAGE_DUP |
 | N10 | 投影严重倾斜 | 微型权益照极端角度 | NEED_HUMAN 或 FAIL | PPT_TEMPLATE_MATCH |
 | N11 | 签到时长不足 | 伪造短时长表头 | FAIL | SIGNIN_DURATION |
 | N12 | 签到门店单一 | 微型听众均同一门店 | FAIL | SIGNIN_RATIO_AND_STORES |
 | N13 | ~~水印日期错误~~ | 水印规则已下线 | — | — |
-| N14 | 类别错挂 | 全景图声明为 Poster | FAIL | ASSET_TYPE_CHECK |
 | N15 | S3 404 | 错误 file_url | ERROR | S3_NOT_FOUND |
 | N16 | 讲者缺过程照 | 大讲堂仅 SpeakerTitle | FAIL | SPEAKER_SHOT_PAIR |
 | N17 | 主题不一致 | 标题合影课件≠表单 topic | FAIL | SPEAKER_TOPIC_OCR |

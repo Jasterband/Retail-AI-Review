@@ -11,8 +11,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from app.services.pipeline.asset_context import AssetContext
 from app.services.rules.base import RuleOutcome, fail, pass_, skip, uncertain
-from app.services.rules.common import _is_blurry
-
 
 def _flag_conf(
     vision: dict, flag_key: str, conf_key: str
@@ -125,10 +123,6 @@ def rule_ppt_template_match(
             "confidence": conf,
         }
         evidence["checks"].append(item)
-
-        if _is_blurry(c, options) and flag is not True:
-            uncs.append({**item, "reason": "画面模糊，模版特征不可靠"})
-            continue
 
         if flag is True and conf >= thr_pass:
             passes.append(item)
@@ -258,7 +252,7 @@ def rule_ppt_page_kind(
     if any(k is None or k == "OTHER" for _, k in kinds):
         return uncertain(
             "PPT_PAGE_KIND",
-            "OCR_LOW_CONFIDENCE",
+            "TEMPLATE_UNCERTAIN",
             "权益页类（介绍/日程）识别不清",
             related=related,
             evidence=evidence,
@@ -268,7 +262,7 @@ def rule_ppt_page_kind(
     if len(set(values)) < 2:
         return fail(
             "PPT_PAGE_KIND",
-            "TYPE_MISMATCH",
+            "TEMPLATE_MISMATCH",
             "两张权益页页类重复或缺少「项目介绍/日程」组合",
             related=related,
             evidence=evidence,
@@ -283,7 +277,7 @@ def rule_ppt_page_kind(
         )
     return fail(
         "PPT_PAGE_KIND",
-        "TYPE_MISMATCH",
+        "TEMPLATE_MISMATCH",
         "页类错误或重复",
         related=related,
         evidence=evidence,
@@ -293,6 +287,7 @@ def rule_ppt_page_kind(
 def rule_signin_ratio_and_stores(
     contexts: List[AssetContext], form: dict, options: dict
 ) -> RuleOutcome:
+    """微型签到门店种类（人数改由 SIGNIN_AUDIENCE 单独判定）。"""
     from app.services.pipeline.aggregate import merge_signin_sheets
     from app.services.thresholds import merge_thresholds
 
@@ -300,57 +295,36 @@ def rule_signin_ratio_and_stores(
     if not merged:
         return skip("SIGNIN_RATIO_AND_STORES", "无签到")
     thr = merge_thresholds(options)
-    n_speakers = len(form.get("speakers") or [])
-    need_audience = n_speakers * int(thr.get("signin_audience_per_speaker", 6))
     min_stores = int(thr.get("signin_min_store_kinds", 2))
     related = list(merged.get("photo_ids") or [])
     page_n = int(merged.get("page_count") or len(related) or 1)
-
-    audience = merged.get("audience_count")
     uniq_stores = set(merged.get("store_names") or [])
+    evidence = {
+        "stores": list(uniq_stores),
+        "need_stores": min_stores,
+        "page_count": page_n,
+        "pages": merged.get("pages"),
+    }
 
-    if audience is None and not uniq_stores:
+    if not uniq_stores:
         return uncertain(
             "SIGNIN_RATIO_AND_STORES",
             "OCR_LOW_CONFIDENCE",
-            "签到表听众/门店识别困难",
+            "签到表听众门店识别困难",
             related=related,
+            evidence=evidence,
         )
-
-    problems = []
-    if audience is not None and audience < need_audience:
-        problems.append(
-            "听众数{0}<讲者数×6（{1}）（{2}页合计）".format(
-                audience, need_audience, page_n
-            )
-        )
-    if uniq_stores and len(uniq_stores) < min_stores:
-        problems.append(
-            "听众门店种类不足{0}（当前{1}）".format(min_stores, len(uniq_stores))
-        )
-    if problems:
+    if len(uniq_stores) < min_stores:
         return fail(
             "SIGNIN_RATIO_AND_STORES",
             "COUNT_BELOW_THRESHOLD",
-            "；".join(problems),
+            "听众门店种类不足{0}（当前{1}）".format(min_stores, len(uniq_stores)),
             related=related,
-            evidence={
-                "audience": audience,
-                "need_audience": need_audience,
-                "stores": list(uniq_stores),
-                "page_count": page_n,
-                "pages": merged.get("pages"),
-            },
+            evidence=evidence,
         )
     return pass_(
         "SIGNIN_RATIO_AND_STORES",
-        "签到听众人数与门店种类满足要求（{0}页合计）".format(page_n),
+        "签到听众门店种类满足要求（{0}页合计）".format(page_n),
         related=related,
-        evidence={
-            "audience": audience,
-            "need_audience": need_audience,
-            "stores": list(uniq_stores),
-            "page_count": page_n,
-            "pages": merged.get("pages"),
-        },
+        evidence=evidence,
     )

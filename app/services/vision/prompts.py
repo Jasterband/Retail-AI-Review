@@ -6,7 +6,6 @@ SYSTEM = (
     "你是药师会零售会议材料审核助手。根据图片返回严格 JSON（不要 markdown）。"
     "不适用的字段填 null。"
     "材料类型已由上游声明，不要猜测或改写类型。"
-    "清晰度由本地算法计算，无需也不要返回 clarity_score。"
 )
 
 SCHEMA_HINT = """
@@ -48,9 +47,7 @@ SCHEMA_HINT = """
     "duration_minutes": number|null,
     "audience_count": number|null,
     "store_names": string[]|null,
-    "is_printed_form": boolean|null,
     "has_handwritten_signatures": boolean|null,
-    "signin_template_ok": boolean|null,
     "header_complete": boolean|null,
     "rows_complete": boolean|null,
     "incomplete_row_count": number|null,
@@ -156,21 +153,18 @@ def user_prompt(photo_type: str, project_type: str) -> str:
             "不抽水印。"
         ),
         "SignSheet": (
-            "这是【打印出来的签到表】扫描/照片（可多页之一）：纸质打印表格，"
-            "供参会者在姓名栏旁【手写签名】。"
+            "这是签到表扫描/照片（可多页之一）。"
             "请抽取：会议开始/结束时间、时长分钟；"
             "audience_count=本页可见听众签名行数（勿估全场总数；多页由上游累加）；"
-            "听众所属门店名列表（若有）。"
-            "模版判定：is_printed_form=是否为印刷签到表（含表头栏位+姓名/签名列）；"
-            "has_handwritten_signatures=是否可见手写签字笔迹；"
-            "signin_template_ok=是印刷签到表（有手签更好，空白表头也可 true）。"
-            "截屏电子表、纯打印无签名栏、白纸乱写 → signin_template_ok=false。"
+            "听众所属门店名列表（若有）；"
+            "has_handwritten_signatures=是否可见手写签字笔迹。"
+            "不做签到表模版/是否印刷表判定。"
             "完整性核验（本页独立判，多页各自检）："
             "header_complete=本页若有表头区，则会议时间/时长/地点须已填写；"
             "纯续页无表头则 header_complete=null。"
             "rows_complete=凡已占用行（讲者签到+参会人员签到），"
-            "姓名/职称/连锁名称/签名四列都须有内容；末尾空白模板行可不填。"
-            "说明栏、其他/备注列不纳入必填。"
+            "除「其他」列外所有列（姓名/职称/连锁名称/签名等）都须有内容；"
+            "仅「其他」列允许空；末尾空白模板行可不填。"
             "incomplete_row_count=缺列的已占用行数；"
             "signin_complete_ok=header_complete不为false 且 rows_complete=true。"
         ),
@@ -179,7 +173,7 @@ def user_prompt(photo_type: str, project_type: str) -> str:
             "（handbook_ok）；务必读取封面上的年份数字写入 handbook_year 与"
             "ocr_fields.handbook_year（如 2026）。"
         ),
-    }.get(photo_type, "按声明类型抽取清晰度、可见文字与 Logo。")
+    }.get(photo_type, "按声明类型抽取可见文字与 Logo。")
 
     return (
         "项目类型: {pt}\n材料类型（PE 已声明，按此审核，勿改类型）: {dt}\n"

@@ -174,7 +174,6 @@
   ],
   "refs": {
     "template_pack_version": "2026Q2",
-    "topic_search_scope": "period",
     "image_dup_search_scope": "period"
   },
   "options": {

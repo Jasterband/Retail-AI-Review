@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from app.services.asset_fetch import FetchedObject, fetch_object
-from app.services.clarity_util import compute_clarity_score
 from app.services.embedding_util import compute_image_embedding
+from app.services.image_dup_policy import dup_category, uses_embedding_dup
 from app.services.phash_util import compute_phash
 from app.services.vision.client import VisionClient, VisionError
 
@@ -18,6 +18,7 @@ class AssetContext:
     photo_type: str
     file_url: str
     content_type: str
+    photo_type_name: Optional[str] = None
     speaker_id: Optional[str] = None
     body: Optional[bytes] = None
     fetch_error_code: Optional[str] = None
@@ -27,21 +28,10 @@ class AssetContext:
     phash: Optional[str] = None
     embedding: Optional[bytes] = None
     template_match: Dict[str, Any] = field(default_factory=dict)
-    local_clarity: Optional[float] = None
 
     @property
     def ok(self) -> bool:
         return self.body is not None and self.fetch_error_code is None
-
-    def clarity_score(self) -> Optional[float]:
-        # 以本地 Laplacian 为准；Vision 估分不稳定，仅作兜底
-        if self.local_clarity is not None:
-            return self.local_clarity
-        v = self.vision.get("clarity_score")
-        try:
-            return float(v) if v is not None else None
-        except (TypeError, ValueError):
-            return None
 
     def detected_type(self) -> Optional[str]:
         return self.vision.get("detected_type")
@@ -63,6 +53,7 @@ def build_contexts(
             photo_type=a["photo_type"],
             file_url=a["file_url"],
             content_type=a.get("content_type") or "image/jpeg",
+            photo_type_name=a.get("photo_type_name"),
             speaker_id=a.get("speaker_id"),
         )
         fetched: FetchedObject = fetch_object(ctx.file_url, ctx.content_type)
@@ -74,10 +65,10 @@ def build_contexts(
 
         ctx.body = fetched.body
         ctx.content_type = fetched.content_type
-        if fetched.body:
+        if fetched.body and dup_category(ctx.photo_type):
             ctx.phash = compute_phash(fetched.body)
-            ctx.embedding = compute_image_embedding(fetched.body)
-            ctx.local_clarity = compute_clarity_score(fetched.body)
+            if uses_embedding_dup(ctx.photo_type):
+                ctx.embedding = compute_image_embedding(fetched.body)
 
         try:
             ctx.vision = vision.analyze(

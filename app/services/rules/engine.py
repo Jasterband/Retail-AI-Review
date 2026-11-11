@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from sqlalchemy.orm import Session
 
@@ -10,6 +10,12 @@ from app.services.pipeline.asset_context import AssetContext
 from app.services.rules import common, hall, micro
 from app.services.rules.base import RuleOutcome
 from app.services.rules.registry import list_rule_codes_for_project
+
+
+def _as_outcomes(result: Union[RuleOutcome, List[RuleOutcome]]) -> List[RuleOutcome]:
+    if isinstance(result, list):
+        return result
+    return [result]
 
 
 def run_all_rules(
@@ -25,8 +31,6 @@ def run_all_rules(
 
     dispatch = {
         "ASSET_MISSING": lambda: common.rule_asset_missing(contexts, snap),
-        "ASSET_TYPE_CHECK": lambda: common.rule_photo_type_check(contexts, options),
-        "CLARITY": lambda: common.rule_clarity(contexts, options),
         "KEY_FIELD_MATCH": lambda: common.rule_key_field_match(contexts, form, options),
         "TIME_CONSISTENCY": lambda: common.rule_time_consistency(
             contexts, form, options
@@ -39,10 +43,10 @@ def run_all_rules(
         ),
         "SIGNIN_DURATION": lambda: common.rule_signin_duration(contexts, snap, options),
         "SIGNIN_COMPLETE": lambda: common.rule_signin_complete(contexts, options),
-        "IMAGE_DUP": lambda: common.rule_image_dup(contexts, snap, refs, options, db),
-        "TOPIC_REUSE": lambda: common.rule_topic_reuse(
-            contexts, snap, form, refs, options, db
+        "SIGNIN_AUDIENCE": lambda: common.rule_signin_audience(
+            contexts, snap, options
         ),
+        "IMAGE_DUP": lambda: common.rule_image_dup(contexts, snap, refs, options, db),
         "SPEAKER_COMPOSITION": lambda: common.rule_speaker_composition(
             contexts, options
         ),
@@ -74,5 +78,5 @@ def run_all_rules(
                 )
             )
         else:
-            results.append(fn())
+            results.extend(_as_outcomes(fn()))
     return results

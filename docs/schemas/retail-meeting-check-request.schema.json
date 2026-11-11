@@ -93,7 +93,7 @@
     "PePhoto": {
       "type": "object",
       "additionalProperties": true,
-      "required": ["photoId", "photoType", "fileUrl"],
+      "required": ["photoId", "photoType", "photoTypeName", "fileUrl"],
       "properties": {
         "photoId": { "type": "string", "minLength": 1, "maxLength": 36 },
         "photoType": {
@@ -112,13 +112,13 @@
             "SpeakerLecture"
           ]
         },
+        "photoTypeName": { "type": "string", "minLength": 1, "maxLength": 50 },
         "fileUrl": {
           "type": "string",
           "maxLength": 1000,
           "pattern": "^(s3|https?)://.+"
         },
-        "fileName": { "type": "string" },
-        "photoTypeName": { "type": "string" }
+        "fileName": { "type": "string" }
       }
     }
   }

@@ -340,7 +340,7 @@ components:
 
     PePhoto:
       type: object
-      required: [photoId, photoType, fileUrl]
+      required: [photoId, photoType, photoTypeName, fileUrl]
       properties:
         photoId:
           type: string
@@ -360,13 +360,16 @@ components:
             - SignSheet
             - EDMDisplay
             - ProjectIntro
+        photoTypeName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 材料中文名；simple 失败 comments 前缀为「photoTypeName：原因」
         fileUrl:
           type: string
           maxLength: 1000
           pattern: '^(s3|https?)://.+'
         fileName:
-          type: string
-        photoTypeName:
           type: string
 
     Speaker:
@@ -548,23 +551,31 @@ components:
 
     FailReason:
       type: object
-      required: [reason_text]
       properties:
         check:
           type: string
           nullable: true
+          description: full 可选
         reason_code:
           type: string
           nullable: true
         reason_text:
           type: string
+          nullable: true
+          description: full 可选中文；simple 用 comments
+        comments:
+          type: string
+          nullable: true
+          description: |
+            simple 后处理写入的中文说明。
+            photo_status=ERROR 或系统错误码（S3_* / MODEL_* / INTERNAL_ERROR）不附此字段。
 
     AssetResult:
       type: object
       required: [photo_id, photo_type, photo_status, fail_reasons]
       description: |
-        simple：photo_id / photo_type / photo_status / fail_reasons。
-        full：另含 checks、ocr、detections、debug 类字段。
+        simple：仅非 PASS 图；photo_id / photo_status(FAIL|UNCERTAIN|ERROR) / fail_reasons[{reason_code, comments?}]（不下发 photo_type；整场 PASS 时 photo_results=[]）。
+        full：另含 checks、ocr、detections、debug 类字段（含 PASS 图）。
       properties:
         photo_id:
           type: string
@@ -579,18 +590,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FailReason'
-        detected_type:
-          type: string
-          nullable: true
-        type_match:
-          type: boolean
-          nullable: true
-        clarity_score:
-          type: number
-          nullable: true
-        is_clear:
-          type: boolean
-          nullable: true
         is_blurry:
           type: boolean
           nullable: true
@@ -630,13 +629,6 @@ components:
           type: string
           nullable: true
         image_dup_ref_meeting_no:
-          type: string
-          nullable: true
-        topic_reuse_hit:
-          type: boolean
-          default: false
-          description: 仅讲者照：标题是否与历史主题重复
-        topic_reuse_ref_meeting_no:
           type: string
           nullable: true
         topic_text_ocr:

@@ -146,7 +146,11 @@ def legacy_flat_to_pe_envelope(data: Dict[str, Any]) -> Dict[str, Any]:
                         "photoType": p.get("photo_type") or p.get("photoType"),
                         "fileUrl": p.get("file_url") or p.get("fileUrl"),
                         "fileName": p.get("file_name") or p.get("fileName"),
-                        "photoTypeName": p.get("photo_type_name") or p.get("photoTypeName"),
+                        "photoTypeName": p.get("photo_type_name")
+                        or p.get("photoTypeName")
+                        or p.get("photo_type")
+                        or p.get("photoType")
+                        or "材料",
                     }
                     for p in photos
                     if isinstance(p, dict)
@@ -163,7 +167,11 @@ def legacy_flat_to_pe_envelope(data: Dict[str, Any]) -> Dict[str, Any]:
                     "photoType": p.get("photo_type") or p.get("photoType"),
                     "fileUrl": p.get("file_url") or p.get("fileUrl"),
                     "fileName": p.get("file_name") or p.get("fileName"),
-                    "photoTypeName": p.get("photo_type_name") or p.get("photoTypeName"),
+                    "photoTypeName": p.get("photo_type_name")
+                    or p.get("photoTypeName")
+                    or p.get("photo_type")
+                    or p.get("photoType")
+                    or "材料",
                 }
             )
 
@@ -176,6 +184,11 @@ def legacy_flat_to_pe_envelope(data: Dict[str, Any]) -> Dict[str, Any]:
             item = {
                 "photoId": p.get("photo_id") or p.get("photoId"),
                 "photoType": p.get("photo_type") or p.get("photoType"),
+                "photoTypeName": p.get("photo_type_name")
+                or p.get("photoTypeName")
+                or p.get("photo_type")
+                or p.get("photoType")
+                or "材料",
                 "fileUrl": p.get("file_url") or p.get("fileUrl"),
                 "fileName": p.get("file_name") or p.get("fileName"),
             }

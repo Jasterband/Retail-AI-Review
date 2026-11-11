@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pe.local/schemas/retail-meeting-check-response.schema.json",
   "title": "RetailMeetingCheckResponse (full)",
-  "description": "AI 侧 full 响应（排障 / 落库完整形态）。PE 线上默认 simple 最瘦形状见 docs/README-PE-simple对接.md 与 app/services/projection.py：仅 task_id、meeting_id、overall_status、photo_results[{photo_id,photo_status,fail_reasons[{reason_code}]}]、以及 ERROR 时的 error。本 schema 不要用来校验 PE simple 响应。业务 FAIL 与系统 ERROR 分离。",
+  "description": "AI 侧 full 响应（排障 / 落库完整形态）。PE 线上默认 simple 见 docs/README-PE-simple对接.md 与 app/services/projection.py：仅 task_id、meeting_id、overall_status、photo_results（仅非 PASS 图；整场 PASS 时 []；每项 photo_id/photo_status/fail_reasons[{reason_code,comments?}]; ERROR 图不附 comments）。本 schema 不要用来校验 PE simple 响应。业务 FAIL 与系统 ERROR 分离。",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -16,69 +16,125 @@
   "properties": {
     "response_mode": {
       "type": "string",
-      "enum": ["simple", "full"],
+      "enum": [
+        "simple",
+        "full"
+      ],
       "description": "full=本 schema 目标；simple 投影已瘦身，勿用本 schema 校验"
     },
-    "task_id": { "type": "string" },
+    "task_id": {
+      "type": "string"
+    },
     "meeting_id": {
       "type": "string",
       "minLength": 1,
       "maxLength": 36
     },
-    "job_id": { "type": ["integer", "null"] },
-    "attempt_no": { "type": ["integer", "null"], "minimum": 1 },
+    "job_id": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "attempt_no": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
     "overall_status": {
       "type": "string",
-      "enum": ["PASS", "FAIL", "NEED_HUMAN", "ERROR"]
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NEED_HUMAN",
+        "ERROR"
+      ]
     },
     "overall_confidence": {
-      "type": ["number", "null"],
+      "type": [
+        "number",
+        "null"
+      ],
       "minimum": 0,
       "maximum": 1,
       "description": "full 模式建议返回；simple 可省略"
     },
     "model_version": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "full 模式"
     },
     "template_pack_version": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "full 模式"
     },
     "summary_matched": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "合格要点中文列表"
     },
     "summary_failed": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "不合格原因中文列表"
     },
     "need_human_reasons": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "error": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": false,
-      "required": ["code", "message"],
+      "required": [
+        "code",
+        "message"
+      ],
       "properties": {
-        "code": { "type": "string" },
-        "message": { "type": "string" },
-        "retryable": { "type": "boolean", "default": false }
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean",
+          "default": false
+        }
       }
     },
     "photo_results": {
       "type": "array",
-      "items": { "$ref": "#/$defs/AssetResult" }
+      "items": {
+        "$ref": "#/$defs/AssetResult"
+      }
     },
     "rule_results": {
       "type": "array",
-      "items": { "$ref": "#/$defs/RuleResult" }
+      "items": {
+        "$ref": "#/$defs/RuleResult"
+      }
     },
     "debug": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "description": "仅 full：pipeline 步骤、中间产物引用等",
       "additionalProperties": true,
       "properties": {
@@ -87,27 +143,48 @@
           "items": {
             "type": "object",
             "properties": {
-              "step": { "type": "string" },
-              "ms": { "type": "number" },
-              "ok": { "type": "boolean" },
-              "message": { "type": "string" }
+              "step": {
+                "type": "string"
+              },
+              "ms": {
+                "type": "number"
+              },
+              "ok": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string"
+              }
             }
           }
         },
-        "artifact_refs": { "type": "object" },
-        "notes": { "type": "string" }
+        "artifact_refs": {
+          "type": "object"
+        },
+        "notes": {
+          "type": "string"
+        }
       }
     },
     "finished_at": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "date-time"
     },
     "processing_status": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "进行中时可用，如 RUNNING"
     },
     "message": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "进行中提示文案"
     }
   },
@@ -115,67 +192,112 @@
     "FailReason": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["reason_code"],
+      "required": [
+        "reason_code"
+      ],
       "properties": {
-        "check": { "type": ["string", "null"], "description": "full：对应 checks 键；simple 不返回" },
-        "reason_code": { "type": "string", "description": "机器码；simple 仅此字段" },
-        "reason_text": { "type": ["string", "null"], "description": "full：中文说明；simple 不返回，由 PE 本地映射" }
+        "check": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "full：对应 checks 键；simple 不返回"
+        },
+        "reason_code": {
+          "type": "string",
+          "description": "机器码"
+        },
+        "reason_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "full：规则原文说明"
+        },
+        "comments": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "simple 后处理中文说明；ERROR / 系统错误码不附"
+        }
       }
     },
     "AssetResult": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["photo_id", "photo_status", "fail_reasons"],
+      "required": [
+        "photo_id",
+        "photo_status",
+        "fail_reasons"
+      ],
       "properties": {
-        "photo_id": { "type": "string", "minLength": 1, "maxLength": 36 },
+        "photo_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 36
+        },
         "photo_type": {
           "type": "string",
           "description": "full：声明类型；simple 不返回"
         },
         "photo_status": {
           "type": "string",
-          "enum": ["PASS", "FAIL", "UNCERTAIN", "ERROR"],
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNCERTAIN",
+            "ERROR"
+          ],
           "description": "simple/full 均有；PE 展示用"
         },
         "fail_reasons": {
           "type": "array",
-          "items": { "$ref": "#/$defs/FailReason" },
-          "description": "不合格/待人工原因；通过时为空数组。simple 仅含 reason_code"
-        },
-        "detected_type": {
-          "type": ["string", "null"],
-          "description": "full"
-        },
-        "type_match": { "type": ["boolean", "null"] },
-        "clarity_score": {
-          "type": ["number", "null"],
-          "minimum": 0,
-          "maximum": 1
-        },
-        "is_clear": { "type": ["boolean", "null"] },
-        "is_blurry": {
-          "type": ["boolean", "null"],
-          "description": "兼容旧字段；建议用 is_clear"
+          "items": {
+            "$ref": "#/$defs/FailReason"
+          },
+          "description": "不合格/待人工原因；通过时为空数组。simple：reason_code + comments（ERROR 除外）"
         },
         "checks": {
           "type": "object",
-          "description": "full：检测点全量。含 image_not_duplicated（全图）、topic_not_reused_in_period（仅讲者照）等",
+          "description": "full：检测点全量。含 image_not_duplicated（全图）、topic_matches_form（仅讲者标题合影）等",
           "additionalProperties": {
-            "type": ["boolean", "null"]
+            "type": [
+              "boolean",
+              "null"
+            ]
           }
         },
         "uncertain_checks": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
-        "ocr_fields": { "type": ["object", "null"] },
+        "ocr_fields": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
         "ocr_raw": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "full：OCR 原文"
         },
-        "detections": { "type": ["object", "null"] },
+        "detections": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
         "model_scores": {
-          "type": ["object", "null"],
+          "type": [
+            "object",
+            "null"
+          ],
           "description": "full：子模型分数"
         },
         "image_dup_hit": {
@@ -184,28 +306,54 @@
           "description": "本张是否与其他会议照片重复（跨会议混用；完全一致或近似相似）"
         },
         "image_dup_kind": {
-          "type": ["string", "null"],
-          "enum": ["exact", "similar", null]
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "exact",
+            "similar",
+            null
+          ]
         },
         "image_dup_score": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": 0,
           "maximum": 1
         },
-        "image_dup_ref_meeting_id": { "type": ["string", "null"] },
-        "image_dup_ref_meeting_no": { "type": ["string", "null"] },
-        "topic_reuse_hit": {
-          "type": "boolean",
-          "default": false,
-          "description": "讲者照OCR标题是否与历史主题重复"
+        "image_dup_ref_meeting_id": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
-        "topic_reuse_ref_meeting_no": { "type": ["string", "null"] },
-        "topic_text_ocr": { "type": ["string", "null"] },
+        "image_dup_ref_meeting_no": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "topic_text_ocr": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "fetch_error": {
-          "type": ["object", "null"],
+          "type": [
+            "object",
+            "null"
+          ],
           "properties": {
-            "code": { "type": "string" },
-            "message": { "type": "string" }
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
           }
         }
       }
@@ -213,33 +361,67 @@
     "RuleResult": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rule_code", "status"],
+      "required": [
+        "rule_code",
+        "status"
+      ],
       "properties": {
-        "rule_code": { "type": "string" },
+        "rule_code": {
+          "type": "string"
+        },
         "passed": {
-          "type": ["boolean", "null"],
+          "type": [
+            "boolean",
+            "null"
+          ],
           "description": "true通过 / false不通过 / null不确定或跳过"
         },
         "status": {
           "type": "string",
-          "enum": ["PASS", "FAIL", "SKIP", "UNCERTAIN"]
+          "enum": [
+            "PASS",
+            "FAIL",
+            "SKIP",
+            "UNCERTAIN"
+          ]
         },
         "confidence": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": 0,
           "maximum": 1,
           "description": "full 建议返回"
         },
-        "trigger_human": { "type": "boolean", "default": false },
-        "reason_code": { "type": ["string", "null"] },
-        "reason_text": { "type": ["string", "null"] },
+        "trigger_human": {
+          "type": "boolean",
+          "default": false
+        },
+        "reason_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason_text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "evidence": {
-          "type": ["object", "null"],
+          "type": [
+            "object",
+            "null"
+          ],
           "description": "full：比对明细等"
         },
         "related_photo_ids": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

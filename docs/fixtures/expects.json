@@ -49,7 +49,6 @@
       "讲者未拍到脸(243)"
     ],
     "rules": {
-      "CLARITY": "FAIL",
       "PANORAMA_COUNT": "FAIL",
       "KEY_FIELD_MATCH": "FAIL"
     }

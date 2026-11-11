@@ -61,9 +61,9 @@ class PePhoto(BaseModel):
 
     photoId: str = Field(min_length=1, max_length=36)
     photoType: PhotoType
+    photoTypeName: str = Field(min_length=1, max_length=50)
     fileUrl: str = Field(max_length=1000)
     fileName: Optional[str] = None
-    photoTypeName: Optional[str] = None
 
     @field_validator("fileUrl")
     @classmethod
@@ -120,7 +120,6 @@ class Refs(BaseModel):
 
     template_pack_version: Optional[str] = None
     logo_ref_s3: Optional[str] = None
-    topic_search_scope: Literal["period", "all"] = "period"
     image_dup_search_scope: Literal["period", "all"] = "period"
     duplicate_search_scope: Optional[Literal["period", "all"]] = None
 
@@ -128,7 +127,6 @@ class Refs(BaseModel):
 class Options(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    clarity_threshold: float = 0.6
     human_confidence_threshold: float = 0.75
     # 仅用于海报等材料上的日程起止时间容差；不做时间水印检测
     watermark_time_skew_minutes: int = 120
@@ -211,6 +209,7 @@ class RetailMeetingCheckRequest(BaseModel):
                     {
                         "photo_id": p.photoId,
                         "photo_type": p.photoType,
+                        "photo_type_name": p.photoTypeName,
                         "file_url": p.fileUrl,
                         "content_type": infer_content_type(p.fileUrl, p.fileName),
                         "sort": n,
@@ -223,6 +222,7 @@ class RetailMeetingCheckRequest(BaseModel):
                 {
                     "photo_id": p.photoId,
                     "photo_type": p.photoType,
+                    "photo_type_name": p.photoTypeName,
                     "file_url": p.fileUrl,
                     "content_type": infer_content_type(p.fileUrl, p.fileName),
                     "sort": n,

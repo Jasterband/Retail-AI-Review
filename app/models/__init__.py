@@ -5,7 +5,6 @@ from app.models.tables import (
     AiRuleResult,
     AiStepLog,
     ImageDupHistory,
-    TopicHistory,
 )
 
 __all__ = [
@@ -15,5 +14,4 @@ __all__ = [
     "AiStepLog",
     "AiArtifact",
     "ImageDupHistory",
-    "TopicHistory",
 ]

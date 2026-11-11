@@ -7,8 +7,12 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import ImageDupHistory, TopicHistory
+from app.models import ImageDupHistory
 from app.services.embedding_util import embedding_similarity
+from app.services.image_dup_policy import (
+    DUP_EXACT_ONLY,
+    dup_category,
+)
 from app.services.phash_util import phash_distance
 from app.services.pipeline.asset_context import AssetContext
 from app.services.rules.base import RuleOutcome, fail, pass_, skip, uncertain
@@ -17,7 +21,6 @@ from app.services.text_norm import (
     fuzzy_contains,
     name_set_equal,
     normalize_name,
-    normalize_topic,
     time_to_minutes,
 )
 from app.services.thresholds import (
@@ -109,149 +112,152 @@ def rule_asset_missing(
     )
 
 
-def rule_photo_type_check(
-    contexts: List[AssetContext], options: dict
-) -> RuleOutcome:
-    """材料类型以 PE 声明的 photo_type 为准，不做视觉分类比对。"""
-    del options  # 保留签名与引擎一致
-    related = [c.photo_id for c in contexts if c.ok]
-    if not related:
-        return skip("ASSET_TYPE_CHECK", "无可用材料")
-    return pass_(
-        "ASSET_TYPE_CHECK",
-        "以 PE 声明 photo_type 为准，不做视觉分类",
-        related=related,
-    )
-
-
-def rule_clarity(contexts: List[AssetContext], options: dict) -> RuleOutcome:
-    thr = float(_opts(options).get("clarity_threshold", 0.6))
-    blurry = []
-    related = []
-    for c in contexts:
-        if not c.ok:
-            continue
-        related.append(c.photo_id)
-        score = c.clarity_score()
-        if score is None:
-            continue
-        if score < thr:
-            blurry.append((c.photo_id, score))
-    if blurry:
-        return uncertain(
-            "CLARITY",
-            "BLURRY",
-            "清晰度不足: " + ", ".join(
-                "asset {0}={1:.2f}".format(a, s) for a, s in blurry
-            ),
-            related=[b[0] for b in blurry],
-            evidence={"threshold": thr, "scores": blurry},
-        )
-    if not related:
-        return skip("CLARITY", "无可用图片")
-    return pass_("CLARITY", "材料清晰度达标", related=related)
-
-
-def _is_blurry(c: AssetContext, options: dict) -> bool:
-    thr = float(_opts(options).get("clarity_threshold", 0.6))
-    s = c.clarity_score()
-    return s is not None and s < thr
-
-
 def rule_key_field_match(
     contexts: List[AssetContext], form: dict, options: dict
-) -> RuleOutcome:
-    types = {
-        "Poster",
-        "Stand",
-        "EDM",
-        "EDMDisplay",
-        "SpeakerTitle",
-        "Panorama",
-        "SignSheet",
-    }
+) -> List[RuleOutcome]:
+    """对台账字段拆码：DATE / LOCATION / SPEAKER_NAME（时间见 TIME_CONSISTENCY）。
+
+    适用材料对齐《按材料类型-图像检测清单_枚举检测点》检测点定义表。
+    """
+    date_types = {"SpeakerTitle", "EDM", "Poster", "Stand", "SignSheet"}
+    loc_types = {"EDM", "Poster", "Stand", "SignSheet"}
+    # 海报类比姓名集合；标题合影比该讲者姓名（台卡另走 NAME_SET_MISMATCH）
+    poster_name_types = {"EDM", "Poster", "Stand"}
+    title_name_types = {"SpeakerTitle"}
+
     mode = _opts(options).get("name_match_mode", "fuzzy")
     form_date = form.get("meeting_date")
     form_loc = form.get("meeting_location") or ""
     form_names = [s["speaker_name"] for s in form.get("speakers") or []]
-    checked = []
-    fails = []
-    uncs = []
+    speakers_by_id = {
+        s["speaker_id"]: s for s in form.get("speakers") or [] if s.get("speaker_id")
+    }
+
+    date_fails: List[str] = []
+    loc_fails: List[str] = []
+    name_fails: List[str] = []
+    related: List[str] = []
+    uncs: List[str] = []
+    saw = False
 
     for c in contexts:
-        if c.photo_type not in types or not c.ok:
+        if not c.ok:
+            continue
+        pt = c.photo_type
+        if pt not in date_types | loc_types | poster_name_types | title_name_types:
             continue
         if c.vision_error:
             uncs.append(c.photo_id)
             continue
-        checked.append(c.photo_id)
-        if _is_blurry(c, options):
-            uncs.append(c.photo_id)
-            continue
         of = c.ocr_fields()
-        date_ok = True
-        loc_ok = True
-        names_ok = True
-        if of.get("meeting_date") and form_date:
-            date_ok = date_equal(of.get("meeting_date"), form_date)
-        ocr_loc = of.get("meeting_location") or of.get("location")
-        if ocr_loc and form_loc:
-            loc_ok = fuzzy_contains(ocr_loc, form_loc) or fuzzy_contains(
-                form_loc, ocr_loc
-            )
-        raw_names = of.get("speaker_names") or []
-        if isinstance(raw_names, str):
-            ocr_names = [raw_names] if raw_names.strip() else []
-        elif isinstance(raw_names, list):
-            ocr_names = raw_names
-        else:
-            ocr_names = []
-        if ocr_names and form_names and c.photo_type in (
-            "Poster",
-            "Stand",
-            "EDM",
-            "TableCard",
-        ):
-            cmp = name_set_equal(ocr_names, form_names, mode)
-            names_ok = cmp["ok"] or len(cmp["missing"]) == 0
-        if not date_ok or not loc_ok or not names_ok:
-            fails.append(c.photo_id)
+        related.append(c.photo_id)
+        saw = True
 
-    if fails:
-        return fail(
-            "KEY_FIELD_MATCH",
-            "FIELD_MISMATCH",
-            "关键字段与表单不一致，材料: {0}".format(fails),
-            related=fails,
+        if pt in date_types and of.get("meeting_date") and form_date:
+            if not date_equal(of.get("meeting_date"), form_date):
+                date_fails.append(c.photo_id)
+
+        if pt in loc_types:
+            ocr_loc = of.get("meeting_location") or of.get("location")
+            if ocr_loc and form_loc:
+                if not (
+                    fuzzy_contains(ocr_loc, form_loc)
+                    or fuzzy_contains(form_loc, ocr_loc)
+                ):
+                    loc_fails.append(c.photo_id)
+
+        if pt in poster_name_types and form_names:
+            raw_names = of.get("speaker_names") or []
+            if isinstance(raw_names, str):
+                ocr_names = [raw_names] if raw_names.strip() else []
+            elif isinstance(raw_names, list):
+                ocr_names = raw_names
+            else:
+                ocr_names = []
+            if ocr_names:
+                cmp = name_set_equal(ocr_names, form_names, mode)
+                if not (cmp["ok"] or len(cmp["missing"]) == 0):
+                    name_fails.append(c.photo_id)
+
+        if pt in title_name_types:
+            sp = speakers_by_id.get(c.speaker_id) or {}
+            expect = sp.get("speaker_name")
+            visible = of.get("speaker_name_on_slide")
+            if not visible:
+                names = of.get("speaker_names")
+                if isinstance(names, list) and names:
+                    visible = names[0]
+                elif isinstance(names, str) and names.strip():
+                    visible = names.strip()
+            if visible and expect:
+                ok = name_set_equal([visible], [expect], mode)["ok"] or (
+                    normalize_name(visible) == normalize_name(expect)
+                )
+                if not ok:
+                    name_fails.append(c.photo_id)
+
+    outcomes: List[RuleOutcome] = []
+    if date_fails:
+        outcomes.append(
+            fail(
+                "KEY_FIELD_MATCH",
+                "DATE_MISMATCH",
+                "日期是否和表单一致：不一致材料 {0}".format(date_fails),
+                related=date_fails,
+            )
         )
-    if uncs and not fails:
-        return uncertain(
-            "KEY_FIELD_MATCH",
-            "OCR_LOW_CONFIDENCE",
-            "关键字段 OCR 不可靠，材料: {0}".format(uncs),
-            related=uncs,
+    if loc_fails:
+        outcomes.append(
+            fail(
+                "KEY_FIELD_MATCH",
+                "LOCATION_MISMATCH",
+                "地点是否和表单一致：不一致材料 {0}".format(loc_fails),
+                related=loc_fails,
+            )
         )
-    if not checked:
-        return skip("KEY_FIELD_MATCH", "无对应材料")
-    return pass_(
-        "KEY_FIELD_MATCH",
-        "海报/展架等日期地点与表单一致",
-        related=checked,
-    )
+    if name_fails:
+        outcomes.append(
+            fail(
+                "KEY_FIELD_MATCH",
+                "SPEAKER_NAME_MISMATCH",
+                "讲者姓名是否与表单一致：不一致材料 {0}".format(name_fails),
+                related=name_fails,
+            )
+        )
+    if outcomes:
+        return outcomes
+    if uncs:
+        return [
+            uncertain(
+                "KEY_FIELD_MATCH",
+                "OCR_LOW_CONFIDENCE",
+                "关键字段 OCR 不可靠，材料: {0}".format(uncs),
+                related=uncs,
+            )
+        ]
+    if not saw:
+        return [skip("KEY_FIELD_MATCH", "无对应材料")]
+    return [
+        pass_(
+            "KEY_FIELD_MATCH",
+            "日期/地点/讲者姓名与表单一致",
+            related=related,
+        )
+    ]
 
 
 def rule_time_consistency(
     contexts: List[AssetContext], form: dict, options: dict
 ) -> RuleOutcome:
-    """只比对海报/展架等材料上的日程起止时间；不做时间水印检测。"""
+    """比对材料上的日程起止时间 → TIME_MISMATCH；不做时间水印检测。"""
     skew = int(_opts(options).get("watermark_time_skew_minutes", 120))
     start = time_to_minutes(form.get("start_time"))
     end = time_to_minutes(form.get("end_time"))
     if start is None or end is None:
         return skip("TIME_CONSISTENCY", "表单无时段")
 
-    # 日程类材料：比对画面上的 start_time / end_time（不是相机时间水印）
-    agenda_types = {"Poster", "Stand", "EDM", "EDMDisplay"}
+    # EDMDisplay 不做日程时间对台账；签到表/海报类做
+    agenda_types = {"Poster", "Stand", "EDM", "SignSheet"}
     related = []
     bad = []
     saw = False
@@ -277,8 +283,8 @@ def rule_time_consistency(
     if bad:
         return fail(
             "TIME_CONSISTENCY",
-            "FIELD_MISMATCH",
-            "部分材料日程时间偏离会议时段: {0}".format(bad),
+            "TIME_MISMATCH",
+            "时间是否和表单一致：不一致材料 {0}".format(bad),
             related=bad,
         )
     return pass_("TIME_CONSISTENCY", "各图日程时间与会议时段一致", related=related)
@@ -523,8 +529,8 @@ def rule_signin_duration(
     if best is None:
         return uncertain(
             "SIGNIN_DURATION",
-            "BLURRY",
-            "签到表模糊或无法可靠读取起止时间",
+            "OCR_LOW_CONFIDENCE",
+            "签到表无法可靠读取起止时间",
             related=related,
         )
     best = int(best)
@@ -556,9 +562,10 @@ def rule_signin_duration(
 
 
 def rule_signin_complete(
-    contexts: List[AssetContext], options: dict
+    contexts: List[AssetContext],
+    options: dict,
 ) -> RuleOutcome:
-    """每张签到表独立做完整性：表头（若有）+ 已占用行四列齐。"""
+    """签到表填写完整：每页独立；除「其他」列外，表头（若有）与已占用行均须填齐。"""
     from app.services.pipeline.aggregate import _signin_payload, merge_signin_sheets
 
     merged = merge_signin_sheets(contexts, options)
@@ -570,10 +577,6 @@ def rule_signin_complete(
     page_ev: List[dict] = []
     for c in contexts:
         if c.photo_type != "SignSheet" or not c.ok:
-            continue
-        if _is_blurry(c, options):
-            uncs.append(c.photo_id)
-            page_ev.append({"photo_id": c.photo_id, "skipped": "blurry"})
             continue
         p = _signin_payload(c)
         ok = p.get("complete_ok")
@@ -590,29 +593,85 @@ def rule_signin_complete(
         elif ok is None:
             uncs.append(c.photo_id)
 
+    evidence = {"pages": page_ev, "page_count": len(related)}
     if fails:
         return fail(
             "SIGNIN_COMPLETE",
             "SIGNIN_INCOMPLETE",
-            "签到表填写不完整（姓名/职称/连锁/签名或表头缺项），材料: {0}".format(
-                fails
-            ),
+            "签到表填写不完整（除「其他」外均须填写），材料: {0}".format(fails),
             related=fails,
-            evidence={"pages": page_ev},
+            evidence=evidence,
         )
-    if uncs and not fails:
+    if uncs:
         return uncertain(
             "SIGNIN_COMPLETE",
             "OCR_LOW_CONFIDENCE",
-            "签到表完整性无法可靠判定，材料: {0}".format(uncs),
+            "签到表填写完整性无法可靠判定，材料: {0}".format(uncs),
             related=uncs,
-            evidence={"pages": page_ev},
+            evidence=evidence,
         )
     return pass_(
         "SIGNIN_COMPLETE",
         "签到表填写完整（{0}页各自通过）".format(len(related)),
         related=related,
-        evidence={"pages": page_ev},
+        evidence=evidence,
+    )
+
+
+def rule_signin_audience(
+    contexts: List[AssetContext],
+    snap: dict,
+    options: dict,
+) -> RuleOutcome:
+    """签到表听众人数：多页合计达标（大讲堂≥35；微型≥讲者×6）。"""
+    from app.services.pipeline.aggregate import merge_signin_sheets
+    from app.services.thresholds import merge_thresholds, signin_audience_need
+
+    merged = merge_signin_sheets(contexts, options)
+    if not merged:
+        return skip("SIGNIN_AUDIENCE", "无签到")
+    related = list(merged.get("photo_ids") or [])
+    form = snap.get("form") or {}
+    thr = merge_thresholds(options)
+    need_aud = signin_audience_need(
+        snap.get("project_type") or "LECTURE_HALL",
+        snap.get("meeting_type"),
+        form,
+        thr,
+    )
+    page_n = int(merged.get("page_count") or len(related) or 1)
+    audience = merged.get("audience_count")
+    evidence = {
+        "audience_count": audience,
+        "need_audience": need_aud,
+        "page_count": page_n,
+        "pages": merged.get("pages"),
+    }
+    if audience is None:
+        return uncertain(
+            "SIGNIN_AUDIENCE",
+            "COUNT_UNCERTAIN",
+            "签到表听众人数无法可靠读取",
+            related=related,
+            evidence=evidence,
+        )
+    if int(audience) < need_aud:
+        return fail(
+            "SIGNIN_AUDIENCE",
+            "SIGNIN_COUNT_BELOW",
+            "签到表听众数{0}<要求{1}（{2}页合计）".format(
+                audience, need_aud, page_n
+            ),
+            related=related,
+            evidence=evidence,
+        )
+    return pass_(
+        "SIGNIN_AUDIENCE",
+        "签到表听众人数达标（{0}页合计{1}≥{2}）".format(
+            page_n, audience, need_aud
+        ),
+        related=related,
+        evidence=evidence,
     )
 
 
@@ -638,27 +697,47 @@ def rule_image_dup(
     if not history:
         return skip("IMAGE_DUP", "查重库为空（首场）")
 
+    # 库按有人/无人分组，本场每张只与同组历史比
+    hist_by_cat: Dict[str, List[ImageDupHistory]] = {"people": [], "material": []}
+    for h in history:
+        cat = dup_category(h.photo_type)
+        if cat:
+            hist_by_cat[cat].append(h)
+
     hits = []
     related = []
     for c in contexts:
-        if not c.ok or (not c.phash and not c.embedding):
+        cat = dup_category(c.photo_type)
+        if not c.ok or not cat or (not c.phash and not c.embedding):
             continue
         related.append(c.photo_id)
+        peers = hist_by_cat.get(cat) or []
+        if not peers:
+            continue
+
+        exact_only = c.photo_type in DUP_EXACT_ONLY
+        # 海报/电子海报/展架：仅 pHash 完全一致；其余：pHash≤阈值，必要时 embedding
+        phash_limit = 0 if exact_only else max_dist
         best_phash = None  # (dist, kind, hist)
         best_emb = None  # (sim, hist)
-        for h in history:
+        for h in peers:
             if c.phash and h.phash:
                 dist = phash_distance(c.phash, h.phash)
-                if dist <= max_dist and (best_phash is None or dist < best_phash[0]):
+                if dist <= phash_limit and (
+                    best_phash is None or dist < best_phash[0]
+                ):
                     kind = "exact" if dist == 0 else "similar"
                     best_phash = (dist, kind, h)
-            if c.embedding and getattr(h, "embedding", None):
+            if (
+                not exact_only
+                and c.embedding
+                and getattr(h, "embedding", None)
+            ):
                 sim = embedding_similarity(c.embedding, h.embedding)
                 if sim is not None and sim >= sim_thr and (
                     best_emb is None or sim > best_emb[0]
                 ):
                     best_emb = (sim, h)
-        # pHash 优先；否则用 embedding 近似
         if best_phash is not None:
             dist, kind, href = best_phash
             hits.append(
@@ -669,6 +748,7 @@ def rule_image_dup(
                     "kind": kind,
                     "method": "phash",
                     "distance": dist,
+                    "dup_category": cat,
                 }
             )
         elif best_emb is not None:
@@ -681,6 +761,7 @@ def rule_image_dup(
                     "kind": "similar",
                     "method": "embedding",
                     "similarity": round(float(sim), 4),
+                    "dup_category": cat,
                 }
             )
     if hits:
@@ -695,94 +776,13 @@ def rule_image_dup(
         )
     return pass_(
         "IMAGE_DUP",
-        "全部照片未盗用其他会议现场照（pHash+embedding）",
+        "未盗用其他会议同组材料（有人/无人分组；海报类仅完全一致）",
         related=related,
     )
 
 
-def rule_topic_reuse(
-    contexts: List[AssetContext],
-    snap: dict,
-    form: dict,
-    refs: dict,
-    options: dict,
-    db: Session,
-) -> RuleOutcome:
-    speakers = {s["speaker_id"]: s for s in form.get("speakers") or []}
-    titles = []
-    for c in contexts:
-        if c.photo_type != "SpeakerTitle" or not c.ok:
-            continue
-        of = c.ocr_fields()
-        topic = of.get("topic_title") or ""
-        if not topic and c.speaker_id in speakers:
-            topic = speakers[c.speaker_id].get("topic") or ""
-        # prefer OCR
-        topic_ocr = of.get("topic_title")
-        if not topic_ocr:
-            if _is_blurry(c, options):
-                continue
-            continue
-        titles.append(
-            {
-                "photo_id": c.photo_id,
-                "speaker_name": (speakers.get(c.speaker_id) or {}).get(
-                    "speaker_name", ""
-                ),
-                "topic_raw": topic_ocr,
-                "topic_normalized": normalize_topic(topic_ocr),
-            }
-        )
-
-    if not titles:
-        return skip("TOPIC_REUSE", "无标题合影或抽不出标题")
-
-    scope = (refs or {}).get("topic_search_scope") or "period"
-    project_id = snap.get("project_id")
-    meeting_id = snap["meeting_id"]
-    q = select(TopicHistory).where(
-        (TopicHistory.meeting_id.is_(None)) | (TopicHistory.meeting_id != meeting_id)
-    )
-    if scope == "period" and project_id is not None:
-        q = q.where(TopicHistory.project_id == project_id)
-    history = list(db.scalars(q).all())
-    if not history:
-        return skip("TOPIC_REUSE", "主题库为空")
-
-    hits = []
-    for t in titles:
-        sp_name = normalize_name(t.get("speaker_name") or "")
-        for h in history:
-            if not t["topic_normalized"] or t["topic_normalized"] != h.topic_normalized:
-                continue
-            # 同主题 + 同讲者名（或历史缺讲者名）才判复用
-            hist_sp = normalize_name(h.speaker_name or "")
-            if hist_sp and sp_name and hist_sp != sp_name:
-                continue
-            hits.append(
-                {
-                    "photo_id": t["photo_id"],
-                    "topic": t["topic_raw"],
-                    "speaker_name": t.get("speaker_name"),
-                    "ref_meeting_no": h.meeting_no,
-                    "ref_meeting_id": h.meeting_id,
-                    "ref_speaker_name": h.speaker_name,
-                }
-            )
-            break
-    related = [t["photo_id"] for t in titles]
-    if hits:
-        return fail(
-            "TOPIC_REUSE",
-            "TOPIC_REUSED",
-            "讲者照主题与历史会议重复",
-            related=[h["photo_id"] for h in hits],
-            evidence={"hits": hits},
-        )
-    return pass_("TOPIC_REUSE", "讲者照 OCR 标题未与历史主题重复", related=related)
-
-
 # WATERMARK_CONSISTENCY 已下线：时间/日期/地点水印均不审核。
+# TOPIC_REUSE 已下线：主题跨会复用不再审核。
 
 
 def _truthy_flag(vision: dict, key: str) -> Optional[bool]:
@@ -865,10 +865,6 @@ def rule_speaker_composition(
     evidence_rows = []
     for c in titles:
         related.append(c.photo_id)
-        if _is_blurry(c, options or {}):
-            uncs.append(c.photo_id)
-            evidence_rows.append({"photo_id": c.photo_id, "kind": "title", "blurry": True})
-            continue
         comp = _speaker_title_composition(c)
         evidence_rows.append({"photo_id": c.photo_id, "kind": "title", **comp})
         if comp["ok"]:
@@ -886,12 +882,6 @@ def rule_speaker_composition(
 
     for c in lectures:
         related.append(c.photo_id)
-        if _is_blurry(c, options or {}):
-            uncs.append(c.photo_id)
-            evidence_rows.append(
-                {"photo_id": c.photo_id, "kind": "lecture", "blurry": True}
-            )
-            continue
         comp = _speaker_lecture_composition(c)
         evidence_rows.append({"photo_id": c.photo_id, "kind": "lecture", **comp})
         if comp["ok"]:
@@ -922,7 +912,7 @@ def rule_speaker_composition(
             )
         return fail(
             "SPEAKER_COMPOSITION",
-            "TYPE_MISMATCH",
+            "COMPOSITION_MISSING",
             "；".join(bits),
             related=[f["photo_id"] for f in fails],
             evidence={"rows": evidence_rows, "fails": fails},

@@ -345,8 +345,6 @@
 
   <script>
     const CHECK_LABELS = {
-      type_match: "类别与声明一致",
-      is_clear: "清晰度达标",
       image_not_duplicated: "未盗用他场照片",
       has_bayer_logo: "含拜耳 Logo",
       has_bayer_sponsor: "图最下方含赞助方「拜耳医药保健有限公司」",
@@ -357,7 +355,6 @@
       name_card_count_ok: "台卡人数与讲者人数一致",
       name_set_matches_speakers: "台卡姓名集合 = 讲者集合",
       topic_matches_form: "课件标题与表单 topic 一致",
-      topic_not_reused_in_period: "主题未在同期重复",
       speaker_title_composition_ok: "标题合影含讲者/标题/姓名/日期",
       speaker_lecture_composition_ok: "授课照含讲者与PPT",
       has_speaker_person: "画面有讲者本人",
@@ -700,7 +697,7 @@
       const preview = `
         <div class="preview">
           ${previewHtml(pack, m)}
-          <div class="cap">${escapeHtml(m.file)} · ${escapeHtml(m.photo_type)}${ar ? ` → ${escapeHtml(ar.detected_type || "—")} · clarity ${ar.clarity_score ?? "—"}` : ""}</div>
+          <div class="cap">${escapeHtml(m.file)} · ${escapeHtml(m.photo_type)}${ar ? "" : ""}</div>
         </div>`;
       if (!ar) {
         box.innerHTML = preview + `<div class="checks-pane"><p class="sub">尚无该材料审核结果（浏览场次或未跑审核）</p></div>`;
@@ -721,7 +718,7 @@
         ${preview}
         <div class="checks-pane">
           <h2>checks · 本张检测点</h2>
-          <p class="sub">photo_id=${ar.photo_id} · status=${escapeHtml(ar.photo_status || "—")} · type_match=${ar.type_match} · is_clear=${ar.is_clear}</p>
+          <p class="sub">photo_id=${ar.photo_id} · status=${escapeHtml(ar.photo_status || "—")}</p>
           <div class="check-legend">
             <span><i class="dot t"></i> true</span>
             <span><i class="dot f"></i> false</span>
